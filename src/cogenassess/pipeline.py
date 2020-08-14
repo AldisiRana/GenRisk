@@ -44,5 +44,5 @@ def plink_process(*, genes_folder, plink, bed, bim, fam):
     for gene in tqdm(genes, desc='calculating genes scores'):
         p = subprocess.call(
             plink + " --bed " + bed + " --bim " + bim +
-            " --fam " + fam + " --extract " + genes_folder + '/' + gene + ".v --score "
+            " --fam " + fam + " --extract /" + genes_folder + '/' + gene + ".v --score /"
             + genes_folder + '/' + gene + ".w 1 2 3  sum --out " + gene)
