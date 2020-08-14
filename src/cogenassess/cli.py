@@ -20,7 +20,7 @@ def score_genes(
     output_dir,
 ):
     click.echo('getting information from vcf files')
-    genes_folder = get_gene_info(vcf=vcf)
+    genes_folder = get_gene_info(vcf=vcf, output_dir=output_dir)
     plink_process(genes_folder=genes_folder, plink=plink, bed=bed, bim=bim, fam=fam)
     click.echo('process is done.')
 
