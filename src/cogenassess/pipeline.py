@@ -40,7 +40,7 @@ def get_gene_info(*, vcf, output_dir):
 
 
 def plink_process(*, genes_folder, plink, bed, bim, fam):
-    genes = [line.strip() for line in open(genes_folder + '.genes', 'r')]
+    genes = [line.strip() for line in open(genes_folder + '/' + genes_folder + '.genes', 'r')]
     for gene in tqdm(genes, desc='calculating genes scores'):
         p = subprocess.call(
             plink + " --bed " + bed + " --bim " + bim +
