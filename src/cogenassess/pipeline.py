@@ -45,6 +45,6 @@ def plink_process(*, genes_folder, plink, bed, bim, fam):
         try:
             p = subprocess.call(
                 plink + " --bed " + bed + " --bim " + bim +
-                " --fam " + fam + " --extract " + gene + ".v --score " + gene + ".w 1 2 3  sum --out " + gene)
+                " --fam " + fam + " --extract " + gene + ".v --score " + gene + ".w 1 2 3 sum --out " + gene)
         except:
             print('Cannot find ' + gene)
