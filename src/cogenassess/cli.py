@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import click
 
-from CoGenAssess.src.cogenassess.pipeline import get_gene_info, plink_process
+from .pipeline import get_gene_info, plink_process
 
 
 @click.command()
