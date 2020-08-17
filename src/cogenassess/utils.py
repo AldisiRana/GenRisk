@@ -6,6 +6,7 @@ import pandas as pd
 from pybiomart import Dataset
 import scipy.stats as stats
 import statsmodels.api as sm
+from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm
 
 
@@ -176,5 +177,8 @@ def find_pvalue(
         ).sort_values(by=['p_value'])
     else:
         raise Exception("The test you selected is not valid.")
+    if adj_pval:
+        adjusted = multipletests(list(p_values_df['p_value']), method=adj_pval, is_sorted=True)
+        p_values_df[adj_pval+'_adj_pval'] = adjusted
     p_values_df.to_csv(output_file, sep='\t', index=False)
     return p_values_df
