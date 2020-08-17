@@ -8,7 +8,8 @@ from scipy.stats import beta
 from tqdm import tqdm
 
 
-def get_gene_info(*, vcf, output_dir):
+def get_gene_info(*, vcf, output_dir, beta_param):
+    #different scoring schema
     line_number = 0
     with gzip.open(vcf, 'r') as infile:
         for line in infile:
@@ -22,7 +23,7 @@ def get_gene_info(*, vcf, output_dir):
     df.replace(to_replace=r'^AF=', value='', regex=True, inplace=True)
     df.replace(to_replace=r'^RawScore=', value='', regex=True, inplace=True)
     df.replace(to_replace=r'^gene=', value='', regex=True, inplace=True)
-    df['beta_AF'] = beta.pdf(df.AF.values.astype(float), 1, 25)
+    df['beta_AF'] = beta.pdf(df.AF.values.astype(float), beta_param[0], beta_param[1])
     df = df[df['AF'].values.astype(float) < 0.01]
     df['score'] = df['beta_AF'].values.astype(float) * df['RawScore'].values.astype(float)
     genes = list(set(df['gene']))
