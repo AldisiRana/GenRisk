@@ -170,7 +170,7 @@ def find_pvalue(
                 continue
             pval = list(result.pvalues)
             beta_coef = list(result.params)[1]
-            p_values.append([gene] + pval + beta_coef)
+            p_values.append([gene] + pval + [beta_coef])
         p_values_df = pd.DataFrame(
             p_values, columns=['genes', 'const_pval', 'p_value', 'PC1_pval', 'PC2_pvcal', 'PC3_pval', 'beta_coef']
         ).sort_values(by=['p_value'])
