@@ -177,7 +177,8 @@ def find_pvalue(
     else:
         raise Exception("The test you selected is not valid.")
     if adj_pval:
-        adjusted = multipletests(list(p_values_df['p_value']), method=adj_pval, is_sorted=True)
+        adjusted = multipletests(list(p_values_df['p_value']), method=adj_pval)
         p_values_df[adj_pval+'_adj_pval'] = list(adjusted)[1]
+        p_values_df = p_values_df.sort_values(by=[adj_pval+'_adj_pval'])
     p_values_df.to_csv(output_file, sep='\t', index=False)
     return p_values_df
