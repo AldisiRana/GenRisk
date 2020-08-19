@@ -137,7 +137,7 @@ def find_pvalue(
     elif test == 'logit':
         if not pc_file:
             raise Exception("Need principle components file.")
-        pc_df = pd.read_csv(pc_file, sep='\t', index_col=False)
+        pc_df = pd.read_csv(pc_file, sep=' ', index_col=False)
         merged_df = pd.merge(merged_df, pc_df, on=samples_column)
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
             X = merged_df[[gene, 'PC1', 'PC2', 'PC3']]
