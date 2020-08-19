@@ -50,9 +50,9 @@ def score_genes(
 @click.option('-c', '--cases-column', required=True, help="the name of the column that contains the case/control type.")
 @click.option('-m', '--samples-column', required=True, help="the name of the column that contains the samples.")
 @click.option('-p', '--pc-file', default=None, help="Principle components values for logistic regression.")
-@click.option('--adj-pval',type=click.Choice(
-    ['fdr', 'bonferroni', 'sidak', 'holm-sidak', 'holm', 'simes-hochberg', 'hommel',
-     'fdr', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
+@click.option('--adj-pval', type=click.Choice(
+    ['bonferroni', 'sidak', 'holm-sidak', 'holm',
+     'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
 def calculate_pval(
     *,
     scores_file,
