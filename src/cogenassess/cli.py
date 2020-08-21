@@ -20,6 +20,7 @@ def main():
 @click.option('--plink', default='plink')
 @click.option('-o', '--output-dir', required=True)
 @click.option('--beta-param', default=(1.0, 25.0), nargs=2, type=float)
+@click.option('--weight-func', default='beta', type=click.Choice(['beta', 'log10']))
 def score_genes(
     vcf,
     bed,
@@ -28,11 +29,12 @@ def score_genes(
     plink,
     beta_param,
     output_dir,
+    weight_func,
 ):
     # add beta values
     # check number of processes
     click.echo('getting information from vcf files')
-    genes_folder = get_gene_info(vcf=vcf, output_dir=output_dir, beta_param=beta_param)
+    genes_folder = get_gene_info(vcf=vcf, output_dir=output_dir, beta_param=beta_param, weight_func=weight_func)
     plink_process(genes_folder=genes_folder, plink=plink, bed=bed, bim=bim, fam=fam)
     click.echo('process is done.')
 

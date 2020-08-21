@@ -3,13 +3,13 @@ import os
 import subprocess
 
 import pandas as pd
+import numpy as np
 import gzip
 from scipy.stats import beta
 from tqdm import tqdm
 
 
-def get_gene_info(*, vcf, output_dir, beta_param):
-    #different scoring schema
+def get_gene_info(*, vcf, output_dir, beta_param, weight_func):
     line_number = 0
     with gzip.open(vcf, 'r') as infile:
         for line in infile:
@@ -23,9 +23,12 @@ def get_gene_info(*, vcf, output_dir, beta_param):
     df.replace(to_replace=r'^AF=', value='', regex=True, inplace=True)
     df.replace(to_replace=r'^RawScore=', value='', regex=True, inplace=True)
     df.replace(to_replace=r'^gene=', value='', regex=True, inplace=True)
-    df['beta_AF'] = beta.pdf(df.AF.values.astype(float), beta_param[0], beta_param[1])
     df = df[df['AF'].values.astype(float) < 0.01]
-    df['score'] = df['beta_AF'].values.astype(float) * df['RawScore'].values.astype(float)
+    if weight_func == 'beta':
+        df[weight_func] = beta.pdf(df.AF.values.astype(float), beta_param[0], beta_param[1])
+    elif weight_func == 'log10':
+        df[weight_func] = -np.log10(df.AF.values.astype(float))
+    df['score'] = df[weight_func].values.astype(float) * df['RawScore'].values.astype(float)
     genes = list(set(df['gene']))
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
