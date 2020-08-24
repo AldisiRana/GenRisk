@@ -23,6 +23,7 @@ def get_gene_info(*, vcf, output_dir, beta_param, weight_func):
     df.replace(to_replace=r'^AF=', value='', regex=True, inplace=True)
     df.replace(to_replace=r'^RawScore=', value='', regex=True, inplace=True)
     df.replace(to_replace=r'^gene=', value='', regex=True, inplace=True)
+    df.AF.replace(to_replace='.', value=np.nan, inplace=True)
     df = df[df['AF'].values.astype(float) < 0.01]
     if weight_func == 'beta':
         df[weight_func] = beta.pdf(df.AF.values.astype(float), beta_param[0], beta_param[1])
