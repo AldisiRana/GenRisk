@@ -37,9 +37,8 @@ def get_gene_info(*, vcf, output_dir, beta_param, weight_func):
     with open(gene_file, 'w') as f:
         for gene in genes:
             f.write("%s\n" % gene)
-    [df[df['gene'] == gene][['ID', 'ALT', 'score', 'gene']].to_csv(str(gene) + '.w', index=False, sep='\t') for gene in
-     genes]
-    [df[df['gene'] == gene][['ID']].to_csv(str(gene) + '.v', index=False, sep='\t') for gene in genes]
+            [df[df['gene'] == gene][['ID', 'ALT', 'score', 'gene']].to_csv(str(gene) + '.w', index=False, sep='\t') for gene in genes]
+            [df[df['gene'] == gene][['ID']].to_csv(str(gene) + '.v', index=False, sep='\t') for gene in genes]
     return output_dir
 
 
