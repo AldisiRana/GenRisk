@@ -35,6 +35,7 @@ def score_genes(
     # check number of processes
     click.echo('getting information from vcf files')
     genes_folder = get_gene_info(vcf=vcf, output_dir=output_dir, beta_param=beta_param, weight_func=weight_func)
+    click.echo('calculating gene scores ...')
     plink_process(genes_folder=genes_folder, plink=plink, bed=bed, bim=bim, fam=fam)
     click.echo('process is done.')
 
