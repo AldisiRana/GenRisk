@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import re
 import subprocess
 
 import pandas as pd
@@ -7,6 +8,8 @@ import numpy as np
 import gzip
 from scipy.stats import beta
 from tqdm import tqdm
+
+from cogenassess.utils import unisci
 
 
 def get_gene_info(*, vcf, output_dir, beta_param, weight_func):
@@ -41,6 +44,24 @@ def get_gene_info(*, vcf, output_dir, beta_param, weight_func):
             [df[df['gene'] == gene][['ID', 'ALT', 'score', 'gene']].to_csv(str(gene) + '.w', index=False, sep='\t') for gene in genes]
             [df[df['gene'] == gene][['ID']].to_csv(str(gene) + '.v', index=False, sep='\t') for gene in genes]
     return output_dir
+
+
+def combine_scores(
+    *,
+    input_path,
+    output_path,
+):
+    all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(input_path) for name in files]
+    profile_files = [f for f in all_files if re.match(r'.+profile$', f)]
+    df = pd.read_csv(str(profile_files[0]), usecols=['IID', 'SCORESUM'], sep=r'\s+')
+    r = re.compile(r'(\w+).profile$')
+    gene = r.findall(str(profile_files[0]))
+    df.rename(columns={'SCORESUM': gene[0]}, inplace=True)
+    pf = profile_files
+    for i in range(1, len(pf)-1):
+        df = unisci(df, pf[i])
+    df.to_csv(output_path, sep='\t', index=False)
+    return df
 
 
 def plink_process(*, genes_folder, plink, bed, bim, fam):

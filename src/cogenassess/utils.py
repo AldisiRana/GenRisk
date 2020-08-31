@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 
 import pandas as pd
 from pybiomart import Dataset
@@ -114,6 +115,7 @@ def find_pvalue(
     p_values = []
     if genes is None:
         genes = scores_df.columns.tolist()[1:]
+    # improvement: make it so that more than one statistical test can be used
     if test == 'mannwhitneyu':
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
             case_0 = df_by_cases.get_group(cases[0])[gene].tolist()
@@ -182,3 +184,12 @@ def find_pvalue(
         p_values_df = p_values_df.sort_values(by=[adj_pval+'_adj_pval'])
     p_values_df.to_csv(output_file, sep='\t', index=False)
     return p_values_df
+
+
+def unisci(df, f):
+    df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+')
+    r = re.compile(r'(w\+).profile$')
+    gene2 = r.findall(str(f))
+    df2.rename(columns={'SCORESUM': gene2[0]}, inplace=True)
+    df = pd.merge(df, df2, on='IID')
+    return df

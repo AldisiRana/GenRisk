@@ -4,7 +4,7 @@ import click
 import pandas as pd
 
 from .utils import normalize_gene_len, merge_matrices, find_pvalue
-from .pipeline import get_gene_info, plink_process
+from .pipeline import get_gene_info, plink_process, combine_scores
 
 
 @click.group()
@@ -18,7 +18,8 @@ def main():
 @click.option('--bim', required=True)
 @click.option('--fam', required=True)
 @click.option('--plink', default='plink')
-@click.option('-o', '--output-dir', required=True)
+@click.option('-t', '--temp-dir', required=True)
+@click.option('-o', '--output-file', required=True)
 @click.option('--beta-param', default=(1.0, 25.0), nargs=2, type=float)
 @click.option('--weight-func', default='beta', type=click.Choice(['beta', 'log10']))
 def score_genes(
@@ -28,16 +29,20 @@ def score_genes(
     fam,
     plink,
     beta_param,
-    output_dir,
+    temp_dir,
+    output_file,
     weight_func,
 ):
     # add beta values
     # check number of processes
     click.echo('getting information from vcf files')
-    genes_folder = get_gene_info(vcf=vcf, output_dir=output_dir, beta_param=beta_param, weight_func=weight_func)
+    genes_folder = get_gene_info(vcf=vcf, output_dir=temp_dir, beta_param=beta_param, weight_func=weight_func)
     click.echo('calculating gene scores ...')
     plink_process(genes_folder=genes_folder, plink=plink, bed=bed, bim=bim, fam=fam)
-    click.echo('process is done.')
+    click.echo('combining score files ...')
+    df = combine_scores(input_path=temp_dir, output_path=output_file)
+    click.echo(df.info())
+    click.echo('process is complete.')
 
 
 @main.command()
