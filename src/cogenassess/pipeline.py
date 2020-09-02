@@ -72,5 +72,6 @@ def plink_process(*, genes_folder, plink, bed, bim, fam):
         w_file = os.path.join(genes_folder, (gene + '.w'))
         p = subprocess.call(
             plink + " --bed " + bed + " --bim " + bim +
-            " --fam " + fam + " --extract " + v_file + " --score " + w_file + " 1 2 3 sum --out " + gene, shell=True
+            " --fam " + fam + " --extract " + v_file + " --score " + w_file + " 1 2 3 sum --out " +
+            os.path.join(genes_folder, gene), shell=True
         )
