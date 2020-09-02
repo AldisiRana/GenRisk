@@ -44,6 +44,19 @@ def score_genes(
     click.echo('process is complete.')
 
 
+@main.command
+@click.option('-v', '--vcf', required=True)
+@click.option('--bed', required=True)
+@click.option('--bim', required=True)
+@click.option('--fam', required=True)
+@click.option('--plink', default='plink')
+@click.option('--genes-folder', required=True)
+def run_plink(*, genes_folder, plink, bed, bim, fam):
+    click.echo('staring plink processing ...')
+    plink_process(genes_folder=genes_folder, plink=plink, bed=bed, bim=bim, fam=fam)
+    click.echo('plink processing is complete.')
+
+
 @main.command()
 @click.option('-s', '--scores-file', required=True, help="The scoring file of genes across a population.")
 @click.option('--scores-file-sep', default='\t', help="the seperator for scores files")
