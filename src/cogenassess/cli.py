@@ -33,7 +33,6 @@ def score_genes(
     output_file,
     weight_func,
 ):
-    # add beta values
     # check number of processes
     click.echo('getting information from vcf files')
     genes_folder = get_gene_info(vcf=vcf, output_dir=temp_dir, beta_param=beta_param, weight_func=weight_func)

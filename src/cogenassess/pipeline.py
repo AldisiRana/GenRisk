@@ -36,13 +36,14 @@ def get_gene_info(*, vcf, output_dir, beta_param, weight_func):
     genes = list(set(df['gene']))
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
-    os.chdir(output_dir)
     gene_file = output_dir + '.genes'
-    with open(gene_file, 'w') as f:
+    with open(os.path.join(output_dir, gene_file), 'w') as f:
         for gene in genes:
             f.write("%s\n" % gene)
-            [df[df['gene'] == gene][['ID', 'ALT', 'score', 'gene']].to_csv(str(gene) + '.w', index=False, sep='\t') for gene in genes]
-            [df[df['gene'] == gene][['ID']].to_csv(str(gene) + '.v', index=False, sep='\t') for gene in genes]
+            [df[df['gene'] == gene][['ID', 'ALT', 'score', 'gene']].to_csv(os.path.join(output_dir, (str(gene) + '.w')),
+                                                                           index=False, sep='\t') for gene in genes]
+            [df[df['gene'] == gene][['ID']].to_csv(os.path.join(output_dir, (str(gene) + '.v')),
+                                                   index=False, sep='\t') for gene in genes]
     return output_dir
 
 
@@ -65,12 +66,11 @@ def combine_scores(
 
 
 def plink_process(*, genes_folder, plink, bed, bim, fam):
-    genes = [line.strip() for line in open(genes_folder + '.genes', 'r')]
+    genes = [line.strip() for line in open(os.path.join(genes_folder, (genes_folder + '.genes')), 'r')]
     for gene in tqdm(genes, desc='calculating genes scores'):
-        try:
-            p = subprocess.call(
-                plink + " --bed " + bed + " --bim " + bim +
-                " --fam " + fam + " --extract " + gene + ".v --score " + gene + ".w 1 2 3 sum --out " + gene, shell=True
-            )
-        except:
-            print('Cannot find ' + gene)
+        v_file = os.path.join(genes_folder, (gene + '.v'))
+        w_file = os.path.join(genes_folder, (gene + '.w'))
+        p = subprocess.call(
+            plink + " --bed " + bed + " --bim " + bim +
+            " --fam " + fam + " --extract " + v_file + " --score " + w_file + " 1 2 3 sum --out " + gene, shell=True
+        )
