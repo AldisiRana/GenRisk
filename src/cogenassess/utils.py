@@ -3,6 +3,7 @@
 import os
 import re
 
+import numpy as np
 import pandas as pd
 from pybiomart import Dataset
 import scipy.stats as stats
@@ -187,7 +188,7 @@ def find_pvalue(
 
 
 def unisci(df, f):
-    df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+')
+    df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
     r = re.compile(r'(\w+).profile$')
     gene2 = r.findall(str(f))
     df2.rename(columns={'SCORESUM': gene2[0]}, inplace=True)
