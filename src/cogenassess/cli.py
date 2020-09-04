@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import click
+import shutil
 
 import pandas as pd
 
@@ -22,6 +23,7 @@ def main():
 @click.option('-o', '--output-file', required=True)
 @click.option('--beta-param', default=(1.0, 25.0), nargs=2, type=float)
 @click.option('--weight-func', default='beta', type=click.Choice(['beta', 'log10']))
+@click.option('--remove-temp', default=True)
 def score_genes(
     vcf,
     bed,
@@ -32,6 +34,7 @@ def score_genes(
     temp_dir,
     output_file,
     weight_func,
+    remove_temp,
 ):
     # check number of processes
     click.echo('getting information from vcf files')
@@ -41,6 +44,8 @@ def score_genes(
     click.echo('combining score files ...')
     df = combine_scores(input_path=temp_dir, output_path=output_file)
     click.echo(df.info())
+    if remove_temp:
+        shutil.rmtree(temp_dir)
     click.echo('process is complete.')
 
 
