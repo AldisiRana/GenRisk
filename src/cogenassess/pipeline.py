@@ -59,7 +59,7 @@ def combine_scores(
     gene = r.findall(str(profile_files[0]))
     df.rename(columns={'SCORESUM': gene[0]}, inplace=True)
     pf = profile_files
-    for i in range(1, len(pf)-1):
+    for i in tqdm(range(1, len(pf)-1), desc='merging in process'):
         df = unisci(df, pf[i])
     df.to_csv(output_path, sep='\t', index=False)
     return df
