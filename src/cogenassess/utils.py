@@ -188,7 +188,7 @@ def find_pvalue(
 
 def unisci(df, f):
     df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+')
-    r = re.compile(r'(w\+).profile$')
+    r = re.compile(r'(\w+).profile$')
     gene2 = r.findall(str(f))
     df2.rename(columns={'SCORESUM': gene2[0]}, inplace=True)
     df = pd.merge(df, df2, on='IID')
