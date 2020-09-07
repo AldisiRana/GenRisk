@@ -14,7 +14,7 @@ def main():
 
 
 @main.command()
-@click.option('-v', '--vcf', required=True)
+@click.option('-v', '--vcf', required=True, help='the annotated vcf file')
 @click.option('--bed', required=True)
 @click.option('--bim', required=True)
 @click.option('--fam', required=True)
