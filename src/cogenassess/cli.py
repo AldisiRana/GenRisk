@@ -114,15 +114,19 @@ def calculate_pval(
 @main.command()
 @click.option('-i', '--input-path', required=True, help="The directory that contains the matrices to merge.")
 @click.option('-o', '--output-path', required=True, help='the path for the output file.')
+@click.option('-r', '--remove-input', flag=True, help='if flagged will remove input folder')
 def merge(
     *,
     output_path,
     input_path,
+    remove_input,
 ):
     """This command merges all matrices in a directory into one big matrix"""
     click.echo("Starting the merging process")
     df = combine_scores(input_path=input_path, output_path=output_path)
     click.echo(df.info())
+    if remove_input:
+        shutil.rmtree(input_path)
     click.echo("Merging is done.")
 
 
