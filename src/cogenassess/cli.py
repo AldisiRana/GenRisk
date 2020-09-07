@@ -63,9 +63,7 @@ def run_plink(*, genes_folder, plink, bed, bim, fam):
 
 @main.command()
 @click.option('-s', '--scores-file', required=True, help="The scoring file of genes across a population.")
-@click.option('--scores-file-sep', default='\t', help="the seperator for scores files")
 @click.option('-i', '--genotype-file', required=True, help="File containing information about the cohort.")
-@click.option('--genotype-file-sep', default='\t', help="The file separator")
 @click.option('-o', '--output-path', required=True, help='the path for the output file.')
 @click.option('-g', '--genes',
               help="a list containing the genes to calculate. if not provided all genes will be used.")
@@ -87,19 +85,16 @@ def calculate_pval(
     samples_column,
     test,
     pc_file,
-    scores_file_sep,
-    genotype_file_sep,
     adj_pval,
 ):
     """Calculate the P-value between two given groups."""
-    scores_df = pd.read_csv(scores_file, sep=scores_file_sep)
+    scores_df = pd.read_csv(scores_file, sep=r'\s+')
 
     click.echo("The process for calculating the p_values will start now.")
     df = find_pvalue(
         scores_df=scores_df,
         output_file=output_path,
         genotype_file=genotype_file,
-        genotype_file_sep=genotype_file_sep,
         genes=genes,
         cases_column=cases_column,
         samples_column=samples_column,
@@ -135,21 +130,18 @@ def merge(
 @click.option('-g', '--genes-lengths-file',
               help="The file containing the lengths of genes. If not provided it will be produced.")
 @click.option('-o', '--output-path', required=True, help='the path for the output file.')
-@click.option('--file-sep', default='\t', help="the seperator for scores files")
 @click.option('-s', '--samples-col', default='patient_id', help='the name of the samples column')
 def normalize(
     *,
     matrix_file,
     genes_lengths_file=None,
     output_path=None,
-    file_sep='\t',
     samples_col
 ):
     """This command normalizes the scoring matrix by gene length."""
     click.echo("Normalization in process.")
     normalize_gene_len(
         matrix_file=matrix_file,
-        file_sep=file_sep,
         genes_lengths_file=genes_lengths_file,
         output_path=output_path,
         samples_col=samples_col

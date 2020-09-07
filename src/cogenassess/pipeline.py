@@ -3,7 +3,6 @@ import os
 import re
 import subprocess
 
-import numpy as np
 import pandas as pd
 import numpy as np
 import gzip
@@ -20,7 +19,7 @@ def get_gene_info(*, vcf, output_dir, beta_param, weight_func):
             line_number = line_number + 1
             if line.startswith(b'#CHR'):
                 break
-    df = pd.read_csv(vcf, usecols=['ID', 'ALT', 'INFO'], sep="\t", skiprows=line_number - 1)
+    df = pd.read_csv(vcf, usecols=['ID', 'ALT', 'INFO'], sep=r'\s+', skiprows=line_number - 1)
     df = df[df.INFO.str.contains('AF=', regex=True, na=False) & df.INFO.str.contains(
         'RawScore=', regex=True, na=False) & df.INFO.str.contains('gene=', regex=True, na=False)]
     df[['PR', 'AF', 'RawScore', 'PHRED', 'gene']] = df.INFO.str.split(";", expand=True, )

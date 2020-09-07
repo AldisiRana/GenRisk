@@ -18,7 +18,6 @@ def merge_matrices(
     output_path,
     samples_col,
     scores_col,
-    file_sep='\t',
     file_suffix='.tsv'
 ):
     """
@@ -32,7 +31,7 @@ def merge_matrices(
     for filename in tqdm(os.listdir(directory), desc="merging matrices"):
         if not filename.endswith(file_suffix):
             continue
-        data = pd.read_csv(os.path.join(directory, filename), sep=file_sep, usecols=samples_col+[scores_col])
+        data = pd.read_csv(os.path.join(directory, filename), sep=r'\s+', usecols=samples_col+[scores_col])
         gene_name = filename.split('.')[0]
         data = data.rename(columns={scores_col: gene_name})
         full_data = pd.merge(data, full_data, on=samples_col, how='left')
@@ -45,7 +44,6 @@ def normalize_gene_len(
     genes_lengths_file=None,
     matrix_file,
     samples_col,
-    file_sep='\t',
     output_path
 ):
     """
@@ -57,7 +55,7 @@ def normalize_gene_len(
     :return: a normalized dataframe.
     """
     if genes_lengths_file:
-        genes_df = pd.read_csv(genes_lengths_file, sep='\t')
+        genes_df = pd.read_csv(genes_lengths_file, sep=r'\s+')
     else:
         gene_dataset = Dataset(name='hsapiens_gene_ensembl', host='http://www.ensembl.org')
         genes_df = gene_dataset.query(
@@ -68,7 +66,7 @@ def normalize_gene_len(
         row['Gene name']: round((row['Gene end (bp)'] - row['Gene start (bp)']) / 1000, 3)
         for _, row in genes_df.iterrows()
     }
-    scores_df = pd.read_csv(matrix_file, sep=file_sep)
+    scores_df = pd.read_csv(matrix_file, sep=r'\s+')
     unnormalized = []
     for (name, data) in tqdm(scores_df.iteritems(), desc="Normalizing genes scores"):
         if name == samples_col:
@@ -95,7 +93,6 @@ def find_pvalue(
     samples_column,
     pc_file=None,
     test='mannwhitneyu',
-    genotype_file_sep='\t',
     adj_pval,
 ):
     """
@@ -109,7 +106,7 @@ def find_pvalue(
     :param cases_column: the name of the column containing cases and controls information.
     :return: dataframe with genes and their p_values
     """
-    genotype_df = pd.read_csv(genotype_file, sep=genotype_file_sep, usecols=[samples_column, cases_column])
+    genotype_df = pd.read_csv(genotype_file, sep=r'\s+', usecols=[samples_column, cases_column])
     merged_df = pd.merge(genotype_df, scores_df, on=samples_column, how='right')
     df_by_cases = merged_df.groupby(cases_column)
     cases = list(df_by_cases.groups.keys())
@@ -140,7 +137,7 @@ def find_pvalue(
     elif test == 'logit':
         if not pc_file:
             raise Exception("Need principle components file.")
-        pc_df = pd.read_csv(pc_file, sep=' ', index_col=False)
+        pc_df = pd.read_csv(pc_file, sep=r'\s+', index_col=False)
         merged_df = pd.merge(merged_df, pc_df, on=samples_column)
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
             X = merged_df[[gene, 'PC1', 'PC2', 'PC3']]
@@ -160,7 +157,7 @@ def find_pvalue(
     elif test == 'glm':
         if not pc_file:
             raise Exception("Need principle components file.")
-        pc_df = pd.read_csv(pc_file, sep=' ', index_col=False)
+        pc_df = pd.read_csv(pc_file, sep=r'\s+', index_col=False)
         merged_df = pd.merge(merged_df, pc_df, on=samples_column)
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
             X = merged_df[[gene, 'PC1', 'PC2', 'PC3']]
