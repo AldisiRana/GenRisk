@@ -114,7 +114,7 @@ def calculate_pval(
 @main.command()
 @click.option('-i', '--input-path', required=True, help="The directory that contains the matrices to merge.")
 @click.option('-o', '--output-path', required=True, help='the path for the output file.')
-@click.option('-r', '--remove-input', flag=True, help='if flagged will remove input folder')
+@click.option('-r', '--remove-input', is_flag=True, help='if flagged will remove input folder')
 def merge(
     *,
     output_path,
