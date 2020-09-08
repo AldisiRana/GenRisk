@@ -31,7 +31,7 @@ def get_gene_info(*, vcf, output_dir, beta_param, weight_func):
     if weight_func == 'beta':
         df[weight_func] = beta.pdf(df.AF.values.astype(float), beta_param[0], beta_param[1])
     elif weight_func == 'log10':
-        df[weight_func].replace(0.0, 1.0, inplace=True)
+        df.AF.replace(0.0, 1.0, inplace=True)
         df[weight_func] = -np.log10(df.AF.values.astype(float))
         df[weight_func].replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
     df['score'] = df[weight_func].values.astype(float) * df['RawScore'].values.astype(float)
