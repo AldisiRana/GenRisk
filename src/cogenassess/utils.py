@@ -107,7 +107,7 @@ def find_pvalue(
     :return: dataframe with genes and their p_values
     """
     genotype_df = pd.read_csv(genotype_file, sep=r'\s+', usecols=[samples_column, cases_column])
-    merged_df = pd.merge(genotype_df, scores_df, on=samples_column, how='right')
+    merged_df = pd.merge(genotype_df, scores_df, on=samples_column)
     df_by_cases = merged_df.groupby(cases_column)
     cases = list(df_by_cases.groups.keys())
     p_values = []
@@ -179,7 +179,6 @@ def find_pvalue(
     if adj_pval:
         adjusted = multipletests(list(p_values_df['p_value']), method=adj_pval)
         p_values_df[adj_pval+'_adj_pval'] = list(adjusted)[1]
-        p_values_df = p_values_df.sort_values(by=[adj_pval+'_adj_pval'])
     p_values_df.to_csv(output_file, sep='\t', index=False)
     return p_values_df
 
