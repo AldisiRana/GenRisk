@@ -23,7 +23,7 @@ def main():
 @click.option('-o', '--output-file', required=True)
 @click.option('--beta-param', default=(1.0, 25.0), nargs=2, type=float)
 @click.option('--weight-func', default='beta', type=click.Choice(['beta', 'log10']))
-@click.option('--remove-temp', default=True)
+@click.option('--remove-temp', is_flag=True)
 def score_genes(
     vcf,
     bed,
