@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 
 import click
 import shutil
@@ -165,9 +166,16 @@ def calc_corr(
 ):
     """Calculate the pearson's correlation between same genes in two scoring matices."""
     with open(first_file) as f:
-        genes = f.readline().strip('\n').split(r'\s+').remove(samples_col)
+        genes_01 = re.split('\s+', f.readline().strip('\n')).remove(samples_col)
+    with open(second_file) as f:
+        genes_02 = re.split('\s+', f.readline().strip('\n')).remove(samples_col)
+    as_set = set(genes_01)
+    common_genes = as_set.intersection(genes_02)
+    genes = list(common_genes)
     corr_info = []
     for gene in tqdm(genes, desc='calculating correlation'):
+        if gene not in second_df.columns:
+            continue
         first_df = pd.read_csv(first_file, sep=r'\s+', index_col=False, usecols=[samples_col, gene])
         second_df = pd.read_csv(second_file, sep=r'\s+', index_col=False, usecols=[samples_col, gene])
         gene_df = pd.merge(first_df, second_df, on='IID')
