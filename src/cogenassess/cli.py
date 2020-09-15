@@ -169,7 +169,7 @@ def calc_corr(
         genes_01 = re.split('\s+', f.readline().strip('\n'))
         genes_01.remove(samples_col)
     with open(second_file) as f:
-        genes_02 = re.split('\s+', f.readline().strip('\n')).remove(samples_col)
+        genes_02 = re.split('\s+', f.readline().strip('\n'))
         genes_02.remove(samples_col)
     as_set = set(genes_01)
     common_genes = as_set.intersection(genes_02)
