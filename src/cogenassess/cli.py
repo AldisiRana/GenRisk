@@ -175,7 +175,7 @@ def calc_corr(
         gene_df = pd.merge(first_df, second_df, on='IID')
         corr, pval = pearsonr(gene_df[gene+'_x'], gene_df[gene+'_y'])
         corr_info.append([gene, corr, pval])
-    corr_df = pd.DataFrame(corr_info, columns=['genes', 'corr', 'p_value'])
+    corr_df = pd.DataFrame(corr_info, columns=['genes', 'corr', 'p_value']).sort_values(by=['p_value'])
     corr_df.to_csv(output_file, sep='\t', index=False)
     click.echo('Process is complete.')
     click.echo(corr_df.info())
