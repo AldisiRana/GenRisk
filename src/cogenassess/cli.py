@@ -175,10 +175,10 @@ def calc_corr(
     common_genes = as_set.intersection(genes_02)
     genes = list(common_genes)
     corr_info = []
+    first_df = pd.read_csv(first_file, sep=r'\s+', index_col=False)
+    second_df = pd.read_csv(second_file, sep=r'\s+', index_col=False)
     for gene in tqdm(genes, desc='calculating correlation'):
-        first_df = pd.read_csv(first_file, sep=r'\s+', index_col=False, usecols=[samples_col, gene])
-        second_df = pd.read_csv(second_file, sep=r'\s+', index_col=False, usecols=[samples_col, gene])
-        gene_df = pd.merge(first_df, second_df, on='IID')
+        gene_df = pd.merge(first_df[samples_col, gene], second_df[samples_col, gene], on=samples_col)
         corr, pval = pearsonr(gene_df[gene+'_x'], gene_df[gene+'_y'])
         corr_info.append([gene, corr, pval])
     corr_df = pd.DataFrame(corr_info, columns=['genes', 'corr', 'p_value']).sort_values(by=['p_value'])
