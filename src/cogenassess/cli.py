@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+import csv
+
 import click
 import shutil
 
 import pandas as pd
+from scipy.stats import pearsonr
+from tqdm import tqdm
 
-from .utils import normalize_gene_len, merge_matrices, find_pvalue
+from .utils import normalize_gene_len, find_pvalue
 from .pipeline import get_gene_info, plink_process, combine_scores
 
 
@@ -130,7 +134,7 @@ def merge(
 @click.option('-g', '--genes-lengths-file',
               help="The file containing the lengths of genes. If not provided it will be produced.")
 @click.option('-o', '--output-path', required=True, help='the path for the output file.')
-@click.option('-s', '--samples-col', default='patient_id', help='the name of the samples column')
+@click.option('-s', '--samples-col', default='IID', help='the name of the samples column')
 def normalize(
     *,
     matrix_file,
@@ -146,6 +150,35 @@ def normalize(
         output_path=output_path,
         samples_col=samples_col
     )
+
+
+@main.command()
+@click.option('--first-file', required=True)
+@click.option('--second-file', required=True)
+@click.option('--samples_col', default='IID')
+@click.option('--output_file', required=True)
+def calc_corr(
+    *,
+    first_file,
+    second_file,
+    samples_col,
+    output_file,
+):
+    """Calculate the pearson's correlation between same genes in two scoring matices."""
+    with open(first_file) as f:
+        reader = csv.reader(f)
+        genes = reader.next().split(r'\s+').remove(samples_col)
+    corr_info = []
+    for gene in tqdm(genes, desc='calculating correlation'):
+        first_df = pd.read_csv(first_file, sep=r'\s+', index_col=False, usecols=[samples_col, gene])
+        second_df = pd.read_csv(second_file, sep=r'\s+', index_col=False, usecols=[samples_col, gene])
+        gene_df = pd.merge(first_df, second_df, on='IID')
+        corr, pval = pearsonr(gene_df[gene+'_x'], gene_df[gene+'_y'])
+        corr_info.append([gene, corr, pval])
+    corr_df = pd.DataFrame(corr_info, columns=['genes', 'corr', 'p_value'])
+    corr_df.to_csv(output_file, sep='\t', index=False)
+    click.echo('Process is complete.')
+    click.echo(corr_df.info())
 
 
 if __name__ == '__main__':
