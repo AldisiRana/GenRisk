@@ -166,9 +166,11 @@ def calc_corr(
 ):
     """Calculate the pearson's correlation between same genes in two scoring matices."""
     with open(first_file) as f:
-        genes_01 = re.split('\s+', f.readline().strip('\n')).remove(samples_col)
+        genes_01 = re.split('\s+', f.readline().strip('\n'))
+        genes_01.remove(samples_col)
     with open(second_file) as f:
         genes_02 = re.split('\s+', f.readline().strip('\n')).remove(samples_col)
+        genes_02.remove(samples_col)
     as_set = set(genes_01)
     common_genes = as_set.intersection(genes_02)
     genes = list(common_genes)
