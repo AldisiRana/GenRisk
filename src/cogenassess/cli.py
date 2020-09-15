@@ -176,8 +176,6 @@ def calc_corr(
     genes = list(common_genes)
     corr_info = []
     for gene in tqdm(genes, desc='calculating correlation'):
-        if gene not in second_df.columns:
-            continue
         first_df = pd.read_csv(first_file, sep=r'\s+', index_col=False, usecols=[samples_col, gene])
         second_df = pd.read_csv(second_file, sep=r'\s+', index_col=False, usecols=[samples_col, gene])
         gene_df = pd.merge(first_df, second_df, on='IID')
