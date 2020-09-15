@@ -178,7 +178,7 @@ def calc_corr(
     first_df = pd.read_csv(first_file, sep=r'\s+', index_col=False)
     second_df = pd.read_csv(second_file, sep=r'\s+', index_col=False)
     for gene in tqdm(genes, desc='calculating correlation'):
-        gene_df = pd.merge(first_df[samples_col, gene], second_df[samples_col, gene], on=samples_col)
+        gene_df = pd.merge(first_df[[samples_col, gene]], second_df[[samples_col, gene]], on=samples_col)
         corr, pval = pearsonr(gene_df[gene+'_x'], gene_df[gene+'_y'])
         corr_info.append([gene, corr, pval])
     corr_df = pd.DataFrame(corr_info, columns=['genes', 'corr', 'p_value']).sort_values(by=['p_value'])
