@@ -5,6 +5,7 @@ import click
 import shutil
 
 import pandas as pd
+import numpy as np
 from scipy.stats import pearsonr
 from tqdm import tqdm
 
@@ -179,6 +180,7 @@ def calc_corr(
     second_df = pd.read_csv(second_file, sep=r'\s+', index_col=False)
     for gene in tqdm(genes, desc='calculating correlation'):
         gene_df = pd.merge(first_df[[samples_col, gene]], second_df[[samples_col, gene]], on=samples_col)
+        gene_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
         corr, pval = pearsonr(gene_df[gene+'_x'], gene_df[gene+'_y'])
         corr_info.append([gene, corr, pval])
     corr_df = pd.DataFrame(corr_info, columns=['genes', 'corr', 'p_value']).sort_values(by=['p_value'])
