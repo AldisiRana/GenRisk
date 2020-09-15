@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import csv
 
 import click
 import shutil
@@ -155,8 +154,8 @@ def normalize(
 @main.command()
 @click.option('--first-file', required=True)
 @click.option('--second-file', required=True)
-@click.option('--samples_col', default='IID')
-@click.option('--output_file', required=True)
+@click.option('--samples-col', default='IID')
+@click.option('--output-file', required=True)
 def calc_corr(
     *,
     first_file,
@@ -166,8 +165,7 @@ def calc_corr(
 ):
     """Calculate the pearson's correlation between same genes in two scoring matices."""
     with open(first_file) as f:
-        reader = csv.reader(f)
-        genes = reader.next().split(r'\s+').remove(samples_col)
+        genes = f.readline().strip('\n').split(r'\s+').remove(samples_col)
     corr_info = []
     for gene in tqdm(genes, desc='calculating correlation'):
         first_df = pd.read_csv(first_file, sep=r'\s+', index_col=False, usecols=[samples_col, gene])
