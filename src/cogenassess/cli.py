@@ -72,7 +72,7 @@ def run_plink(*, genes_folder, plink, bed, bim, fam):
 @click.option('-o', '--output-path', required=True, help='the path for the output file.')
 @click.option('-g', '--genes',
               help="a list containing the genes to calculate. if not provided all genes will be used.")
-@click.option('-t', '--test', required=True, type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'glm']),
+@click.option('-t', '--test', required=True, type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'glm', 'betareg']),
               help='statistical test for calculating P value.')
 @click.option('-c', '--cases-column', required=True, help="the name of the column that contains the case/control type.")
 @click.option('-m', '--samples-column', required=True, help="the name of the column that contains the samples.")
@@ -93,22 +93,25 @@ def calculate_pval(
     adj_pval,
 ):
     """Calculate the P-value between two given groups."""
-    scores_df = pd.read_csv(scores_file, sep=r'\s+')
+    if test == 'betareg':
+        pass
+    else:
+        scores_df = pd.read_csv(scores_file, sep=r'\s+')
 
-    click.echo("The process for calculating the p_values will start now.")
-    df = find_pvalue(
-        scores_df=scores_df,
-        output_file=output_path,
-        genotype_file=genotype_file,
-        genes=genes,
-        cases_column=cases_column,
-        samples_column=samples_column,
-        test=test,
-        pc_file=pc_file,
-        adj_pval=adj_pval,
-    )
-    click.echo('Process is complete.')
-    click.echo(df.info())
+        click.echo("The process for calculating the p_values will start now.")
+        df = find_pvalue(
+            scores_df=scores_df,
+            output_file=output_path,
+            genotype_file=genotype_file,
+            genes=genes,
+            cases_column=cases_column,
+            samples_column=samples_column,
+            test=test,
+            pc_file=pc_file,
+            adj_pval=adj_pval,
+        )
+        click.echo('Process is complete.')
+        click.echo(df.info())
 
 
 @main.command()
