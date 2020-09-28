@@ -220,8 +220,8 @@ def betareg_pvalues(
     for i in tqdm(range(scores_df.ncol - 1), desc="Calculating p-values..."):
         if i == complete_df.colnames.index(samples_col):
             continue
-        equation = complete_df.colnames[i] + cases_col + covariates
-        betaMod = betareg.betareg(equation, data=complete_df, link="log")
+        equation = complete_df.colnames[i] + ' ~ ' + cases_col + '+' + covariates
+        betaMod = betareg.betareg(formula=equation, data=complete_df, link="log")
         beta_reg.append(betaMod)
     return beta_reg
 
