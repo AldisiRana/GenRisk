@@ -2,11 +2,11 @@
 
 import os
 import re
+import subprocess
 
 import numpy as np
 import pandas as pd
 from pybiomart import Dataset
-from rpy2.robjects.packages import importr
 import scipy.stats as stats
 import statsmodels.api as sm
 from sklearn.preprocessing import MinMaxScaler
@@ -201,29 +201,19 @@ def betareg_pvalues(
     pc_file,
     samples_col,
     cases_col,
-    covariates,
+    nprocessess=5,
+    output_path
 ):
-    # test on jupyter notebook first
-    base, betareg, scales, parallel, data_table = importr('base'), importr('betareg'), importr('scales'), importr(
-        'parallel'), importr('data.table')
-    scores_df = data_table.fread(scores_file)
-    for i in tqdm(range(scores_df.ncol - 1), desc="Rescaling scores"):
-        if i == scores_df.colnames.index(samples_col):
-            continue
-        rescaled = rescale(np.array(scores_df[i]).reshape(-1, 1))
-        scores_df[i] = rescaled
-    pheno_df = data_table.fread(pheno_file)
-    pc_df = data_table.fread(pc_file)
-    merged = data_table.merge_data_table(scores_df, pheno_df, by=samples_col)
-    complete_df = data_table.merge_data_table(merged, pc_df, by=samples_col)
-    beta_reg = []
-    for i in tqdm(range(scores_df.ncol - 1), desc="Calculating p-values..."):
-        if i == complete_df.colnames.index(samples_col):
-            continue
-        equation = complete_df.colnames[i] + ' ~ ' + cases_col + '+' + covariates
-        betaMod = betareg.betareg(formula=equation, data=complete_df, link="log")
-        beta_reg.append(betaMod)
-    return beta_reg
+    subprocess.run(
+        ["Rscript", "betareg_shell.R",
+         "-s", scores_file,
+         "--phenofile", pheno_file,
+         "--pcfile", pc_file,
+         "--samplescol", samples_col,
+         "--casescol", cases_col,
+         "--nprocessess", nprocessess,
+         "-o", output_path]
+    )
 
 
 def rescale(gene, epsilon=0.001):

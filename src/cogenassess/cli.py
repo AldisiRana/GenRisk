@@ -9,7 +9,7 @@ import numpy as np
 from scipy.stats import pearsonr
 from tqdm import tqdm
 
-from .utils import normalize_gene_len, find_pvalue
+from .utils import normalize_gene_len, find_pvalue, betareg_pvalues
 from .pipeline import get_gene_info, plink_process, combine_scores
 
 
@@ -94,7 +94,14 @@ def calculate_pval(
 ):
     """Calculate the P-value between two given groups."""
     if test == 'betareg':
-        pass
+        betareg_pvalues(
+            scores_file=scores_file,
+            pheno_file=genotype_file,
+            pc_file=pc_file,
+            cases_col=cases_column,
+            samples_col=samples_column,
+            output_path=output_path
+        )
     else:
         scores_df = pd.read_csv(scores_file, sep=r'\s+')
 
