@@ -216,7 +216,20 @@ def betareg_pvalues(
     )
 
 
-def rescale(gene, epsilon=0.001):
-    scaler = MinMaxScaler((0+epsilon, 1-epsilon))
-    gene_scaled = scaler.fit_transform(gene)
-    return gene_scaled
+def r_visualize(
+    *,
+    genescol_1,
+    genescol_2,
+    info_file,
+    pvals_file,
+    output_path
+):
+    subprocess.run(
+        ["Rscript", "plot_script.R",
+         "-p", pvals_file,
+         "-i", info_file,
+         "-o", output_path,
+         "--genescol-1", genescol_1,
+         "--genescol-2", genescol_2]
+    )
+

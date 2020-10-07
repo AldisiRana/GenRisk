@@ -9,7 +9,7 @@ import numpy as np
 from scipy.stats import pearsonr
 from tqdm import tqdm
 
-from .utils import normalize_gene_len, find_pvalue, betareg_pvalues
+from .utils import normalize_gene_len, find_pvalue, betareg_pvalues, r_visualize
 from .pipeline import get_gene_info, plink_process, combine_scores
 
 
@@ -197,6 +197,28 @@ def calc_corr(
     corr_df.to_csv(output_file, sep='\t', index=False)
     click.echo('Process is complete.')
     click.echo(corr_df.info())
+
+
+@main.command()
+@click.option('--pvals-file', required=True)
+@click.option('--info-file', required=True)
+@click.option('--genescol-1', default='gene')
+@click.option('--genescol-2', default='Gene.refGene')
+@click.option('--output-file', required=True)
+def visualize(
+    pvals_file,
+    info_file,
+    genescol_1,
+    genescol_2,
+    output_file
+):
+    r_visualize(
+        pvals_file=pvals_file,
+        info_file=info_file,
+        genescol_1=genescol_1,
+        genescol_2=genescol_2,
+        output_path=output_file
+    )
 
 
 if __name__ == '__main__':
