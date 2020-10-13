@@ -202,7 +202,8 @@ def betareg_pvalues(
     samples_col,
     cases_col,
     nprocessess=5,
-    output_path
+    output_path,
+    covariates
 ):
     subprocess.run(
         ["Rscript", "betareg_shell.R",
@@ -212,7 +213,8 @@ def betareg_pvalues(
          "--samplescol", samples_col,
          "--casescol", cases_col,
          "--nprocessess", nprocessess,
-         "-o", output_path]
+         "-o", output_path,
+         "--covariates", covariates]
     )
 
 

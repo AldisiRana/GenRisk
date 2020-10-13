@@ -80,6 +80,7 @@ def run_plink(*, genes_folder, plink, bed, bim, fam):
 @click.option('--adj-pval', type=click.Choice(
     ['bonferroni', 'sidak', 'holm-sidak', 'holm',
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
+@click.option('--covariates', default='PC1,PC2', help="the covariates used for calculation")
 def calculate_pval(
     *,
     scores_file,
@@ -91,6 +92,7 @@ def calculate_pval(
     test,
     pc_file,
     adj_pval,
+    covariates,
 ):
     """Calculate the P-value between two given groups."""
     if test == 'betareg':
@@ -100,7 +102,8 @@ def calculate_pval(
             pc_file=pc_file,
             cases_col=cases_column,
             samples_col=samples_column,
-            output_path=output_path
+            output_path=output_path,
+            covariates=covariates
         )
     else:
         scores_df = pd.read_csv(scores_file, sep=r'\s+')

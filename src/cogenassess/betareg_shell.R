@@ -19,6 +19,7 @@ option_list = list(
   make_option(c("--pcfile"), type='character', help="covariates file path", default = NULL),
   make_option(c("--samplescol"), type='character', help="name of samples column", default="IID"),
   make_option(c("--casescol"), type='character', help="name of cases column", default="cases"),
+  make_option(c("--covariates"), type='character', help="all covariates for calculation, seperated by comma", default="PC1,PC2,age.y"),
   make_option(c("--nprocesses"), type='integer', default=5)
 ); 
 
@@ -34,7 +35,7 @@ mydata = mydata[, .SD, .SDcols = unique(names(mydata))]
 pheno=fread(opt$phenofile)
 pc=fread(opt$pcfile)
 
-covariates = opt$covariates
+covariates = c(opt$casescol, as.list(strsplit(opt$covariates, ",")[[1]]))
 
 epsilon=0.001
 
@@ -46,10 +47,12 @@ normalize <- function(gene)
   return(rescaled)
 }
 
+
+
 get_beta_pvals <- function(x) {
-  
-  equation = substitute(i ~ pheno_1_vs_2_3_4+PC1+PC2+age.y, list(i = as.name(x)))
-  betaMod <- betareg(equation, data = completed)
+
+  form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
+  betaMod <- betareg(form, data = completed)
   coefficient=betaMod$coefficients$mean[2]
   pval=coef(summary(betaMod))$mean[2,4]
   stderr=coef(summary(betaMod))$mean[2,2]
@@ -78,7 +81,7 @@ clusterEvalQ(cl, {
 })
 
 
-clusterExport(cl, "completed")
+clusterExport(cl, c("completed", "covariates"))
 
 models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
 
