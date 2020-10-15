@@ -1,5 +1,6 @@
 
 if (!require("pacman")) install.packages("pacman", repos = "https://CRAN.R-project.org/")
+p_set_cranrepo(default_repo = "http://cran.rstudio.com/")
 pacman::p_load(data.table, qqman, ggplot2, grid, optparse, gridGraphics)
 
 library(qqman)
@@ -16,7 +17,8 @@ option_list = list(
               help="info file path", metavar="character"),
   make_option(c("--genescol_1"), type='character', help="name of genes column in pvals file", default="gene"),
   make_option(c("--genescol_2"), type='character', help="name of genes column in info file", default="Gene.refGene"),
-  make_option(c("-o", "--output_file"), type='character')
+  make_option(c("--qq_output"), type='character')
+  make_option(c("--manhattan_output"), type='character')
 ); 
 
 
@@ -36,12 +38,16 @@ complete_df = unique(complete_df, by='gene')
 complete_df[complete_df == 'X'] = 23
 complete_df[complete_df == 'Y'] = 24
 complete_df$Chr <- as.integer(complete_df$Chr)
+complete_df=na.omit(complete_df)
 
-manhattan(complete_df, chr="Chr", bp="Start", snp="gene", p="pval", 
+jpeg(opt$manhattan_output, res=300, width = 12, height = 6, units = 'in')
+manhattan(complete_df,chr='#CHR', bp='POS', p='P', snp='ID', chr="Chr", bp="Start", snp="gene", p="pval",
           ylim = c(0, -log10(1e-06)), chrlabs = NULL,
-          suggestiveline = -log10(1e-03), genomewideline = -log10(1e-05),
-          highlight = NULL, logp = TRUE, annotatePval = 0.005,
-          annotateTop = TRUE, main=opt$pvals_file)
+          suggestiveline = -log10(1e-03), genomewideline = -log10(1e-05), logp = TRUE, main=opt$pvals_file, highlight=T, annotatePval=1, annotateTop=T)
+dev.off()
+lambda=median(qchisq(complete_df$pval, df=1, lower.tail=FALSE)) / qchisq(0.5, 1)
+jpeg(opt$qq_output, res=300, width = 6, height = 6, units = 'in')
+qq(complete_df$pval,main=as.character(lambda))
+dev.off()
 
-qq(complete_df$pval, main = opt$pvals_file)
 
