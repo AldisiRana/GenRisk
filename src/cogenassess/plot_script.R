@@ -17,7 +17,7 @@ option_list = list(
               help="info file path", metavar="character"),
   make_option(c("--genescol_1"), type='character', help="name of genes column in pvals file", default="gene"),
   make_option(c("--genescol_2"), type='character', help="name of genes column in info file", default="Gene.refGene"),
-  make_option(c("--qq_output"), type='character')
+  make_option(c("--qq_output"), type='character'),
   make_option(c("--manhattan_output"), type='character')
 ); 
 
