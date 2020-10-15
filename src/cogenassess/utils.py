@@ -224,13 +224,15 @@ def r_visualize(
     genescol_2,
     info_file,
     pvals_file,
-    output_path
+    qq_output,
+    manhattan_output
 ):
     subprocess.run(
         ["Rscript", "plot_script.R",
          "-p", pvals_file,
          "-i", info_file,
-         "-o", output_path,
+         "--qq_output", qq_output,
+         "--manhattan_output", manhattan_output,
          "--genescol-1", genescol_1,
          "--genescol-2", genescol_2]
     )

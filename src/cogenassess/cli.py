@@ -207,7 +207,8 @@ def calc_corr(
 @click.option('--info-file', required=True)
 @click.option('--genescol-1', default='gene')
 @click.option('--genescol-2', default='Gene.refGene')
-@click.option('--output-file', required=True)
+@click.option('--qq-output', required=True)
+@click.option('--manhattan-output', required=True)
 def visualize(
     pvals_file,
     info_file,
@@ -220,7 +221,8 @@ def visualize(
         info_file=info_file,
         genescol_1=genescol_1,
         genescol_2=genescol_2,
-        output_path=output_file
+        qq_output=qq_output,
+        manhattan_output=manhattan_output,
     )
 
 
