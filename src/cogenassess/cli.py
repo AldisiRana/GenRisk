@@ -214,7 +214,8 @@ def visualize(
     info_file,
     genescol_1,
     genescol_2,
-    output_file
+    qq_output,
+    manhattan_output
 ):
     r_visualize(
         pvals_file=pvals_file,
