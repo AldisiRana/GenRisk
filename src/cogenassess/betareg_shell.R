@@ -1,6 +1,5 @@
 
 if (!require("pacman")) install.packages("pacman", repos = "https://CRAN.R-project.org/")
-p_set_cranrepo(default_repo = "http://cran.rstudio.com/")
 pacman::p_load(data.table, 'betareg', scales, parallel, optparse, tidyverse)
 
 library(data.table)
