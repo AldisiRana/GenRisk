@@ -41,7 +41,7 @@ complete_df$Chr <- as.integer(complete_df$Chr)
 complete_df=na.omit(complete_df)
 
 jpeg(opt$manhattan_output, res=300, width = 12, height = 6, units = 'in')
-manhattan(complete_df,chr='#CHR', bp="Start", snp=opt$genescol_1, p=opt$pvalcol,
+manhattan(complete_df,chr='Chr', bp="Start", snp=opt$genescol_1, p=opt$pvalcol,
           ylim = c(0, -log10(1e-06)), chrlabs = NULL,
           suggestiveline = -log10(1e-03), genomewideline = -log10(1e-05), logp = TRUE, main=opt$pvals_file, highlight=T, annotatePval=1, annotateTop=T)
 dev.off()
