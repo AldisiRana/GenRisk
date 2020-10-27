@@ -9,9 +9,13 @@ import pandas as pd
 from pybiomart import Dataset
 import scipy.stats as stats
 import statsmodels.api as sm
-from sklearn.preprocessing import MinMaxScaler
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm
+
+
+PATH = os.path.abspath(os.path.join((__file__), os.pardir, os.pardir, os.pardir))
+BETAREG_SHELL = os.path.join(PATH, 'scripts', 'betareg_shell.R')
+PLOT_SHELL = os.path.join(PATH, 'scripts', 'plot_script.R')
 
 
 def merge_matrices(
@@ -206,7 +210,7 @@ def betareg_pvalues(
     covariates
 ):
     subprocess.run(
-        ["Rscript", "betareg_shell.R",
+        ["Rscript", BETAREG_SHELL,
          "-s", scores_file,
          "--phenofile", pheno_file,
          "--pcfile", pc_file,
@@ -228,7 +232,7 @@ def r_visualize(
     manhattan_output
 ):
     subprocess.run(
-        ["Rscript", "plot_script.R",
+        ["Rscript", PLOT_SHELL,
          "-p", pvals_file,
          "-i", info_file,
          "--qq_output", qq_output,
