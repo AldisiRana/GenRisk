@@ -9,8 +9,8 @@ import numpy as np
 from scipy.stats import pearsonr
 from tqdm import tqdm
 
-from .utils import normalize_gene_len, find_pvalue, betareg_pvalues, r_visualize
-from .pipeline import get_gene_info, plink_process, combine_scores
+from .utils import get_gene_info, plink_process, combine_scores
+from .pipeline import normalize_gene_len, find_pvalue, betareg_pvalues, r_visualize
 
 
 @click.group()
@@ -41,17 +41,31 @@ def score_genes(
     weight_func,
     remove_temp,
 ):
-    # check number of processes
+    """
+    Get genes' scores using annotated vcf.
+
+    :param vcf: a vcf with annotations. use vcfanno.
+    :param bed: test file for genotype.
+    :param bim: file with variant information
+    :param fam: text file for pedigree information
+    :param plink: the directory of plink, if not set in environment
+    :param beta_param: the parameters from beta weight function.
+    :param temp_dir: a temporary directory to save temporary files before merging.
+    :param output_file: the final output scores matrix.
+    :param weight_func: the weighting function used in score calculation.
+    :param remove_temp: if True temporary directory will be deleted after process completion.
+    :return: the final dataframe information.
+    """
     click.echo('getting information from vcf files')
     genes_folder = get_gene_info(vcf=vcf, output_dir=temp_dir, beta_param=beta_param, weight_func=weight_func)
     click.echo('calculating gene scores ...')
     plink_process(genes_folder=genes_folder, plink=plink, bed=bed, bim=bim, fam=fam)
     click.echo('combining score files ...')
     df = combine_scores(input_path=temp_dir, output_path=output_file)
-    click.echo(df.info())
     if remove_temp:
         shutil.rmtree(temp_dir)
     click.echo('process is complete.')
+    return df.info()
 
 
 @main.command()
@@ -61,6 +75,16 @@ def score_genes(
 @click.option('--plink', default='plink')
 @click.option('--genes-folder', required=True)
 def run_plink(*, genes_folder, plink, bed, bim, fam):
+    """
+    Get the genes' scores from a folder of genes info.
+    :param genes_folder: a folder that contains two files for each gene,
+    one containing gene and ID (.v) and the other containing the rest of the information (.w)
+    :param plink: the directory of plink, if not set in environment
+    :param bed: test file for genotype.
+    :param bim: file with variant information
+    :param fam: text file for pedigree information
+    :return:
+    """
     click.echo('staring plink processing ...')
     plink_process(genes_folder=genes_folder, plink=plink, bed=bed, bim=bim, fam=fam)
     click.echo('plink processing is complete.')
@@ -94,7 +118,20 @@ def calculate_pval(
     adj_pval,
     covariates,
 ):
-    """Calculate the P-value between two given groups."""
+    """
+    Calculate the P-value between two given groups.
+    :param scores_file: the file containing gene scores.
+    :param genotype_file: file containing the phenotype.
+    :param output_path: the path for final output.
+    :param genes: a list of genes to calculate. if not, all genes in scoring file will be used.
+    :param cases_column: the name of the column with phenotypes.
+    :param samples_column: the name of the column with sample IDs. All files need to have the same format.
+    :param test: the test used to calculate pvalue.
+    :param pc_file: the file with PC (alternatively the file with covariates to use in test).
+    :param adj_pval: the adjustment method used (if any).
+    :param covariates: the column names of covariates to use, with comma in between. (e.g: PC1,PC2,age)
+    :return:
+    """
     if test == 'betareg':
         betareg_pvalues(
             scores_file=scores_file,
@@ -134,7 +171,13 @@ def merge(
     input_path,
     remove_input,
 ):
-    """This command merges all matrices in a directory into one big matrix"""
+    """
+    This command merges all matrices in a directory into one big matrix.
+    :param output_path: the path of final merged matrix
+    :param input_path: the directory containing the matrices to merge.
+    :param remove_input: if True, the input directory will be removed after merge.
+    :return:
+    """
     click.echo("Starting the merging process")
     df = combine_scores(input_path=input_path, output_path=output_path)
     click.echo(df.info())
