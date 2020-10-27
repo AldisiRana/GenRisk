@@ -1,7 +1,8 @@
 
-if (!require("pacman")) install.packages("pacman", repos = "https://CRAN.R-project.org/")
-pacman::p_load(data.table, 'betareg', scales, parallel, optparse, tidyverse)
+#if (!require("pacman")) install.packages("pacman", repos = "https://CRAN.R-project.org/")
+#pacman::p_load(data.table, 'betareg', scales, parallel, optparse, tidyverse)
 
+if (!require("data.table")) install.packages("data.table", repos = "https://CRAN.R-project.org/")
 library(data.table)
 library('betareg')
 library(scales)
