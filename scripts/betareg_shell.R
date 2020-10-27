@@ -20,8 +20,8 @@ option_list = list(
   make_option(c("--pcfile"), type='character', help="covariates file path", default = NULL),
   make_option(c("--samplescol"), type='character', help="name of samples column", default="IID"),
   make_option(c("--casescol"), type='character', help="name of cases column", default="cases"),
-  make_option(c("--covariates"), type='character', help="all covariates for calculation, seperated by comma", default="PC1,PC2,age.y"),
-  make_option(c("--nprocesses"), type='integer', default=5)
+  make_option(c("--covariates"), type='character', help="all covariates for calculation, seperated by comma", default="PC1,PC2,age"),
+  make_option(c("--nprocesses"), type='integer', default=3)
 ); 
 
 opt_parser = OptionParser(option_list=option_list);

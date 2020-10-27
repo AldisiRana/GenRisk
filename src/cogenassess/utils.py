@@ -205,7 +205,7 @@ def betareg_pvalues(
     pc_file,
     samples_col,
     cases_col,
-    nprocessess=5,
+    nprocesses=3,
     output_path,
     covariates
 ):
@@ -216,7 +216,7 @@ def betareg_pvalues(
          "--pcfile", pc_file,
          "--samplescol", samples_col,
          "--casescol", cases_col,
-         "--nprocessess", nprocessess,
+         "--nprocesses", str(nprocesses),
          "-o", output_path,
          "--covariates", covariates]
     )
