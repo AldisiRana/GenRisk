@@ -1,6 +1,6 @@
-#!/usr/bin/env Rscript
-if (!require("pacman")) install.packages("pacman", repos = "https://CRAN.R-project.org/")
-pacman::p_load(data.table, qqman, ggplot2, grid, optparse, gridGraphics)
+#! /usr/bin/Rscript
+# if (!require("pacman")) install.packages("pacman", repos = "https://CRAN.R-project.org/")
+#pacman::p_load(data.table, qqman, ggplot2, grid, optparse, gridGraphics)
 
 library(qqman)
 library(data.table)

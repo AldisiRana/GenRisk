@@ -209,7 +209,7 @@ def betareg_pvalues(
     output_path,
     covariates
 ):
-    subprocess.run(
+    subprocess.call(
         ["Rscript", BETAREG_SHELL,
          "-s", scores_file,
          "--phenofile", pheno_file,
@@ -218,7 +218,7 @@ def betareg_pvalues(
          "--casescol", cases_col,
          "--nprocessess", str(nprocessess),
          "-o", output_path,
-         "--covariates", covariates], shell=True
+         "--covariates", covariates]
     )
 
 
