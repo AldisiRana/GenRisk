@@ -15,11 +15,11 @@ within a phenotype in a population
 
 ## Usage
 
-### Get scores
+### Score genes
 This function calculates the gene-based scores of a gene list for a group of samples.
 
-    $ cogenassess get-scores --vcf vcf/file/path --bed bed/file/path --bim bim/file/path --fam fam/file/path 
-    --temp-dir /dir/for/temp/files --ourput-file /final/output/file --weight-func [log10|beta] 
+    $ cogenassess score_genes --vcf vcf/file/path --bed bed/file/path --bim bim/file/path --fam fam/file/path 
+    --temp-dir /dir/for/temp/files --ourput-file /final/output/file --weight-func [log10|beta] --remove-dir
 
 
 ### Normalize scores
@@ -34,4 +34,4 @@ This function calculates the p-values across the genes between two given groups
 
     $ cogenassess calculate-pval --scores-file path/to/scores/file --gentype-file file/containing/the/cases 
     --cases-column the-name-of-cases-column --samples-column name-of-samples-column 
-    --test [ttest-ind|mannwhitneyu|logit|glm] --output-path path/of/output/file
+    --test [ttest-ind|mannwhitneyu|logit|glm|betareg] --output-path path/of/output/file --covariates (e.g: PC1,PC2)
