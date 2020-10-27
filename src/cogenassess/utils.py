@@ -209,6 +209,7 @@ def betareg_pvalues(
     output_path,
     covariates
 ):
+    print(BETAREG_SHELL)
     subprocess.run(
         ["Rscript", BETAREG_SHELL,
          "-s", scores_file,
