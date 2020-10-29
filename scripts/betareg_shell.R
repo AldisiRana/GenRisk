@@ -4,11 +4,17 @@
 
 if (!require("data.table")) install.packages("data.table", repos = "https://CRAN.R-project.org/")
 library(data.table)
-library('betareg')
+if (!require(scales)) install.packages("data.table", repos = "https://CRAN.R-project.org/")
 library(scales)
+if (!require(parallel)) install.packages("data.table", repos = "https://CRAN.R-project.org/")
 library(parallel)
+if (!require(optparse)) install.packages("data.table", repos = "https://CRAN.R-project.org/")
 library(optparse)
+if (!require(tidyverse)) install.packages("data.table", repos = "https://CRAN.R-project.org/")
 library(tidyverse)
+if (!require("betareg")) install.packages("data.table", repos = "https://CRAN.R-project.org/")
+library('betareg')
+
 
 option_list = list(
   make_option(c("-s", "--scoresfile"), type="character",
