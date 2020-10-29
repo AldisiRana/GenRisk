@@ -4,15 +4,15 @@
 
 if (!require("data.table")) install.packages("data.table", repos = "https://CRAN.R-project.org/")
 library(data.table)
-if (!require(scales)) install.packages("data.table", repos = "https://CRAN.R-project.org/")
+if (!require(scales)) install.packages("scales", repos = "https://CRAN.R-project.org/")
 library(scales)
-if (!require(parallel)) install.packages("data.table", repos = "https://CRAN.R-project.org/")
+if (!require(parallel)) install.packages("parallel", repos = "https://CRAN.R-project.org/")
 library(parallel)
-if (!require(optparse)) install.packages("data.table", repos = "https://CRAN.R-project.org/")
+if (!require(optparse)) install.packages("optparse", repos = "https://CRAN.R-project.org/")
 library(optparse)
-if (!require(tidyverse)) install.packages("data.table", repos = "https://CRAN.R-project.org/")
+if (!require(tidyverse)) install.packages("tidyverse", repos = "https://CRAN.R-project.org/")
 library(tidyverse)
-if (!require("betareg")) install.packages("data.table", repos = "https://CRAN.R-project.org/")
+if (!require("betareg")) install.packages("betareg", repos = "https://CRAN.R-project.org/")
 library('betareg')
 
 
