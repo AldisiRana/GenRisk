@@ -10,8 +10,6 @@ if (!require(parallel)) install.packages("parallel", repos = "https://CRAN.R-pro
 library(parallel)
 if (!require(optparse)) install.packages("optparse", repos = "https://CRAN.R-project.org/")
 library(optparse)
-if (!require(tidyverse)) install.packages("tidyverse", repos = "https://CRAN.R-project.org/")
-library(tidyverse)
 if (!require("betareg")) install.packages("betareg", repos = "https://CRAN.R-project.org/")
 library('betareg')
 
