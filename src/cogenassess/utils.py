@@ -21,7 +21,7 @@ def get_gene_info(*, vcf, output_dir, beta_param, weight_func):
     df = pd.read_csv(vcf, usecols=['ID', 'ALT', 'INFO'], sep=r'\s+', skiprows=line_number - 1)
     df = df[df.INFO.str.contains('AF=', regex=True, na=False) & df.INFO.str.contains(
         'RawScore=', regex=True, na=False) & df.INFO.str.contains('gene=', regex=True, na=False)]
-    df[['AF', 'RawScore', 'PHRED', 'gene']] = df.INFO.str.split(";", expand=True, )
+    df[['PR', 'AF', 'RawScore', 'PHRED', 'gene']] = df.INFO.str.split(";", expand=True, )
     df.replace(to_replace=r'^AF=', value='', regex=True, inplace=True)
     df.replace(to_replace=r'^RawScore=', value='', regex=True, inplace=True)
     df.replace(to_replace=r'^gene=', value='', regex=True, inplace=True)
