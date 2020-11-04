@@ -12,6 +12,8 @@ if (!require(optparse)) install.packages("optparse", repos = "https://CRAN.R-pro
 library(optparse)
 if (!require("betareg")) install.packages("betareg", repos = "https://CRAN.R-project.org/")
 library('betareg')
+if (!require(purrr)) install.packages("purrr", repos = "https://CRAN.R-project.org/")
+library(purrr)
 
 
 option_list = list(
