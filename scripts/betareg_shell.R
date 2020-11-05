@@ -59,7 +59,8 @@ normalize <- function(gene)
 get_beta_pvals <- function(x) {
 
   form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
-  betaMod <- betareg(form, data = completed)
+  cols <- c(x, covariates)
+  betaMod <- betareg(form, data = completed[, cols])
   coefficient=betaMod$coefficients$mean[2]
   pval=coef(summary(betaMod))$mean[2,4]
   stderr=coef(summary(betaMod))$mean[2,2]
@@ -70,14 +71,19 @@ message("rescaling scores ...")
 output=apply(mydata,2,normalize)
 output=as.data.frame(output)
 output[, 1] = mydata[,1]
+rm(mydata)
 
 message("merging dataframes")
-merge=merge(output,pheno,by=opt$samplescol)
-completed=merge(merge,pc,by=opt$samplescol)
+merged=merge(output,pheno,by=opt$samplescol)
+genes = 2:ncol(output)
+rm(output)
+rm(pheno)
+completed=merge(merged,pc,by=opt$samplescol)
+rm(merged)
+rm(pc)
 completed<-completed[complete.cases(completed),]
-
 message("Calculating pvalues ...")
-varlist <- names(completed)[2:ncol(output)]
+genelist <- names(completed)[genes]
 cl <- makeCluster(opt$nprocesses)
 
 
@@ -90,7 +96,7 @@ clusterEvalQ(cl, {
 
 clusterExport(cl, c("completed", "covariates"))
 
-models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
+models = parLapply(cl,genelist,possibly(get_beta_pvals,NA_real_))
 
 message("saving to output file ...")
 pvals_df = data.frame(Reduce(rbind, models))
