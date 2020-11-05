@@ -93,6 +93,7 @@ clusterEvalQ(cl, {
 
 
 clusterExport(cl, c("completed", "covariates"))
+rm(completed)
 
 models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
 
