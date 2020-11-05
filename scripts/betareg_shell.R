@@ -75,15 +75,14 @@ rm(mydata)
 
 message("merging dataframes")
 merged=merge(output,pheno,by=opt$samplescol)
-genes = 2:ncol(output)
-rm(output)
 rm(pheno)
 completed=merge(merged,pc,by=opt$samplescol)
 rm(merged)
 rm(pc)
 completed<-completed[complete.cases(completed),]
 message("Calculating pvalues ...")
-genelist <- names(completed)[genes]
+varlist <- names(completed)[2:ncol(output)]
+rm(output)
 cl <- makeCluster(opt$nprocesses)
 
 
@@ -96,10 +95,11 @@ clusterEvalQ(cl, {
 
 clusterExport(cl, c("completed", "covariates"))
 
-models = parLapply(cl,genelist,possibly(get_beta_pvals,NA_real_))
+models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
 
 message("saving to output file ...")
 pvals_df = data.frame(Reduce(rbind, models))
+head(pvals_df)
 colnames(pvals_df) <- c("gene", "coeff","pval","stderr")
 write.table(pvals_df, file=opt$outputfile, quote=FALSE, sep='\t', row.names = FALSE)
 message("Done")
