@@ -82,20 +82,21 @@ completed<-completed[complete.cases(completed),]
 message("Calculating pvalues ...")
 varlist <- names(completed)[2:ncol(output)]
 rm(output)
-cl <- makeCluster(opt$nprocesses)
+#cl <- makeCluster(opt$nprocesses)
 
 
-clusterEvalQ(cl, {
-  library(scales)
-  library(data.table)
-  library(betareg)
-})
+#clusterEvalQ(cl, {
+#  library(scales)
+#  library(data.table)
+#  library(betareg)
+#})
 
 
-clusterExport(cl, c("completed", "covariates"))
-rm(completed)
+#clusterExport(cl, c("completed", "covariates"))
+#rm(completed)
 
-models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
+#models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
+models = lapply(varlist,possibly(get_beta_pvals,NA_real_))
 
 message("saving to output file ...")
 pvals_df = data.frame(Reduce(rbind, models))
