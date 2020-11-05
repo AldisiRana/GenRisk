@@ -59,7 +59,7 @@ normalize <- function(gene)
 get_beta_pvals <- function(x) {
 
   form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
-  betaMod <- betareg(form, data = completed)
+  betaMod <- betareg(form, data = completed[, c(x, covariates)])
   coefficient=betaMod$coefficients$mean[2]
   pval=coef(summary(betaMod))$mean[2,4]
   stderr=coef(summary(betaMod))$mean[2,2]
