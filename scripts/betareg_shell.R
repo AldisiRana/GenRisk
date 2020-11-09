@@ -94,9 +94,7 @@ rm(output)
 
 #clusterExport(cl, c("completed", "covariates"))
 #rm(completed)
-system.time(
-  models = mclapply(varlist, possibly(get_beta_pvals,NA_real_), mc.cores = opt$nprocesses)
-)
+models = mclapply(varlist, possibly(get_beta_pvals,NA_real_), mc.cores = opt$nprocesses)
 #models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
 #models = lapply(varlist,possibly(get_beta_pvals,NA_real_))
 
