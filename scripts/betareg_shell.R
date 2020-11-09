@@ -42,7 +42,7 @@ mydata = mydata[, .SD, .SDcols = unique(names(mydata))]
 pheno=fread(opt$phenofile)
 pc=fread(opt$pcfile)
 
-covariates = c(opt$casescol, as.list(strsplit(opt$covariates, ",")[[1]]))
+covariates = c(opt$casescol, strsplit(opt$covariates, ",")[[1]])
 
 epsilon=0.001
 
@@ -60,7 +60,7 @@ get_beta_pvals <- function(x) {
 
   form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
   cols = c(x, covariates)
-  betaMod <- betareg(form, data = completed[, ..cols])
+  betaMod <- betareg(form, data = mydata[, ..cols])
   coefficient=betaMod$coefficients$mean[2]
   pval=coef(summary(betaMod))$mean[2,4]
   stderr=coef(summary(betaMod))$mean[2,2]
