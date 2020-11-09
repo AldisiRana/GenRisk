@@ -68,7 +68,7 @@ get_beta_pvals <- function(x) {
 
 message("rescaling scores ...")
 output=apply(mydata,2,normalize)
-output=as.data.frame(output)
+output=as.data.table(output)
 output[, 1] = mydata[,1]
 rm(mydata)
 
