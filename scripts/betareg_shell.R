@@ -59,7 +59,7 @@ normalize <- function(gene)
 get_beta_pvals <- function(x) {
 
   form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
-  betaMod <- betareg(form, data = completed)
+  betaMod <- betareg(form, data = completed[,c(x,covariates)])
   coefficient=betaMod$coefficients$mean[2]
   pval=coef(summary(betaMod))$mean[2,4]
   stderr=coef(summary(betaMod))$mean[2,2]
@@ -82,20 +82,22 @@ completed<-completed[complete.cases(completed),]
 message("Calculating pvalues ...")
 varlist <- names(completed)[2:ncol(output)]
 rm(output)
-cl <- makeCluster(opt$nprocesses)
+#cl <- makeCluster(opt$nprocesses)
 
 
-clusterEvalQ(cl, {
-  library(scales)
-  library(data.table)
-  library(betareg)
-})
+#clusterEvalQ(cl, {
+#  library(scales)
+#  library(data.table)
+#  library(betareg)
+#})
 
 
-clusterExport(cl, c("completed", "covariates"))
+#clusterExport(cl, c("completed", "covariates"))
 #rm(completed)
-
-models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
+system.time(
+  models = mclapply(varlist, possibly(get_beta_pvals,NA_real_), mc.cores = opt$nprocesses)
+)
+#models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
 #models = lapply(varlist,possibly(get_beta_pvals,NA_real_))
 
 message("saving to output file ...")
