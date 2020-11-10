@@ -56,11 +56,11 @@ normalize <- function(gene)
 
 
 
-get_beta_pvals <- function(x) {
+get_beta_pvals <- function(x, data) {
 
   form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
-  cols = c(x, covariates)
-  betaMod <- betareg(form, data = completed[, ..cols])
+  #cols = c(x, covariates)
+  betaMod <- betareg(form, data=data)
   coefficient=betaMod$coefficients$mean[2]
   pval=coef(summary(betaMod))$mean[2,4]
   stderr=coef(summary(betaMod))$mean[2,2]
@@ -91,11 +91,21 @@ rm(output)
 #  library(data.table)
 #  library(betareg)
 #})
-
+i <- 1
+pb = txtProgressBar(min = 0, max = length(varlist), initial = 0) 
+models <- c()
+for (x in varlist){
+  setTxtProgressBar(pb,i)
+  cols = c(x, covariates)
+  data=completed[, ..cols]
+  model = get_beta_pvals(x, data)
+  models <- c(models,model)
+  i <- i+1
+}
 
 #clusterExport(cl, c("completed", "covariates"))
 #rm(completed)
-models = mclapply(varlist, possibly(get_beta_pvals,NA_real_), mc.cores = opt$nprocesses)
+#models = mclapply(varlist, possibly(get_beta_pvals,NA_real_), mc.cores = opt$nprocesses)
 #models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
 #models = lapply(varlist,possibly(get_beta_pvals,NA_real_))
 
