@@ -94,13 +94,13 @@ rm(output)
 #  library(betareg)
 #})
 i <- 1
-pb = txtProgressBar(min = 0, max = length(varlist), initial = 0) 
+pb = txtProgressBar(min = 0, max = length(varlist), initial = 1) 
 models <- c()
 for (x in varlist){
   message(setTxtProgressBar(pb,i))
   cols = c(x, covariates)
   data=completed[, ..cols]
-  model = get_beta_pvals(x, data)
+  model = possibly(get_beta_pvals(x, data),NA_real_)
   models <- c(models,model)
   i <- i+1
 }
