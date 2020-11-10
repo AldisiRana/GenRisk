@@ -14,6 +14,7 @@ if (!require("betareg")) install.packages("betareg", repos = "https://CRAN.R-pro
 library('betareg')
 if (!require(purrr)) install.packages("purrr", repos = "https://CRAN.R-project.org/")
 library(purrr)
+if (!require(utils)) install.packages("utils", repos = "https://CRAN.R-project.org/")
 library(utils)
 
 
@@ -96,7 +97,7 @@ i <- 1
 pb = txtProgressBar(min = 0, max = length(varlist), initial = 0) 
 models <- c()
 for (x in varlist){
-  setTxtProgressBar(pb,i)
+  message(setTxtProgressBar(pb,i))
   cols = c(x, covariates)
   data=completed[, ..cols]
   model = get_beta_pvals(x, data)
