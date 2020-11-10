@@ -14,6 +14,7 @@ if (!require("betareg")) install.packages("betareg", repos = "https://CRAN.R-pro
 library('betareg')
 if (!require(purrr)) install.packages("purrr", repos = "https://CRAN.R-project.org/")
 library(purrr)
+library(utils)
 
 
 option_list = list(
