@@ -100,7 +100,7 @@ for (x in varlist){
   message(setTxtProgressBar(pb,i))
   cols = c(x, covariates)
   data=completed[, ..cols]
-  model = possibly(get_beta_pvals(x, data),NA_real_)
+  model = possibly(get_beta_pvals(x, data), otherwise = NA)
   models <- c(models,model)
   i <- i+1
 }
