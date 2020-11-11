@@ -41,7 +41,7 @@ message("Reading files...")
 
 mydata=fread(opt$scoresfile)
 mydata = mydata[, .SD, .SDcols = unique(names(mydata))]
-drop.cols <- grep("_x_", colnames(mydata))
+drop.cols <- grep("_", colnames(mydata))
 mydata[, (drop.cols) := NULL]
 
 pheno=fread(opt$phenofile)
