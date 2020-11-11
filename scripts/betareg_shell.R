@@ -71,7 +71,9 @@ get_beta_pvals <- function(x, data) {
     pval=coef(summary(betaMod))$mean[2,4]
     stderr=coef(summary(betaMod))$mean[2,2]
     return(c(x,coefficient,pval,stderr))
-  }, error=function(e){})
+  }, error=function(e){
+    return(NA)
+  })
 }
 
 message("rescaling scores ...")
