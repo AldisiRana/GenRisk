@@ -64,16 +64,12 @@ normalize <- function(gene)
 get_beta_pvals <- function(x, data) {
 
   #cols = c(x, covariates)
-  tryCatch({
-    form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
-    betaMod <- betareg(form, data=data)
-    coefficient=betaMod$coefficients$mean[2]
-    pval=coef(summary(betaMod))$mean[2,4]
-    stderr=coef(summary(betaMod))$mean[2,2]
-    return(c(x,coefficient,pval,stderr))
-  }, error=function(e){
-    return(NA)
-  })
+  form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
+  betaMod <- betareg(form, data=data)
+  coefficient=betaMod$coefficients$mean[2]
+  pval=coef(summary(betaMod))$mean[2,4]
+  stderr=coef(summary(betaMod))$mean[2,2]
+  return(c(x,coefficient,pval,stderr))
 }
 
 message("rescaling scores ...")
