@@ -43,6 +43,7 @@ mydata=fread(opt$scoresfile)
 mydata = mydata[, .SD, .SDcols = unique(names(mydata))]
 drop.cols <- grep("_", colnames(mydata))
 mydata[, (drop.cols) := NULL]
+mydata = Filter(var, mydata)
 
 pheno=fread(opt$phenofile)
 pc=fread(opt$pcfile)
