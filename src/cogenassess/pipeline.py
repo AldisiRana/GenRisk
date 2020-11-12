@@ -9,7 +9,6 @@ import statsmodels.api as sm
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm
 
-
 PATH = os.path.abspath(os.path.join((__file__), os.pardir, os.pardir, os.pardir))
 BETAREG_SHELL = os.path.join(PATH, 'scripts', 'betareg_shell.R')
 PLOT_SHELL = os.path.join(PATH, 'scripts', 'plot_script.R')
@@ -57,6 +56,7 @@ def normalize_gene_len(
     if output_path:
         scores_df.to_csv(output_path, sep='\t', index=False)
     return scores_df
+
 
 def find_pvalue(
     *,
@@ -124,8 +124,8 @@ def find_pvalue(
             except:
                 continue
             pval = list(result.pvalues)
-            #add std err
-            p_values.append([gene]+pval)
+            # add std err
+            p_values.append([gene] + pval)
         p_values_df = pd.DataFrame(
             p_values, columns=['genes', 'const_pval', 'p_value', 'PC1_pval', 'PC2_pvcal', 'PC3_pval']
         ).sort_values(by=['p_value'])
@@ -153,7 +153,7 @@ def find_pvalue(
         raise Exception("The test you selected is not valid.")
     if adj_pval:
         adjusted = multipletests(list(p_values_df['p_value']), method=adj_pval)
-        p_values_df[adj_pval+'_adj_pval'] = list(adjusted)[1]
+        p_values_df[adj_pval + '_adj_pval'] = list(adjusted)[1]
     p_values_df.to_csv(output_file, sep='\t', index=False)
     return p_values_df
 
@@ -221,9 +221,22 @@ def merge_matrices(
     for filename in tqdm(os.listdir(directory), desc="merging matrices"):
         if not filename.endswith(file_suffix):
             continue
-        data = pd.read_csv(os.path.join(directory, filename), sep=r'\s+', usecols=samples_col+[scores_col])
+        data = pd.read_csv(os.path.join(directory, filename), sep=r'\s+', usecols=samples_col + [scores_col])
         gene_name = filename.split('.')[0]
         data = data.rename(columns={scores_col: gene_name})
         full_data = pd.merge(data, full_data, on=samples_col, how='left')
     full_data.to_csv(output_path, sep='\t', index=False)
     return full_data
+
+def merge_files_fun(
+    *,
+    input_dir,
+    samples_col,
+):
+    folder = os.listdir(input_dir)
+    df = pd.read_csv(os.path.join(input_dir, folder[0]), sep='\t', index_col=False).sort_values(by=[samples_col])
+    for filename in tqdm(folder[1:], desc="merging files"):
+        new_df = pd.read_csv(os.path.join(input_dir, filename), sep='\t', index_col=False).sort_values(by=[samples_col])
+        new_df.drop(columns=[samples_col])
+        df = pd.concat([df, new_df])
+    return df

@@ -10,7 +10,7 @@ from scipy.stats import pearsonr
 from tqdm import tqdm
 
 from .utils import get_gene_info, plink_process, combine_scores
-from .pipeline import normalize_gene_len, find_pvalue, betareg_pvalues, r_visualize
+from .pipeline import normalize_gene_len, find_pvalue, betareg_pvalues, r_visualize, merge_files_fun
 
 
 @click.group()
@@ -96,7 +96,8 @@ def run_plink(*, genes_folder, plink, bed, bim, fam):
 @click.option('-o', '--output-path', required=True, help='the path for the output file.')
 @click.option('-g', '--genes',
               help="a list containing the genes to calculate. if not provided all genes will be used.")
-@click.option('-t', '--test', required=True, type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'glm', 'betareg']),
+@click.option('-t', '--test', required=True,
+              type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'glm', 'betareg']),
               help='statistical test for calculating P value.')
 @click.option('-c', '--cases-column', required=True, help="the name of the column that contains the case/control type.")
 @click.option('-m', '--samples-column', required=True, help="the name of the column that contains the samples.")
@@ -237,7 +238,7 @@ def calc_corr(
     for gene in tqdm(genes, desc='calculating correlation'):
         gene_df = pd.merge(first_df[[samples_col, gene]], second_df[[samples_col, gene]], on=samples_col)
         gene_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
-        corr, pval = pearsonr(gene_df[gene+'_x'], gene_df[gene+'_y'])
+        corr, pval = pearsonr(gene_df[gene + '_x'], gene_df[gene + '_y'])
         corr_info.append([gene, corr, pval])
     corr_df = pd.DataFrame(corr_info, columns=['genes', 'corr', 'p_value']).sort_values(by=['p_value'])
     corr_df.to_csv(output_file, sep='\t', index=False)
@@ -268,6 +269,31 @@ def visualize(
         qq_output=qq_output,
         manhattan_output=manhattan_output,
     )
+
+
+@main.command()
+@click.option('-d', '--input-dir', required=True)
+@click.option('-o', '--output-file', required=True)
+@click.option('-s', '--samples-col', required=True)
+@click.option('-e', '--extension', required=True, type=click.Choice(['pickle', 'feather', 'tsv']))
+def merge_files(
+    *,
+    input_dir,
+    output_file,
+    samples_col,
+    extension
+):
+    df = merge_files_fun(input_dir=input_dir, samples_col=samples_col)
+    if extension == 'pickle':
+        df.to_pickle(output_file)
+    elif extension == 'feather':
+        df.reset_index().to_feather(output_file)
+    # if df.memory_usage(deep=True).sum() / float(1 << 30) > 10:
+    #   df.to_feather(output_file)
+    #  df.to_pickle(output_file)
+    else:
+        df.to_csv(output_file, sep='\t', index=False)
+    return df.info
 
 
 if __name__ == '__main__':
