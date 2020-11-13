@@ -39,10 +39,12 @@ if (any(is.na(opt))) stop("Please make sure to include all required args.")
 
 message("Reading files...")
 
-mydata=fread(opt$scoresfile)
-mydata = mydata[, .SD, .SDcols = unique(names(mydata))]
-drop.cols <- grep("_", colnames(mydata))
-mydata[, (drop.cols) := NULL]
+mydata=read.table(opt$scoresfile, header=TRUE)
+#mydata = mydata[, .SD, .SDcols = unique(names(mydata))]
+#cols <- colnames(mydata)[grep('^[0-9]', colnames(mydata))]
+#new_cols <- paste0("g", cols)
+#colnames(mydata)[cols] <- new_cols
+
 mydata = Filter(var, mydata)
 
 pheno=fread(opt$phenofile)
