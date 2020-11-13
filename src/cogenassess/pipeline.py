@@ -2,6 +2,7 @@
 import os
 import subprocess
 
+import numpy as np
 import pandas as pd
 from pybiomart import Dataset
 import scipy.stats as stats
@@ -228,13 +229,24 @@ def merge_matrices(
     full_data.to_csv(output_path, sep='\t', index=False)
     return full_data
 
+
+def prediction_model(
+    *,
+    x,
+    y,
+    train_test_propotion,
+):
+    pass
+
+
 def merge_files_fun(
     *,
     input_dir,
     samples_col,
 ):
     folder = os.listdir(input_dir)
-    df = pd.read_csv(os.path.join(input_dir, folder[0]), sep='\t', index_col=False).sort_values(by=[samples_col])
+    df = pd.read_csv(os.path.join(input_dir, folder[0]), sep='\t', index_col=False,
+                     dtype=np.float32).sort_values(by=[samples_col])
     for filename in tqdm(folder[1:], desc="merging files"):
         new_df = pd.read_csv(os.path.join(input_dir, filename), sep='\t', index_col=False).sort_values(by=[samples_col])
         new_df.drop(columns=[samples_col])
