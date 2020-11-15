@@ -46,6 +46,8 @@ mydata=read.table(opt$scoresfile, header=TRUE)
 #colnames(mydata)[cols] <- new_cols
 
 mydata = Filter(var, mydata)
+mydata[is.na(mydata)] = 0
+mydata = mydata[colMeans(mydata == 0) <= 0.9]
 
 pheno=fread(opt$phenofile)
 pc=fread(opt$pcfile)
@@ -54,7 +56,7 @@ covariates = c(opt$casescol, strsplit(opt$covariates, ",")[[1]])
 
 epsilon=0.001
 
-mydata[is.na(mydata)] = 0
+
 
 normalize <- function(gene)
 {
