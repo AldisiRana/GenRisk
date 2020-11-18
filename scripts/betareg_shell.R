@@ -70,7 +70,7 @@ get_beta_pvals <- function(x, data) {
   
   #cols = c(x, covariates)
   #form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
-  x = gsub(" ", "", x, fixed = TRUE)
+  #x = gsub(" ", "", x, fixed = TRUE)
   form <- paste(x, paste(" ."), sep = " ~")
   betaMod <- betareg(form, data=data)
   coefficient=betaMod$coefficients$mean[2]
