@@ -97,7 +97,8 @@ if (exists(as.character(expression(pc)))){
 
 message("Calculating pvalues ...")
 genes_list <- names(completed)[2:ncol(output)]
-completed = completed[, c(opt$samplescol, genes_list, covariates)]
+cols <- c(opt$samplescol, genes_list, covariates)
+completed <- completed[, ..cols]
 completed<-completed[complete.cases(completed),]
 rm(output)
 #cl <- makeCluster(opt$nprocesses)
