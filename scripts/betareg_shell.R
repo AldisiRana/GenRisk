@@ -50,7 +50,9 @@ mydata = Filter(var, mydata)
 mydata = mydata[colMeans(mydata == 0) <= 0.9]
 
 pheno=fread(opt$phenofile)
-pc=fread(opt$pcfile)
+if (!is.null(opt$pcfile)){
+  pc=fread(opt$pcfile)
+}
 
 covariates = c(opt$casescol, strsplit(opt$covariates, ",")[[1]])
 
@@ -86,18 +88,19 @@ output[, 1] = mydata[,1]
 rm(mydata)
 
 message("merging dataframes")
-merged=merge(output,pheno,by=opt$samplescol)
+completed=merge(output,pheno,by=opt$samplescol)
 rm(pheno)
-completed=merge(merged,pc,by=opt$samplescol)
-rm(merged)
-rm(pc)
+if (exists(as.character(expression(pc)))){
+  completed=merge(completed,pc,by=opt$samplescol)
+  rm(pc)
+}
 completed<-completed[complete.cases(completed),]
 message("Calculating pvalues ...")
-varlist <- names(completed)[2:ncol(output)]
+genes_list <- names(completed)[2:ncol(output)]
 rm(output)
 #cl <- makeCluster(opt$nprocesses)
 
-write("gene\tcoeff\tpval\tstderr", file=opt$outputfile)
+write("genes\tcoeff\tp_value\tstderr", file=opt$outputfile)
 
 apply_betareg <- function(x){
   cols = c(x, covariates)
@@ -127,7 +130,7 @@ apply_betareg <- function(x){
 
 #clusterExport(cl, c("completed", "covariates"))
 #rm(completed)
-models = mclapply(varlist, possibly(apply_betareg,NA_real_), mc.cores = opt$nprocesses, mc.preschedule = FALSE)
+models = mclapply(genes_list, possibly(apply_betareg,NA_real_), mc.cores = opt$nprocesses, mc.preschedule = FALSE)
 #models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
 #models = lapply(varlist,possibly(get_beta_pvals,NA_real_))
 
