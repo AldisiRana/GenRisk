@@ -108,10 +108,14 @@ write("genes\tcoeff\tp_value\tstderr", file=opt$outputfile)
 apply_betareg <- function(x){
   cols = c(x, covariates)
   data=completed[, ..cols]
-  model=get_beta_pvals(x, data)
-  write(paste(model, collapse = "\t"), file=opt$outputfile, append=TRUE)
-  return(model)
-  
+  form <- paste(x, paste(" ."), sep = " ~")
+  betaMod <- betareg(form, data=data)
+  coefficient=tryCatch(betaMod$coefficients$mean[2], error=function(err) NA)
+  pval=tryCatch(coef(summary(betaMod))$mean[2,4], error=function(err) NA)
+  stderr=tryCatch(coef(summary(betaMod))$mean[2,2], error=function(err) NA)
+  results = c(x,coefficient,pval,stderr)
+  write(paste(results, collapse = "\t"), file=opt$outputfile, append=TRUE)
+  return(results)
 }
 
 #clusterEvalQ(cl, {
