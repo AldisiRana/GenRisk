@@ -70,7 +70,6 @@ get_beta_pvals <- function(x, data) {
 
   #cols = c(x, covariates)
   #form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
-  x = gsub(" ", "", x, fixed = TRUE)
   form <- paste(x, paste(" ."), sep = " ~")
   betaMod <- betareg(form, data=data)
   coefficient=betaMod$coefficients$mean[2]
@@ -103,21 +102,29 @@ rm(output)
 #  library(data.table)
 #  library(betareg)
 #})
-i <- 1
-pb = txtProgressBar(min = 0, max = length(varlist), initial = 0) 
-models <- c()
-for (x in varlist){
-  message(setTxtProgressBar(pb,i))
+#i <- 1
+#pb = txtProgressBar(min = 0, max = length(varlist), initial = 0) 
+#models <- c()
+
+  
+#for (x in varlist){
+#  message(setTxtProgressBar(pb,i))
+#  cols = c(x, covariates)
+#  data=completed[, ..cols]
+#  model = possibly(get_beta_pvals(x, data), otherwise = NA, quiet = TRUE)
+#  models <- c(models,model)
+#  i <- i+1
+#}
+
+apply_betareg <- function(x){
   cols = c(x, covariates)
   data=completed[, ..cols]
-  model = possibly(get_beta_pvals(x, data), otherwise = NA, quiet = TRUE)
-  models <- c(models,model)
-  i <- i+1
+  return(get_beta_pvals(x, data))
 }
 
 #clusterExport(cl, c("completed", "covariates"))
 #rm(completed)
-#models = mclapply(varlist, possibly(get_beta_pvals,NA_real_), mc.cores = opt$nprocesses)
+models = mclapply(varlist, possibly(apply_betareg,NA_real_), mc.cores = opt$nprocesses, mc.preschedule = FALSE)
 #models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
 #models = lapply(varlist,possibly(get_beta_pvals,NA_real_))
 
