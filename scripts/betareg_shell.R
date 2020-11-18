@@ -97,7 +97,7 @@ varlist <- names(completed)[2:ncol(output)]
 rm(output)
 #cl <- makeCluster(opt$nprocesses)
 
-write("gene\tcoeff\tpval\stderr", file=opt$outputfile)
+write("gene\tcoeff\tpval\tstderr", file=opt$outputfile)
 
 apply_betareg <- function(x){
   cols = c(x, covariates)
