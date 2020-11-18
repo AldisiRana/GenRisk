@@ -45,8 +45,8 @@ mydata=read.table(opt$scoresfile, header=TRUE)
 #new_cols <- paste0("g", cols)
 #colnames(mydata)[cols] <- new_cols
 
-mydata = Filter(var, mydata)
 mydata[is.na(mydata)] = 0
+mydata = Filter(var, mydata)
 mydata = mydata[colMeans(mydata == 0) <= 0.9]
 
 pheno=fread(opt$phenofile)
@@ -67,9 +67,10 @@ normalize <- function(gene)
 
 
 get_beta_pvals <- function(x, data) {
-
+  
   #cols = c(x, covariates)
   #form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
+  x = gsub(" ", "", x, fixed = TRUE)
   form <- paste(x, paste(" ."), sep = " ~")
   betaMod <- betareg(form, data=data)
   coefficient=betaMod$coefficients$mean[2]
@@ -96,6 +97,16 @@ varlist <- names(completed)[2:ncol(output)]
 rm(output)
 #cl <- makeCluster(opt$nprocesses)
 
+write("gene\tcoeff\tpval\stderr", file=opt$outputfile)
+
+apply_betareg <- function(x){
+  cols = c(x, covariates)
+  data=completed[, ..cols]
+  model=get_beta_pvals(x, data)
+  write(paste(model, collapse = "\t"), file=opt$outputfile, append=TRUE)
+  return(model)
+  
+}
 
 #clusterEvalQ(cl, {
 #  library(scales)
@@ -105,8 +116,6 @@ rm(output)
 #i <- 1
 #pb = txtProgressBar(min = 0, max = length(varlist), initial = 0) 
 #models <- c()
-
-  
 #for (x in varlist){
 #  message(setTxtProgressBar(pb,i))
 #  cols = c(x, covariates)
@@ -116,21 +125,15 @@ rm(output)
 #  i <- i+1
 #}
 
-apply_betareg <- function(x){
-  cols = c(x, covariates)
-  data=completed[, ..cols]
-  return(get_beta_pvals(x, data))
-}
-
 #clusterExport(cl, c("completed", "covariates"))
 #rm(completed)
 models = mclapply(varlist, possibly(apply_betareg,NA_real_), mc.cores = opt$nprocesses, mc.preschedule = FALSE)
 #models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
 #models = lapply(varlist,possibly(get_beta_pvals,NA_real_))
 
-message("saving to output file ...")
-pvals_df = data.frame(Reduce(rbind, models))
-head(pvals_df)
-colnames(pvals_df) <- c("gene", "coeff","pval","stderr")
-write.table(pvals_df, file=opt$outputfile, quote=FALSE, sep='\t', row.names = FALSE)
+#message("saving to output file ...")
+#pvals_df = data.frame(Reduce(rbind, models))
+#head(pvals_df)
+#colnames(pvals_df) <- c("gene", "coeff","pval","stderr")
+#write.table(pvals_df, file=opt$outputfile, quote=FALSE, sep='\t', row.names = FALSE)
 message("Done")
