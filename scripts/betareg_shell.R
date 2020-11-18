@@ -47,7 +47,7 @@ mydata=read.table(opt$scoresfile, header=TRUE)
 
 mydata[is.na(mydata)] = 0
 mydata = Filter(var, mydata)
-#mydata = mydata[colMeans(mydata == 0) <= 0.9]
+mydata = mydata[colMeans(mydata == 0) <= 0.9]
 
 pheno=fread(opt$phenofile)
 if (!is.null(opt$pcfile)){
@@ -94,7 +94,7 @@ if (exists(as.character(expression(pc)))){
   completed=merge(completed,pc,by=opt$samplescol)
   rm(pc)
 }
-completed<-completed[complete.cases(completed),]
+#completed<-completed[complete.cases(completed),]
 message("Calculating pvalues ...")
 genes_list <- names(completed)[2:ncol(output)]
 rm(output)
