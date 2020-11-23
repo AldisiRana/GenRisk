@@ -202,8 +202,8 @@ def r_visualize(
          "-i", info_file,
          "--qq_output", qq_output,
          "--manhattan_output", manhattan_output,
-         "--genescol-1", genescol_1,
-         "--genescol-2", genescol_2]
+         "--genescol_1", genescol_1,
+         "--genescol_2", genescol_2]
     )
 
 
