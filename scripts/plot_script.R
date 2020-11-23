@@ -45,9 +45,9 @@ manhattan(complete_df,chr='Chr', bp="Start", snp=opt$genescol_1, p=opt$pvalcol,
           ylim = c(0, -log10(1e-06)), chrlabs = NULL,
           suggestiveline = -log10(1e-03), genomewideline = -log10(1e-05), logp = TRUE, main=opt$pvals_file, highlight=T, annotatePval=1, annotateTop=T)
 dev.off()
-lambda=median(qchisq(complete_df$as.character(opt$pvalcol), df=1, lower.tail=FALSE)) / qchisq(0.5, 1)
+lambda=median(qchisq(complete_df$p_value, df=1, lower.tail=FALSE)) / qchisq(0.5, 1)
 jpeg(opt$qq_output, res=300, width = 6, height = 6, units = 'in')
-qq(complete_df$pval,main=as.character(lambda))
+qq(complete_df$p_value,main=as.character(lambda))
 dev.off()
 
 
