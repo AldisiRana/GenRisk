@@ -253,13 +253,15 @@ def calc_corr(
 @click.option('--genescol-2', default='Gene.refGene')
 @click.option('--qq-output', required=True)
 @click.option('--manhattan-output', required=True)
+@click.option('--pvalcol', default='p_value')
 def visualize(
     pvals_file,
     info_file,
     genescol_1,
     genescol_2,
     qq_output,
-    manhattan_output
+    manhattan_output,
+    pvalcol,
 ):
     r_visualize(
         pvals_file=pvals_file,
@@ -268,6 +270,7 @@ def visualize(
         genescol_2=genescol_2,
         qq_output=qq_output,
         manhattan_output=manhattan_output,
+        pvalcol=pvalcol,
     )
 
 

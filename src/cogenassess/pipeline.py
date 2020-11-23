@@ -194,7 +194,8 @@ def r_visualize(
     info_file,
     pvals_file,
     qq_output,
-    manhattan_output
+    manhattan_output,
+    pvalcol
 ):
     subprocess.run(
         ["Rscript", PLOT_SHELL,
@@ -203,7 +204,8 @@ def r_visualize(
          "--qq_output", qq_output,
          "--manhattan_output", manhattan_output,
          "--genescol_1", genescol_1,
-         "--genescol_2", genescol_2]
+         "--genescol_2", genescol_2,
+         "--pvalcol", pvalcol]
     )
 
 
