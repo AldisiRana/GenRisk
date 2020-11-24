@@ -48,7 +48,7 @@ mydata=read.table(opt$scoresfile, header=TRUE)
 
 mydata[is.na(mydata)] = 0
 mydata = Filter(var, mydata)
-mydata = mydata[colMeans(mydata == 0) <= 0.9]
+#mydata = mydata[colMeans(mydata == 0) <= 0.9]
 
 pheno=fread(opt$phenofile)
 if (!is.null(opt$pcfile)){
