@@ -47,7 +47,7 @@ manhattan(complete_df,chr='Chr', bp="Start", snp=opt$genescol_1, p=opt$pvalcol,
 dev.off()
 lambda=median(qchisq(complete_df$p_value, df=1, lower.tail=FALSE)) / qchisq(0.5, 1)
 jpeg(opt$qq_output, res=300, width = 6, height = 6, units = 'in')
-qq(complete_df$p_value,main=as.character(lambda))
+qq(complete_df[[opt$pvalcol]],main=as.character(lambda))
 dev.off()
 
 
