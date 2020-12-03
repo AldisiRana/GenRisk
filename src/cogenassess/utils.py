@@ -54,7 +54,7 @@ def combine_scores(
     all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(input_path) for name in files]
     profile_files = [f for f in all_files if re.match(r'.+profile$', f)]
     df = pd.read_csv(str(profile_files[0]), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
-    r = re.compile(r'(\w+).profile$')
+    r = re.compile(r'(\w+.).profile$')
     gene = r.findall(str(profile_files[0]))
     df.rename(columns={'SCORESUM': gene[0]}, inplace=True)
     pf = profile_files
@@ -66,7 +66,7 @@ def combine_scores(
 
 def unisci(df, f):
     df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
-    r = re.compile(r'(\w+).profile$')
+    r = re.compile(r'(\w+.).profile$')
     gene2 = r.findall(str(f))
     df2.rename(columns={'SCORESUM': gene2[0]}, inplace=True)
     df = pd.merge(df, df2, on='IID')
