@@ -174,7 +174,7 @@ def betareg_pvalues(
     output_path,
     covariates
 ):
-    subprocess.call(
+    p = subprocess.call(
         ["Rscript", BETAREG_SHELL,
          "-s", scores_file,
          "--phenofile", pheno_file,
@@ -183,7 +183,7 @@ def betareg_pvalues(
          "--casescol", cases_col,
          "--nprocesses", str(nprocesses),
          "-o", output_path,
-         "--covariates", covariates]
+         "--covariates", covariates], shell=True
     )
 
 
@@ -241,15 +241,13 @@ def prediction_model(
     x,
     y,
     test_size,
+
 ):
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42)
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     model = LassoCV(alphas=np.arange(0, 1, 0.01), cv=cv, n_jobs=-1)
     model.fit(x_train, y_train)
-    score = model.score(x_test, y_test)
-    y_pred = model.predict(x_test)
-    auc_roc = roc_auc_score(y_test, y_pred)
-    return model, score, auc_roc
+    return model
 
 
 def merge_files_fun(
