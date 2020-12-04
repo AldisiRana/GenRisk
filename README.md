@@ -19,7 +19,7 @@ within a phenotype in a population
 This function calculates the gene-based scores of a gene list for a group of samples.
 
     $ cogenassess score_genes --vcf vcf/file/path --bed bed/file/path --bim bim/file/path --fam fam/file/path 
-    --temp-dir /dir/for/temp/files --ourput-file /final/output/file --weight-func [log10|beta] --remove-dir
+    --temp-dir /dir/for/temp/files --output-file /final/output/file --weight-func [log10|beta] --remove-dir
 
 
 ### Normalize scores
