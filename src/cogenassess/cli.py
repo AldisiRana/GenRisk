@@ -137,7 +137,6 @@ def calculate_pval(
         betareg_pvalues(
             scores_file=scores_file,
             pheno_file=genotype_file,
-            pc_file=pc_file,
             cases_col=cases_column,
             samples_col=samples_column,
             output_path=output_path,
@@ -298,6 +297,14 @@ def merge_files(
         df.to_csv(output_file, sep='\t', index=False)
     return df.info
 
+
+def prediction_model(
+    *,
+    data,
+    labels,
+
+):
+    pass
 
 if __name__ == '__main__':
     main()
