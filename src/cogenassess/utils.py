@@ -22,8 +22,9 @@ def get_gene_info(
     beta_param,
     weight_func
 ):
-    df = pd.read_csv(annotated_file, usecols=[variant_col, af_col, del_col], sep=r'\s+')
+    df = pd.read_csv(annotated_file, usecols=[variant_col, af_col, del_col, genes_col], sep=r'\s+')
     df = df[df[af_col].values.astype(float) < maf_threshold]
+    df.replace('.', 0.0, inplace=True)
     if weight_func == 'beta':
         df[weight_func] = beta.pdf(df[af_col].values.astype(float), beta_param[0], beta_param[1])
     elif weight_func == 'log10':
