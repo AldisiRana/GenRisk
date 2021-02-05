@@ -36,6 +36,7 @@ def main():
 @click.option('--gene-col', default='Gene.refGene')
 @click.option('--af-col', default='MAF')
 @click.option('--del-col', default='CADD_raw')
+@click.option('--alt-col', default='Alt')
 @click.option('--maf-threshold', default=0.01)
 @click.option('--remove-temp', is_flag=True)
 def score_genes(
@@ -52,6 +53,7 @@ def score_genes(
     gene_col,
     af_col,
     del_col,
+    alt_col,
     maf_threshold,
     remove_temp,
 ):
@@ -81,6 +83,7 @@ def score_genes(
         genes_col=gene_col,
         variant_col=variant_col,
         af_col=af_col,
+        alt_col=alt_col,
     )
     click.echo('calculating gene scores ...')
     plink_process(genes_folder=genes_folder, plink=plink, bed=bed, bim=bim, fam=fam)
