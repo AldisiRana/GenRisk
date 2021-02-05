@@ -38,7 +38,7 @@ def get_gene_info(
     gene_file = output_dir + '.genes'
     with open(os.path.join(output_dir, gene_file), 'w') as f:
         f.writelines("%s\n" % gene for gene in genes)
-    [df[df[genes_col] == gene][[variant_col, 'Alt' 'score', genes_col]].to_csv(os.path.join(output_dir, (
+    [df[df[genes_col] == gene][[variant_col, 'Alt', 'score', genes_col]].to_csv(os.path.join(output_dir, (
         str(gene) + '.w')), index=False, sep='\t') for gene in tqdm(genes, desc="writing w gene files")]
     [df[df[genes_col] == gene][[variant_col, alt_col]].to_csv(os.path.join(output_dir, (str(gene) + '.v')),
         index=False, sep='\t') for gene in tqdm(genes, desc="writing v gene files")]
