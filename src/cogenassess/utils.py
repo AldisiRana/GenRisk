@@ -6,42 +6,39 @@ import subprocess
 
 import pandas as pd
 import numpy as np
-import gzip
 from scipy.stats import beta
 from tqdm import tqdm
 
 
-def get_gene_info(*, vcf, output_dir, beta_param, weight_func):
-    line_number = 0
-    with gzip.open(vcf, 'r') as infile:
-        for line in infile:
-            line_number = line_number + 1
-            if line.startswith(b'#CHR'):
-                break
-    df = pd.read_csv(vcf, usecols=['ID', 'ALT', 'INFO'], sep=r'\s+', skiprows=line_number - 1)
-    df = df[df.INFO.str.contains('AF=', regex=True, na=False) & df.INFO.str.contains(
-        'RawScore=', regex=True, na=False) & df.INFO.str.contains('gene=', regex=True, na=False)]
-    df[['PR', 'AF', 'RawScore', 'PHRED', 'gene']] = df.INFO.str.split(";", expand=True, )
-    df.replace(to_replace=r'^AF=', value='', regex=True, inplace=True)
-    df.replace(to_replace=r'^RawScore=', value='', regex=True, inplace=True)
-    df.replace(to_replace=r'^gene=', value='', regex=True, inplace=True)
-    df.AF.replace(to_replace='.', value=np.nan, inplace=True)
-    df = df[df['AF'].values.astype(float) < 0.01]
+def get_gene_info(
+    *,
+    annotated_file,
+    variant_col,
+    af_col,
+    del_col,
+    output_dir,
+    genes_col,
+    maf_threshold,
+    beta_param,
+    weight_func
+):
+    df = pd.read_csv(annotated_file, usecols=[variant_col, af_col, del_col], sep=r'\s+')
+    df = df[df[af_col].values.astype(float) < maf_threshold]
     if weight_func == 'beta':
-        df[weight_func] = beta.pdf(df.AF.values.astype(float), beta_param[0], beta_param[1])
+        df[weight_func] = beta.pdf(df[af_col].values.astype(float), beta_param[0], beta_param[1])
     elif weight_func == 'log10':
-        df[weight_func] = -np.log10(df.AF.values.astype(float))
+        df[weight_func] = -np.log10(df[af_col].values.astype(float))
         df[weight_func].replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
-    df['score'] = df[weight_func].values.astype(float) * df['RawScore'].values.astype(float)
-    genes = list(set(df['gene']))
+    df['score'] = df[weight_func].values.astype(float) * df[del_col].values.astype(float)
+    genes = list(set(df[genes_col]))
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
     gene_file = output_dir + '.genes'
     with open(os.path.join(output_dir, gene_file), 'w') as f:
         f.writelines("%s\n" % gene for gene in genes)
-    [df[df['gene'] == gene][['ID', 'ALT', 'score', 'gene']].to_csv(os.path.join(output_dir, (str(gene) + '.w')),
+    [df[df[genes_col] == gene][[variant_col, 'score', genes_col]].to_csv(os.path.join(output_dir, (str(gene) + '.w')),
         index=False, sep='\t') for gene in tqdm(genes, desc="writing w gene files")]
-    [df[df['gene'] == gene][['ID']].to_csv(os.path.join(output_dir, (str(gene) + '.v')),
+    [df[df[genes_col] == gene][[variant_col]].to_csv(os.path.join(output_dir, (str(gene) + '.v')),
         index=False, sep='\t') for gene in tqdm(genes, desc="writing v gene files")]
     return output_dir
 

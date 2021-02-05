@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from pybiomart import Dataset
 import scipy.stats as stats
-from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import RepeatedKFold
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LassoCV

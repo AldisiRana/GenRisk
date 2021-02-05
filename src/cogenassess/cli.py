@@ -13,13 +13,17 @@ from .utils import get_gene_info, plink_process, combine_scores
 from .pipeline import normalize_gene_len, find_pvalue, betareg_pvalues, r_visualize, merge_files_fun
 
 
+#TO DO:
+#Word args better
+#Fix pipeline -> calc pvals
+#update README
 @click.group()
 def main():
     """Handle cogenassess functions."""
 
 
 @main.command()
-@click.option('-v', '--vcf', required=True, help='the annotated vcf file')
+@click.option('-a', '--annotated-file', required=True, help='the annotated file')
 @click.option('--bed', required=True)
 @click.option('--bim', required=True)
 @click.option('--fam', required=True)
@@ -28,9 +32,14 @@ def main():
 @click.option('-o', '--output-file', required=True)
 @click.option('--beta-param', default=(1.0, 25.0), nargs=2, type=float)
 @click.option('--weight-func', default='beta', type=click.Choice(['beta', 'log10']))
+@click.option('--variant-col', default='SNP')
+@click.option('--gene-col', default='Gene.refGene')
+@click.option('--af-col', default='MAF')
+@click.option('--del-col', default='CADD_raw')
+@click.option('--maf-threshold', default=0.01)
 @click.option('--remove-temp', is_flag=True)
 def score_genes(
-    vcf,
+    annotated_file,
     bed,
     bim,
     fam,
@@ -39,6 +48,11 @@ def score_genes(
     temp_dir,
     output_file,
     weight_func,
+    variant_col,
+    gene_col,
+    af_col,
+    del_col,
+    maf_threshold,
     remove_temp,
 ):
     """
@@ -57,7 +71,17 @@ def score_genes(
     :return: the final dataframe information.
     """
     click.echo('getting information from vcf files')
-    genes_folder = get_gene_info(vcf=vcf, output_dir=temp_dir, beta_param=beta_param, weight_func=weight_func)
+    genes_folder = get_gene_info(
+        annotated_file=annotated_file,
+        output_dir=temp_dir,
+        beta_param=beta_param,
+        weight_func=weight_func,
+        del_col=del_col,
+        maf_threshold=maf_threshold,
+        genes_col=gene_col,
+        variant_col=variant_col,
+        af_col=af_col,
+    )
     click.echo('calculating gene scores ...')
     plink_process(genes_folder=genes_folder, plink=plink, bed=bed, bim=bim, fam=fam)
     click.echo('combining score files ...')
