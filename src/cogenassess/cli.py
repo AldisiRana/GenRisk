@@ -40,6 +40,7 @@ def main():
 @click.option('--maf-threshold', default=0.01)
 @click.option('--remove-temp', is_flag=True)
 def score_genes(
+    *,
     annotated_file,
     bed,
     bim,
