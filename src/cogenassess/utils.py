@@ -15,6 +15,7 @@ def get_gene_info(
     annotated_file,
     variant_col,
     af_col,
+    alt_col='Alt',
     del_col,
     output_dir,
     genes_col,
@@ -22,7 +23,7 @@ def get_gene_info(
     beta_param,
     weight_func
 ):
-    df = pd.read_csv(annotated_file, usecols=[variant_col, af_col, del_col, genes_col], sep=r'\s+')
+    df = pd.read_csv(annotated_file, usecols=[variant_col, alt_col, af_col, del_col, genes_col], sep=r'\s+')
     df = df[df[af_col].values.astype(float) < maf_threshold]
     df.replace('.', 0.0, inplace=True)
     if weight_func == 'beta':
@@ -39,7 +40,7 @@ def get_gene_info(
         f.writelines("%s\n" % gene for gene in genes)
     [df[df[genes_col] == gene][[variant_col, 'score', genes_col]].to_csv(os.path.join(output_dir, (str(gene) + '.w')),
         index=False, sep='\t') for gene in tqdm(genes, desc="writing w gene files")]
-    [df[df[genes_col] == gene][[variant_col]].to_csv(os.path.join(output_dir, (str(gene) + '.v')),
+    [df[df[genes_col] == gene][[variant_col, alt_col]].to_csv(os.path.join(output_dir, (str(gene) + '.v')),
         index=False, sep='\t') for gene in tqdm(genes, desc="writing v gene files")]
     return output_dir
 
