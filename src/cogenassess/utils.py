@@ -127,15 +127,15 @@ def create_model(
     test_size=0.25,
     metric=None,
 ):
-    df = pd.read_csv(training_set, sep='/t', index_col=False)
-    if testing_set:
-        test = pd.read_csv(testing_set, sep='/t', index_col=False)
+    #df = pd.read_csv(training_set, sep='/t', index_col=False)
+    #if testing_set:
+    #    test = pd.read_csv(testing_set, sep='/t', index_col=False)
     # train, test = train_test_split(df, test_size=test_size)
     os.chdir(output_folder)
     if model_type == 'reg':
         if not metric:
             metric = 'RMSE'
-        reg = pyreg.setup(target=y_col, data=df, normalize=normalize, train_size=1-test_size, fold=folds, silent=True)
+        reg = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1-test_size, fold=folds, silent=True)
         best_model = pyreg.compare_models(sort=metric)
         reg_model = pyreg.create_model(best_model)
         reg_tuned_model = pyreg.tune_model(reg_model)
@@ -144,7 +144,7 @@ def create_model(
         pyreg.plot_model(reg_tuned_model, plot='error', save=True)
         final_model = pyreg.finalize_model(reg_tuned_model)
         if testing_set:
-            unseen_predictions = pyreg.predict_model(final_model, data=test)
+            unseen_predictions = pyreg.predict_model(final_model, data=testing_set)
             r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
             rmse = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'RMSE')
         pyreg.save_model(final_model, model_name)
