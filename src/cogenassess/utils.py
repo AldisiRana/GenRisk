@@ -24,10 +24,24 @@ def get_gene_info(
     del_col,
     output_dir,
     genes_col,
-    maf_threshold,
+    maf_threshold=0.01,
     beta_param,
-    weight_func
+    weight_func='beta'
 ):
+    """
+    Create temporary files with variant information for each gene, plus the weights calculated.
+    :param annotated_file: a file containing the variant, AF, ALT, Gene, and deleterious score.
+    :param variant_col: the name of the variant column.
+    :param af_col: the name of the AF column.
+    :param alt_col: the name of the ALT column.
+    :param del_col: the name of deleterious score column.
+    :param output_dir: directory to save in temporary files.
+    :param genes_col: the name of genes column.
+    :param maf_threshold: the minor allele frequency threshold, default is 0.01.
+    :param beta_param: the parameters of the beta function, if chosen for weighting.
+    :param weight_func: the weighting function, beta or log10.
+    :return: returns the output directory with all the temporary files.
+    """
     df = pd.read_csv(annotated_file, usecols=[variant_col, alt_col, af_col, del_col, genes_col], sep=r'\s+')
     df = df[df[af_col].values.astype(float) < maf_threshold]
     df.replace('.', 0.0, inplace=True)
@@ -55,6 +69,12 @@ def combine_scores(
     input_path,
     output_path,
 ):
+    """
+    Combine the files that contain the scores into one file.
+    :param input_path: the directory containing scores files.
+    :param output_path: the name of the output file.
+    :return: dataframe with all the scores.
+    """
     all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(input_path) for name in files]
     profile_files = [f for f in all_files if re.match(r'.+profile$', f)]
     df = pd.read_csv(str(profile_files[0]), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
@@ -69,6 +89,12 @@ def combine_scores(
 
 
 def unisci(df, f):
+    """
+    Merge two dataframes.
+    :param df: the main dataframe with all the scores.
+    :param f: the file containing the scores of one gene.
+    :return: the merged dataframe.
+    """
     df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
     r = re.compile(r'\w+/(.*).profile$')
     gene2 = r.findall(str(f))
@@ -78,6 +104,15 @@ def unisci(df, f):
 
 
 def plink_process(*, genes_folder, plink, bed, bim, fam):
+    """
+    Use plink to calculate and sum the scores for each gene.
+    :param genes_folder: the folder containing the temporary genes files.
+    :param plink: the directory of plink (if not default).
+    :param bed: the bed file path.
+    :param bim: the bim file path.
+    :param fam: the fam file path.
+    :return:
+    """
     genes = [line.strip() for line in open(os.path.join(genes_folder, (genes_folder + '.genes')), 'r')]
     for gene in tqdm(genes, desc='calculating genes scores'):
         v_file = os.path.join(genes_folder, (gene + '.v'))
@@ -143,7 +178,7 @@ def create_model(
         pyreg.plot_model(reg_tuned_model, plot='feature', save=True)
         pyreg.plot_model(reg_tuned_model, plot='error', save=True)
         final_model = pyreg.finalize_model(reg_tuned_model)
-        if testing_set:
+        if testing_set.bool():
             unseen_predictions = pyreg.predict_model(final_model, data=testing_set)
             r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
             rmse = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'RMSE')
