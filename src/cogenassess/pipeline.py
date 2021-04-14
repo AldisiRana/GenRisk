@@ -245,19 +245,3 @@ def prediction_model(
     model = LassoCV(alphas=np.arange(0, 1, 0.01), cv=cv, n_jobs=-1)
     model.fit(x_train, y_train)
     return model
-
-
-def merge_files_fun(
-    *,
-    input_dir,
-    samples_col,
-):
-    folder = os.listdir(input_dir)
-    df = pd.read_csv(os.path.join(input_dir, folder[0]), sep='\t', index_col=False,
-                     dtype=np.float32).sort_values(by=[samples_col])
-    for filename in tqdm(folder[1:], desc="merging files"):
-        new_df = pd.read_csv(os.path.join(input_dir, filename),
-                             sep='\t', index_col=False, dtype=np.float32).sort_values(by=[samples_col])
-        new_df.drop(columns=[samples_col])
-        df = pd.concat([df, new_df])
-    return df
