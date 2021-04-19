@@ -232,7 +232,7 @@ def create_model(
         final_model = cl.finalize_model(cl_tuned_model)
         if testing_set.bool():
             unseen_predictions = cl.predict_model(final_model, data=testing_set)
-            auc = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'auc')
+            auc = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'AUC')
             accuracy = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'accuracy')
             metrics = ['AUC: ' + auc, 'Accuracy: ' + accuracy]
         cl.save_model(final_model, model_name)
