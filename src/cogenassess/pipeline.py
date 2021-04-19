@@ -2,13 +2,9 @@
 import os
 import subprocess
 
-import numpy as np
 import pandas as pd
 from pybiomart import Dataset
 import scipy.stats as stats
-from sklearn.model_selection import RepeatedKFold
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LassoCV
 import statsmodels.api as sm
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm
@@ -30,6 +26,7 @@ def normalize_gene_len(
 
     :param genes_lengths_file: a file containing genes, and their start and end bps.
     :param matrix_file: a tsv file containing a matrix of samples and their scores across genes.
+    :param samples_col: column containing the samples IDs.
     :param output_path: the path to save the normalized matrix.
     :return: a normalized dataframe.
     """
@@ -76,13 +73,15 @@ def find_pvalue(
 ):
     """
     Calculate the significance of a gene in a population using Mann-Whitney-U test.
-    :param pc_file:
-    :param test:
+    :param pc_file: if there is an extra file with PC values.
+    :param test: the type of statistical test to use, choices are: t-test, mannwhitenyu, GLM, logit.
     :param scores_df: dataframe containing the scores of genes across samples.
     :param genotype_file: a file containing the information of the sample.
     :param output_file: a path to save the output file.
     :param genes: a list of the genes to calculate the significance. if None will calculate for all genes.
     :param cases_column: the name of the column containing cases and controls information.
+    :param samples_column: the name of the column contining samples IDs.
+    :param adj_pval: the method for pvalue adjustment.
     :return: dataframe with genes and their p_values
     """
     genotype_df = pd.read_csv(genotype_file, sep=r'\s+', usecols=[samples_column, cases_column])
@@ -92,7 +91,6 @@ def find_pvalue(
     p_values = []
     if genes is None:
         genes = scores_df.columns.tolist()[1:]
-    # improvement: make it so that more than one statistical test can be used
     if test == 'mannwhitneyu':
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
             case_0 = df_by_cases.get_group(cases[0])[gene].tolist()
@@ -172,6 +170,17 @@ def betareg_pvalues(
     output_path,
     covariates
 ):
+    """
+    Calculate association significance between two groups using betareg.
+    :param scores_file: the path to the scores file.
+    :param pheno_file:  the path to the phenotypes and covariates file.
+    :param samples_col: the name of the column containing the samples IDs.
+    :param cases_col: the name of the column containing the case/controls.
+    :param nprocesses: the number of processes used in parallel.
+    :param output_path: the path to the output file.
+    :param covariates: the covariates used in calculations, written with no space and comma in between (e.g PC1,PC2)
+    :return:
+    """
     p = subprocess.call(
         ["Rscript", BETAREG_SHELL,
          "-s", scores_file,
@@ -194,6 +203,17 @@ def r_visualize(
     manhattan_output,
     pvalcol
 ):
+    """
+    Visualize the results of association test. Manhattan plot and QQ-plot.
+    :param genescol_1: the name of the column containing the genes in the pvals_file.
+    :param genescol_2: the name of the column containing the genes in the info_file.
+    :param info_file: the file containing gene information.
+    :param pvals_file: file containing the pvalues.
+    :param qq_output: the name for the qq plot file.
+    :param manhattan_output: the name for manhattan plot file.
+    :param pvalcol: the column containing the pvalues.
+    :return:
+    """
     subprocess.run(
         ["Rscript", PLOT_SHELL,
          "-p", pvals_file,
@@ -204,44 +224,3 @@ def r_visualize(
          "--genescol_2", genescol_2,
          "--pvalcol", pvalcol]
     )
-
-
-def merge_matrices(
-    *,
-    directory,
-    output_path,
-    samples_col,
-    scores_col,
-    file_suffix='.tsv'
-):
-    """
-    Merges multiple files in a directory, each file should contain the score of a gene across the samples.
-
-    :param directory: the directory that contains files to merge.
-    :param output_path: the path for the merged tsv file.
-    :return: a dataframe combining all information from files.
-    """
-    full_data = pd.DataFrame(data=None, columns=samples_col)
-    for filename in tqdm(os.listdir(directory), desc="merging matrices"):
-        if not filename.endswith(file_suffix):
-            continue
-        data = pd.read_csv(os.path.join(directory, filename), sep=r'\s+', usecols=samples_col + [scores_col])
-        gene_name = filename.split('.')[0]
-        data = data.rename(columns={scores_col: gene_name})
-        full_data = pd.merge(data, full_data, on=samples_col, how='left')
-    full_data.to_csv(output_path, sep='\t', index=False)
-    return full_data
-
-
-def prediction_model(
-    *,
-    x,
-    y,
-    test_size,
-
-):
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42)
-    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-    model = LassoCV(alphas=np.arange(0, 1, 0.01), cv=cv, n_jobs=-1)
-    model.fit(x_train, y_train)
-    return model
