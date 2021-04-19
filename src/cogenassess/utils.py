@@ -127,12 +127,25 @@ def plink_process(*, genes_folder, plink, bed, bim, fam):
 def get_prs(
     *,
     prs_id,
-    bed,
-    bim,
-    fam,
+    vcf=None,
+    bed=None,
+    bim=None,
+    fam=None,
     plink,
     output_file,
 ):
+    """
+    Get PGS scores from pgscatalog and calculate PRS score for samples.
+    :param prs_id: the PRS ID in the pgscatalog.
+    :param vcf: vcf file with sampels info. OR use bed/bim/fam files.
+     :param bed: the bed file path.
+    :param bim: the bim file path.
+    :param fam: the fam file path.
+    :param plink:
+    :param output_file: the path to the output scores file.
+    :return:
+    """
+    # make sure that the columns are present and matching
     resp = requests.get('https://www.pgscatalog.org/rest/score/%s' % prs_id)
     prs_info = resp.json()
     if resp.status_code != 200 or not prs_info:
@@ -141,11 +154,15 @@ def get_prs(
     prs_file = prs_id+'.gz'
     urllib.urlretrieve(url, prs_file)
     # unpack file
-    # find a way to change rsID to snpID
-    p = subprocess.call(
-        plink + " --bed " + bed + " --bim " + bim + " --fam " + fam + " --score " + prs_file + " 1 2 3 sum --out " +
-        output_file, shell=True
-    )
+    if vcf:
+        p = subprocess.call(
+            plink + " --vcf " + vcf + " --score " + prs_file + " 1 2 3 sum --out " + output_file, shell=True
+        )
+    else:
+        p = subprocess.call(
+            plink + " --bed " + bed + " --bim " + bim + " --fam " + fam + " --score " + prs_file + " 1 2 3 sum --out " +
+            output_file, shell=True
+        )
 
 
 def create_model(
@@ -162,15 +179,28 @@ def create_model(
     test_size=0.25,
     metric=None,
 ):
-    #df = pd.read_csv(training_set, sep='/t', index_col=False)
-    #if testing_set:
-    #    test = pd.read_csv(testing_set, sep='/t', index_col=False)
-    # train, test = train_test_split(df, test_size=test_size)
+    """
+    Create a prediction model (classifier or regressor) using the provided dataset.
+    :param output_folder: the path to the folder to save outputs.
+    :param model_name: the name of the prediction model.
+    :param model_type: type of model (reg or classifier).
+    :param y_col: the column containing the target (qualitative or quantitative).
+    :param imbalanced: True means data is imbalanced.
+    :param normalize: True if data needs normalization.
+    :param folds: how many folds for cross-validation.
+    :param training_set: the training set for the model.
+    :param testing_set: if exists an extra evaluation step will be done using the testing set.
+    :param test_size: the size to split the training/testing set.
+    :param metric: the metric to evaluate the best model.
+    :return: the metrics.
+    """
     os.chdir(output_folder)
+    metrics = None
     if model_type == 'reg':
         if not metric:
             metric = 'RMSE'
-        reg = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1-test_size, fold=folds, silent=True)
+        reg = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1-test_size, fold=folds,
+                          silent=True)
         best_model = pyreg.compare_models(sort=metric)
         reg_model = pyreg.create_model(best_model)
         reg_tuned_model = pyreg.tune_model(reg_model)
@@ -182,17 +212,32 @@ def create_model(
             unseen_predictions = pyreg.predict_model(final_model, data=testing_set)
             r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
             rmse = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'RMSE')
+            metrics = ['R2: ' + r2, 'RMSE: ' + rmse]
         pyreg.save_model(final_model, model_name)
         pyreg.save_experiment('model_session')
         with open('model.log', 'w') as f:
             f.writelines("%s\n" % output for output in reg)
+            f.writelines("%s\n" % output for output in metrics)
     elif model_type == 'classifier':
         if not metric:
             metric = 'AUC'
-        classifier = cl.setup(target=y_col, fix_imbalance=imbalanced, data=df, train_size=1-test_size, silent=True)
+        classifier = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1-test_size,
+                              silent=True)
         best_model = cl.compare_models(sort=metric)
         cl_model = cl.create_model(best_model)
         cl_tuned_model = pyreg.tune_model(cl_model)
         cl.plot_model(cl_tuned_model, plot='pr', save=True)
         cl.plot_model(cl_tuned_model, plot='confusion_matrix', save=True)
-    return
+        cl.plot_model(cl_tuned_model, plot='feature', save=True)
+        final_model = cl.finalize_model(cl_tuned_model)
+        if testing_set.bool():
+            unseen_predictions = cl.predict_model(final_model, data=testing_set)
+            auc = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'auc')
+            accuracy = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'accuracy')
+            metrics = ['AUC: ' + auc, 'Accuracy: ' + accuracy]
+        cl.save_model(final_model, model_name)
+        cl.save_experiment('model_session')
+        with open('model.log', 'w') as f:
+            f.writelines("%s\n" % output for output in classifier)
+            f.writelines("%s\n" % output for output in metrics)
+    return metrics
