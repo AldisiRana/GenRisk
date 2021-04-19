@@ -10,13 +10,9 @@ from scipy.stats import pearsonr
 from tqdm import tqdm
 
 from .utils import get_gene_info, plink_process, combine_scores
-from .pipeline import normalize_gene_len, find_pvalue, betareg_pvalues, r_visualize, merge_files_fun
+from .pipeline import normalize_gene_len, find_pvalue, betareg_pvalues, r_visualize
 
 
-#TO DO:
-#Word args better
-#Fix pipeline -> calc pvals
-#update README
 @click.group()
 def main():
     """Handle cogenassess functions."""
@@ -24,21 +20,24 @@ def main():
 
 @main.command()
 @click.option('-a', '--annotated-file', required=True, help='the annotated file')
-@click.option('--bed', required=True)
-@click.option('--bim', required=True)
-@click.option('--fam', required=True)
-@click.option('--plink', default='plink')
-@click.option('-t', '--temp-dir', required=True)
-@click.option('-o', '--output-file', required=True)
-@click.option('--beta-param', default=(1.0, 25.0), nargs=2, type=float)
-@click.option('--weight-func', default='beta', type=click.Choice(['beta', 'log10']))
-@click.option('--variant-col', default='SNP')
-@click.option('--gene-col', default='Gene.refGene')
-@click.option('--af-col', default='MAF')
-@click.option('--del-col', default='CADD_raw')
-@click.option('--alt-col', default='Alt')
-@click.option('--maf-threshold', default=0.01)
-@click.option('--remove-temp', is_flag=True)
+@click.option('--bed', required=True, help="text file for genotype")
+@click.option('--bim', required=True, help="file with variant information")
+@click.option('--fam', required=True, help="text file for pedigree information")
+@click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
+@click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
+@click.option('-o', '--output-file', required=True, help="the final output scores matrix.")
+@click.option('--beta-param', default=(1.0, 25.0), nargs=2, type=float,
+              help="the parameters from beta weight function.")
+@click.option('--weight-func', default='beta', type=click.Choice(['beta', 'log10']),
+              help="the weighting function used in score calculation.")
+@click.option('--variant-col', default='SNP', help="the column containing the variant IDs.")
+@click.option('--gene-col', default='Gene.refGene', help="the column containing gene names.")
+@click.option('--af-col', default='MAF', help="the column containing allele frequency.")
+@click.option('--del-col', default='CADD_raw', help="the column containing the deleteriousness score.")
+@click.option('--alt-col', default='Alt', help="the column containing the alternate base.")
+@click.option('--maf-threshold', default=0.01, help="the threshold for minor allele frequency.")
+@click.option('--remove-temp', is_flag=True,
+              help="if flagged the temporary directory will be deleted after process completion.")
 def score_genes(
     *,
     annotated_file,
@@ -59,10 +58,9 @@ def score_genes(
     remove_temp,
 ):
     """
-    Get genes' scores using annotated vcf.
 
-    :param vcf: a vcf with annotations. use vcfanno.
-    :param bed: test file for genotype.
+    :param annotated_file: a file containing
+    :param bed: text file for genotype.
     :param bim: file with variant information
     :param fam: text file for pedigree information
     :param plink: the directory of plink, if not set in environment
@@ -70,6 +68,12 @@ def score_genes(
     :param temp_dir: a temporary directory to save temporary files before merging.
     :param output_file: the final output scores matrix.
     :param weight_func: the weighting function used in score calculation.
+    :param variant_col: the column containing the variant IDs.
+    :param gene_col: the column containing gene names.
+    :param af_col: the column containing allele frequency.
+    :param del_col: the column containing deleteriousness score.
+    :param alt_col: the column containing alternate base.
+    :param maf_threshold: the threshold for minor allele frequency.
     :param remove_temp: if True temporary directory will be deleted after process completion.
     :return: the final dataframe information.
     """
@@ -97,11 +101,11 @@ def score_genes(
 
 
 @main.command()
-@click.option('--bed', required=True)
-@click.option('--bim', required=True)
-@click.option('--fam', required=True)
+@click.option('--bed', required=True, help="text file for genotype")
+@click.option('--bim', required=True, help="file with variant information")
+@click.option('--fam', required=True, help="text file for pedigree information")
 @click.option('--plink', default='plink')
-@click.option('--genes-folder', required=True)
+@click.option('--genes-folder', required=True, help="a folder that contains two files for each gene, w and v files.")
 def run_plink(*, genes_folder, plink, bed, bim, fam):
     """
     Get the genes' scores from a folder of genes info.
@@ -129,7 +133,8 @@ def run_plink(*, genes_folder, plink, bed, bim, fam):
               help='statistical test for calculating P value.')
 @click.option('-c', '--cases-column', required=True, help="the name of the column that contains the case/control type.")
 @click.option('-m', '--samples-column', required=True, help="the name of the column that contains the samples.")
-@click.option('-p', '--pc-file', default=None, help="Principle components values for logistic regression.")
+@click.option('-p', '--pc-file', default=None,
+              help="Principle components values for logistic regression. if not in genotype file")
 @click.option('--adj-pval', type=click.Choice(
     ['bonferroni', 'sidak', 'holm-sidak', 'holm',
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
@@ -238,10 +243,10 @@ def normalize(
 
 
 @main.command()
-@click.option('--first-file', required=True)
-@click.option('--second-file', required=True)
-@click.option('--samples-col', default='IID')
-@click.option('--output-file', required=True)
+@click.option('--first-file', required=True, help="the path to the first scores file.")
+@click.option('--second-file', required=True, help="the path to the second scores file.")
+@click.option('--samples-col', default='IID', help="the column containing the samples IDs.")
+@click.option('--output-file', required=True, help="the path to the output file with correlation values.")
 def calc_corr(
     *,
     first_file,
@@ -249,7 +254,14 @@ def calc_corr(
     samples_col,
     output_file,
 ):
-    """Calculate the pearson's correlation between same genes in two scoring matices."""
+    """
+    Calculate the pearson's correlation between same genes in two scoring matices.
+    :param first_file: the path to the first scores file.
+    :param second_file: the path to the second scores file.
+    :param samples_col: the column containing the samples IDs.
+    :param output_file: the path to the output file with correlation values.
+    :return:
+    """
     with open(first_file) as f:
         genes_01 = re.split('\s+', f.readline().strip('\n'))
         genes_01.remove(samples_col)
@@ -274,13 +286,13 @@ def calc_corr(
 
 
 @main.command()
-@click.option('--pvals-file', required=True)
-@click.option('--info-file', required=True)
-@click.option('--genescol-1', default='gene')
-@click.option('--genescol-2', default='Gene.refGene')
-@click.option('--qq-output', required=True)
-@click.option('--manhattan-output', required=True)
-@click.option('--pvalcol', default='p_value')
+@click.option('--pvals-file', required=True, help="the file containing p-values.")
+@click.option('--info-file', required=True, help="file containing variant/gene info.")
+@click.option('--genescol-1', default='gene', help="the name of the genes column in pvals file.")
+@click.option('--genescol-2', default='Gene.refGene', help="the name of the genes column in info file.")
+@click.option('--qq-output', required=True, help="the name of the qq plot file.")
+@click.option('--manhattan-output', required=True, help="the name of the manhatten plot file.")
+@click.option('--pvalcol', default='p_value', help="the name of the pvalues column.")
 def visualize(
     pvals_file,
     info_file,
@@ -290,6 +302,17 @@ def visualize(
     manhattan_output,
     pvalcol,
 ):
+    """
+    Visualize manhatten plot and qqplot for the data.
+    :param pvals_file: the file containing p-values.
+    :param info_file: file containing variant/gene info.
+    :param genescol_1: the name of the genes column in pvals file.
+    :param genescol_2: the name of the genes column in info file.
+    :param qq_output: the name of the qq plot file.
+    :param manhattan_output: the name of the manhatten plot file.
+    :param pvalcol: the name of the pvalues column.
+    :return:
+    """
     r_visualize(
         pvals_file=pvals_file,
         info_file=info_file,
@@ -300,39 +323,6 @@ def visualize(
         pvalcol=pvalcol,
     )
 
-
-@main.command()
-@click.option('-d', '--input-dir', required=True)
-@click.option('-o', '--output-file', required=True)
-@click.option('-s', '--samples-col', required=True)
-@click.option('-e', '--extension', required=True, type=click.Choice(['pickle', 'feather', 'tsv']))
-def merge_files(
-    *,
-    input_dir,
-    output_file,
-    samples_col,
-    extension
-):
-    df = merge_files_fun(input_dir=input_dir, samples_col=samples_col)
-    if extension == 'pickle':
-        df.to_pickle(output_file)
-    elif extension == 'feather':
-        df.reset_index().to_feather(output_file)
-    # if df.memory_usage(deep=True).sum() / float(1 << 30) > 10:
-    #   df.to_feather(output_file)
-    #  df.to_pickle(output_file)
-    else:
-        df.to_csv(output_file, sep='\t', index=False)
-    return df.info
-
-
-def prediction_model(
-    *,
-    data,
-    labels,
-
-):
-    pass
 
 if __name__ == '__main__':
     main()
