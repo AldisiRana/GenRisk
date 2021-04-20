@@ -331,7 +331,7 @@ def visualize(
 @click.option('--output-folder', required=True, help='path of folder that will contain all outputs.')
 @click.option('--test-size', default=0.25, help='test size for cross validation and evaluation.')
 @click.option('--test', is_flag=True,
-              help='if flagged, the dataset will be split into training and testing for extra evaluation after finalization')
+              help='if flagged, a test set will be created for evaluating the final model.')
 @click.option('--model-name', required=True, help='name of model file.')
 @click.option('--model-type', required=True, type=click.Choice(['reg', 'classifier']), help='type of prediction model.')
 @click.option('--target-col', required=True, help='name of target column in data_file.')
@@ -353,6 +353,21 @@ def prediction_model(
     folds,
     metric,
 ):
+    """
+    Create a predicition model with given dataset.
+    :param data_file: file containing features and target.
+    :param output_folder: a folder path to save all outputs.
+    :param test_size: the size of testing set.
+    :param test: if True the dataset will be split into training and testing for extra evaluation after finalization.
+    :param model_name: the name of the model to be saved.
+    :param model_type: the type of model (reg or classifier).
+    :param target_col: the column of the target.
+    :param imbalanced: if true methods will be used to account for the imbalance.
+    :param normalize:  if true the data will be normalized before training
+    :param folds: the number of folds used for cross validation
+    :param metric: the metric used to choose best model after training.
+    :return: the final model
+    """
     training_set = pd.read_csv(data_file, sep='\s+', index=False)
     if test:
         training_set, testing_set = train_test_split(training_set, test_size=test_size)
