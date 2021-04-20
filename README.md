@@ -18,11 +18,10 @@ within a phenotype in a population
 ### Score genes
 Calculate the gene-based scores for a given dataset.
 
-``` bash
-$ cogenassess score_genes --annotated-vcf toy_example/annotated_toy_dataset.vcf --bed toy_example/toy_dataset.bed 
---bim toy_example/toy_dataset.bim --fam toy_example/toy_dataset.fam --temp-dir toy_example/toy_dataset/ 
---output-file toy_example/toy_dataset_scores --weight-func beta --remove-dir
-
+    $ cogenassess score_genes --annotated-vcf toy_example/annotated_toy_dataset.vcf --bed toy_example/toy_dataset.bed 
+    --bim toy_example/toy_dataset.bim --fam toy_example/toy_dataset.fam --temp-dir toy_example/toy_dataset/ 
+    --output-file toy_example/toy_dataset_scores --weight-func beta --remove-dir
+```
 required arguments:
   -a, --annotated-vcf   a file containing variant IDs, genes, alt, deleteriousness scores and allele frequency.
   --bed                 text file for genotype.
@@ -48,12 +47,25 @@ optional arguments:
 
 ### Calculate p-values
 This function calculates the p-values across the genes between two given groups
-``` sh
-$ cogenassess calculate-pval --scores-file path/to/scores/file --gentype-file file/containing/the/cases 
-    --cases-column the-name-of-cases-column --samples-column name-of-samples-column 
-    --test [ttest-ind|mannwhitneyu|logit|glm|betareg] --output-path path/of/output/file --covariates PC1,PC2
+    
+    $ cogenassess calculate-pval --scores-file toy_example/toy_dataset_scores --gentype-file toy_example/toy.pheno 
+    --cases-column trait1 --samples-column IID --test betareg --output-path toy_dataset_betareg.tsv
 ```
-TODO
+required arguments:
+  -s, --scores-file         a file containing variant IDs, genes, alt, deleteriousness scores and allele frequency.
+  -i, --genotype-file       text file for genotype.
+  -o, --output-path         file with variant information
+  -t, --test                statistical test for calculating P value. Choices: ttest_ind, mannwhitneyu, logit, glm, betareg
+  -c, --cases-column        the name of the column that contains the case/control type.
+  -m, --samples-column      the name of the column that contains the samples.
+  
+optional arguments:
+  -h, --help                show this help message and exit
+  -g, --genes               a list containing the genes to calculate. if not provided all genes will be used.
+  -p, --pc-file             Principle components values for logistic regression. if not in genotype file
+  --adj-pval                adjust pvalue using one of these methods: bonferroni, sidak, holm-sidak, holm, simes-hochberg, hommel, fdr_bh, fdr_by, fdr_tsbh, fdr_tsbky
+  --covariates              the covariates used for calculation. Default=PC1,PC2
+```
 
 ### Visualize
 TODO
