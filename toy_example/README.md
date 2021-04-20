@@ -3,7 +3,7 @@
 This folder contains an example on how to run the CoGenAssess pipeline.
 The toy dataset is not real data. It contains about 10,000 SNP and 20 genes, 
 2 of which (gene5 and gene17) were synthetically made to produce signals for the included phenotypes.
-The dataset the signals and phenotypes were simulated using [SIMU](https://github.com/precimed/simu).
+The signals and phenotypes were simulated using [SIMU](https://github.com/precimed/simu).
 
 ## Files:
 ### Annotated vcf 
