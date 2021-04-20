@@ -68,7 +68,24 @@ optional arguments:
 ```
 
 ### Visualize
-TODO
+Visualize manhatten plot and qqplot for the data.
+
+    $cogenassess visualize --pvals-file toy_example/toy_dataset_scores --info-file annotated_toy_dataset.vcf
+    --qq-output toy_example/toy_dataset_qqplot.jpg --manhattan-output toy_example/toy_dataset_manhattanplot.jpg 
+
+```
+required arguments:
+  --pvals-file              the file containing p-values.
+  --info-file               file containing variant/gene info.
+  --qq-output               the name of the qq plot file. should end with jpg.
+  --manhattan-output        the name of the manhatten plot file. should end with jpg.
+
+optional arguments:
+  -h, --help                show this help message and exit
+  --genescol-1              the name of the genes column in pvals file. Default=gene.
+  --genescol-2              the name of the genes column in info file. default=Gene.refGene.
+  --pvalcol                 the name of the pvalues column. Default=p_value.
+```
 
 ### Prediction model
 TODO
