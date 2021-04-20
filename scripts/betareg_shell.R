@@ -41,14 +41,8 @@ if (any(is.na(opt))) stop("Please make sure to include all required args.")
 message("Reading files...")
 
 mydata=read.table(opt$scoresfile, header=TRUE)
-#mydata = mydata[, .SD, .SDcols = unique(names(mydata))]
-#cols <- colnames(mydata)[grep('^[0-9]', colnames(mydata))]
-#new_cols <- paste0("g", cols)
-#colnames(mydata)[cols] <- new_cols
 
 mydata[is.na(mydata)] = 0
-mydata = Filter(var, mydata)
-#mydata = mydata[colMeans(mydata == 0) <= 0.9]
 
 pheno=fread(opt$phenofile)
 if (!is.null(opt$pcfile)){
@@ -63,29 +57,20 @@ epsilon=0.001
 
 normalize <- function(gene)
 {
-  rescaled=rescale(gene,c(0+epsilon,1-epsilon))
-  return(rescaled)
+  if (gene == mydata$opt$samplescol){
+    return(gene)
+  }
+  else{
+    gene = tryCatch(as.numeric(gene), error=function(err) gene, warning=function(w) gene)
+    rescaled=tryCatch(rescale(gene,c(0+epsilon,1-epsilon)), error=function(err) gene)
+    return(rescaled)
+  }
 }
 
-
-
-#get_beta_pvals <- function(x, data) {
-#
-#  cols = c(x, covariates)
-#  form <- as.formula(paste(x, paste(covariates, collapse = "+"), sep = "~"))
-#  x = gsub(" ", "", x, fixed = TRUE)
-#  form <- paste(x, paste(" ."), sep = " ~")
-#  betaMod <- betareg(form, data=data)
-#  coefficient=betaMod$coefficients$mean[2]
-#  pval=coef(summary(betaMod))$mean[2,4]
-#  stderr=coef(summary(betaMod))$mean[2,2]
-#  return(c(x,coefficient,pval,stderr))
-#}
 
 message("rescaling scores ...")
 output=apply(mydata,2,normalize)
 output=as.data.table(output)
-output[, 1] = mydata[,1]
 rm(mydata)
 
 message("merging dataframes")
@@ -102,7 +87,6 @@ cols <- c(opt$samplescol, genes_list, covariates)
 completed <- completed[, ..cols]
 completed<-completed[complete.cases(completed),]
 rm(output)
-#cl <- makeCluster(opt$nprocesses)
 
 write("genes\tcoeff\tp_value\tstderr", file=opt$outputfile)
 
@@ -119,32 +103,6 @@ apply_betareg <- function(x){
   return(results)
 }
 
-#clusterEvalQ(cl, {
-#  library(scales)
-#  library(data.table)
-#  library(betareg)
-#})
-#i <- 1
-#pb = txtProgressBar(min = 0, max = length(varlist), initial = 0) 
-#models <- c()
-#for (x in varlist){
-#  message(setTxtProgressBar(pb,i))
-#  cols = c(x, covariates)
-#  data=completed[, ..cols]
-#  model = possibly(get_beta_pvals(x, data), otherwise = NA, quiet = TRUE)
-#  models <- c(models,model)
-#  i <- i+1
-#}
-
-#clusterExport(cl, c("completed", "covariates"))
-#rm(completed)
 models = mclapply(genes_list, possibly(apply_betareg,NA_real_), mc.cores = opt$nprocesses, mc.preschedule = FALSE)
-#models = parLapply(cl,varlist,possibly(get_beta_pvals,NA_real_))
-#models = lapply(varlist,possibly(get_beta_pvals,NA_real_))
 
-#message("saving to output file ...")
-#pvals_df = data.frame(Reduce(rbind, models))
-#head(pvals_df)
-#colnames(pvals_df) <- c("gene", "coeff","pval","stderr")
-#write.table(pvals_df, file=opt$outputfile, quote=FALSE, sep='\t', row.names = FALSE)
 message("Done")
