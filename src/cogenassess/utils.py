@@ -167,7 +167,6 @@ def get_prs(
 
 def create_model(
     *,
-    output_folder,
     model_name='final_model',
     model_type='reg',
     y_col,
@@ -194,7 +193,6 @@ def create_model(
     :param metric: the metric to evaluate the best model.
     :return: the metrics.
     """
-    os.chdir(output_folder)
     metrics = None
     if model_type == 'reg':
         if not metric:
@@ -240,4 +238,6 @@ def create_model(
         with open('model.log', 'w') as f:
             f.writelines("%s\n" % output for output in classifier)
             f.writelines("%s\n" % output for output in metrics)
-    return metrics
+    else:
+        return Exception('Model requested is not available. Please choose reg or classifier.')
+    return final_model

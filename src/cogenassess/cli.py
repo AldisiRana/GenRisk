@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import re
 
 import click
@@ -7,9 +8,10 @@ import shutil
 import pandas as pd
 import numpy as np
 from scipy.stats import pearsonr
+from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
-from .utils import get_gene_info, plink_process, combine_scores
+from .utils import get_gene_info, plink_process, combine_scores, create_model
 from .pipeline import normalize_gene_len, find_pvalue, betareg_pvalues, r_visualize
 
 
@@ -322,6 +324,55 @@ def visualize(
         manhattan_output=manhattan_output,
         pvalcol=pvalcol,
     )
+
+
+@main.command()
+@click.option('--data-file', required=True, help='file with all features and target for training model.')
+@click.option('--output-folder', required=True, help='path of folder that will contain all outputs.')
+@click.option('--test-size', default=0.25, help='test size for cross validation and evaluation.')
+@click.option('--test', is_flag=True,
+              help='if flagged, the dataset will be split into training and testing for extra evaluation after finalization')
+@click.option('--model-name', required=True, help='name of model file.')
+@click.option('--model-type', required=True, type=click.Choice(['reg', 'classifier']), help='type of prediction model.')
+@click.option('--target-col', required=True, help='name of target column in data_file.')
+@click.option('--imbalanced', is_flag=True, help='if flagged methods will be used to account for the imbalance.')
+@click.option('--normalize', is_flag=True, help='if flagged the data will be normalized before training.')
+@click.option('--folds', default=10, type=int, help='number of cross-validation folds in training.')
+@click.option('--metric', help='the metric used to choose best model after training.')
+def prediction_model(
+    *,
+    data_file,
+    output_folder,
+    test_size=None,
+    test,
+    model_name,
+    model_type,
+    target_col,
+    imbalanced,
+    normalize,
+    folds,
+    metric,
+):
+    training_set = pd.read_csv(data_file, sep='\s+', index=False)
+    if test:
+        training_set, testing_set = train_test_split(training_set, test_size=test_size)
+    else:
+        testing_set = None
+    os.mkdir(output_folder)
+    os.chdir(output_folder)
+    model = create_model(
+        model_name=model_name,
+        model_type=model_type,
+        imbalanced=imbalanced,
+        normalize=normalize,
+        folds=folds,
+        metric=metric,
+        y_col=target_col,
+        training_set=training_set,
+        testing_set=testing_set,
+        test_size=test_size,
+    )
+    return model
 
 
 if __name__ == '__main__':
