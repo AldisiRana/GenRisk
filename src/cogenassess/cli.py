@@ -60,8 +60,8 @@ def score_genes(
     remove_temp,
 ):
     """
-
-    :param annotated_file: a file containing
+    Calculate the gene-based scores for a given dataset.
+    :param annotated_file: a file containing variant IDs, genes, alt, deleteriousness scores and allele frequency.
     :param bed: text file for genotype.
     :param bim: file with variant information
     :param fam: text file for pedigree information
