@@ -18,7 +18,7 @@ within a phenotype in a population
 ### Score genes
 Calculate the gene-based scores for a given dataset.
 
-``` sh
+``` bash
 $ cogenassess score_genes --annotated-vcf toy_example/annotated_toy_dataset.vcf --bed toy_example/toy_dataset.bed 
 --bim toy_example/toy_dataset.bim --fam toy_example/toy_dataset.fam --temp-dir toy_example/toy_dataset/ 
 --output-file toy_example/toy_dataset_scores --weight-func beta --remove-dir
@@ -53,15 +53,18 @@ $ cogenassess calculate-pval --scores-file path/to/scores/file --gentype-file fi
     --cases-column the-name-of-cases-column --samples-column name-of-samples-column 
     --test [ttest-ind|mannwhitneyu|logit|glm|betareg] --output-path path/of/output/file --covariates PC1,PC2
 ```
+TODO
 
 ### Visualize
+TODO
 
 ### Prediction model
+TODO
 
 ### Normalize scores
 This function normalizes the scores by gene length
 
     $ cogenassess normalize --matrix-file path/to/score/file --output-path path/to/output/file 
     --samples-col name-of-samples-column
-
+TODO
 
