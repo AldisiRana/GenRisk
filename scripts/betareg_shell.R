@@ -6,8 +6,6 @@ if (!require("data.table")) install.packages("data.table", repos = "https://CRAN
 library(data.table)
 if (!require(scales)) install.packages("scales", repos = "https://CRAN.R-project.org/")
 library(scales)
-if (!require(parallel)) install.packages("parallel", repos = "https://CRAN.R-project.org/")
-library(parallel)
 if (!require(optparse)) install.packages("optparse", repos = "https://CRAN.R-project.org/")
 library(optparse)
 if (!require("betareg")) install.packages("betareg", repos = "https://CRAN.R-project.org/")
@@ -57,14 +55,9 @@ epsilon=0.001
 
 normalize <- function(gene)
 {
-  if (gene == mydata$opt$samplescol){
-    return(gene)
-  }
-  else{
     gene = tryCatch(as.numeric(gene), error=function(err) gene, warning=function(w) gene)
     rescaled=tryCatch(rescale(gene,c(0+epsilon,1-epsilon)), error=function(err) gene)
     return(rescaled)
-  }
 }
 
 
@@ -103,6 +96,6 @@ apply_betareg <- function(x){
   return(results)
 }
 
-models = mclapply(genes_list, possibly(apply_betareg,NA_real_), mc.cores = opt$nprocesses, mc.preschedule = FALSE)
+models = mclapply(genes_list, possibly(apply_betareg,NA_real_))
 
 message("Done")

@@ -2,11 +2,17 @@
 # if (!require("pacman")) install.packages("pacman", repos = "https://CRAN.R-project.org/")
 #pacman::p_load(data.table, qqman, ggplot2, grid, optparse, gridGraphics)
 
+if (!require("qqman")) install.packages("qqman", repos = "https://CRAN.R-project.org/")
 library(qqman)
+if (!require("data.table")) install.packages("data.table", repos = "https://CRAN.R-project.org/")
 library(data.table)
+if (!require("ggplot2")) install.packages("ggplot2", repos = "https://CRAN.R-project.org/")
 library(ggplot2)
+if (!require("grid")) install.packages("grid", repos = "https://CRAN.R-project.org/")
 library(grid)
+if (!require("gridGraphics")) install.packages("gridGraphics", repos = "https://CRAN.R-project.org/")
 library(gridGraphics)
+if (!require("optparse")) install.packages("optparse", repos = "https://CRAN.R-project.org/")
 library(optparse)
 
 option_list = list(
@@ -27,8 +33,6 @@ opt = parse_args(opt_parser);
 
 if (any(is.na(opt))) stop("Please make sure to include all required args.")
 
-pdf(opt$output_file)
-
 message("Reading files...")
 
 pvals_df=fread(opt$pvals_file)
@@ -38,7 +42,6 @@ complete_df = unique(complete_df, by=opt$genescol_1)
 complete_df[complete_df == 'X'] = 23
 complete_df[complete_df == 'Y'] = 24
 complete_df$Chr <- as.integer(complete_df$Chr)
-complete_df=na.omit(complete_df)
 
 jpeg(opt$manhattan_output, res=300, width = 12, height = 6, units = 'in')
 manhattan(complete_df,chr='Chr', bp="Start", snp=opt$genescol_1, p=opt$pvalcol,
