@@ -6,9 +6,8 @@ The toy dataset is not real data. It contains about 10,000 SNP and 20 genes,
 The signals and phenotypes were simulated using [SIMU](https://github.com/precimed/simu).
 
 ## Files:
-### Annotated vcf 
-The annotated VCF can be downloaded from [here](https://uni-bonn.sciebo.de/s/XUgOnCKxDhV60YI).
-It contains information about the SNPS, gene, deleteriousness score and allele frequency.
+### Annotated file
+The annotated file contains information about the SNPS, gene, deleteriousness score and allele frequency.
 This information is important for the calculation of the gene-based scores.
 
 ### bim/bam/fam files
