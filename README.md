@@ -89,11 +89,3 @@ optional arguments:
 
 ### Prediction model
 TODO
-
-### Normalize scores
-This function normalizes the scores by gene length
-
-    $ cogenassess normalize --matrix-file path/to/score/file --output-path path/to/output/file 
-    --samples-col name-of-samples-column
-TODO
-

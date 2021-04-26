@@ -78,25 +78,26 @@ def combine_scores(
     all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(input_path) for name in files]
     profile_files = [f for f in all_files if re.match(r'.+profile$', f)]
     df = pd.read_csv(str(profile_files[0]), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
-    r = re.compile(input_path + "/(.*).profile$")
+    r = re.compile(input_path + "(.*).profile$")
     gene = r.findall(str(profile_files[0]))
     df.rename(columns={'SCORESUM': gene[0]}, inplace=True)
     pf = profile_files
     for i in tqdm(range(1, len(pf)-1), desc='merging in process'):
-        df = unisci(df, pf[i])
+        df = unisci(input_path, df, pf[i])
     df.to_csv(output_path, sep='\t', index=False)
     return df
 
 
-def unisci(df, f):
+def unisci(input_path, df, f):
     """
     Merge two dataframes.
+    :param input_path: the path to input directory.
     :param df: the main dataframe with all the scores.
     :param f: the file containing the scores of one gene.
     :return: the merged dataframe.
     """
     df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
-    r = re.compile(r'\w+/(.*).profile$')
+    r = re.compile(input_path + "(.*).profile$")
     gene2 = r.findall(str(f))
     df2.rename(columns={'SCORESUM': gene2[0]}, inplace=True)
     df = pd.merge(df, df2, on='IID')
