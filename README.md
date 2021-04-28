@@ -4,8 +4,8 @@ CoGenAssess is a package that implements different gene-based scoring schemes to
 within a phenotype in a population
 
 ## Requirements
-* annotated vcf file (should contain variant ID, ALT, Gene, and deleterious score, for more information check out the example in toy_example)
-* plink 1.9 https://www.cog-genomics.org/plink/
+* annotated vcf (should contain variant ID, ALT, Gene, and deleterious score, for more information check out the example in toy_example)
+* plink >= 1.9 https://www.cog-genomics.org/plink/
 * R version >= 3.6.3
 
 
