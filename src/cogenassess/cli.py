@@ -11,7 +11,7 @@ from scipy.stats import pearsonr
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
-from .utils import get_gene_info, plink_process, combine_scores, create_model
+from .utils import get_gene_info, plink_process, combine_scores, create_prediction_model
 from .pipeline import normalize_gene_len, find_pvalue, betareg_pvalues, r_visualize
 
 
@@ -333,13 +333,14 @@ def visualize(
 @click.option('--test', is_flag=True,
               help='if flagged, a test set will be created for evaluating the final model.')
 @click.option('--model-name', required=True, help='name of model file.')
-@click.option('--model-type', required=True, type=click.Choice(['reg', 'classifier']), help='type of prediction model.')
+@click.option('--model-type', required=True, type=click.Choice(['regressor', 'classifier']),
+              help='type of prediction model.')
 @click.option('--target-col', required=True, help='name of target column in data_file.')
 @click.option('--imbalanced', is_flag=True, help='if flagged methods will be used to account for the imbalance.')
 @click.option('--normalize', is_flag=True, help='if flagged the data will be normalized before training.')
 @click.option('--folds', default=10, type=int, help='number of cross-validation folds in training.')
 @click.option('--metric', help='the metric used to choose best model after training.')
-def prediction_model(
+def create_model(
     *,
     data_file,
     output_folder,
@@ -354,7 +355,7 @@ def prediction_model(
     metric,
 ):
     """
-    Create a predicition model with given dataset.
+    Create a machine learning model with given dataset.
     :param data_file: file containing features and target.
     :param output_folder: a folder path to save all outputs.
     :param test_size: the size of testing set.
@@ -368,14 +369,13 @@ def prediction_model(
     :param metric: the metric used to choose best model after training.
     :return: the final model
     """
-    training_set = pd.read_csv(data_file, sep='\s+', index=False)
+    training_set = pd.read_csv(data_file, sep='\s+', index_col=False)
+    testing_set = pd.DataFrame()
     if test:
         training_set, testing_set = train_test_split(training_set, test_size=test_size)
-    else:
-        testing_set = None
     os.mkdir(output_folder)
     os.chdir(output_folder)
-    model = create_model(
+    model = create_prediction_model(
         model_name=model_name,
         model_type=model_type,
         imbalanced=imbalanced,

@@ -166,10 +166,10 @@ def get_prs(
         )
 
 
-def create_model(
+def create_prediction_model(
     *,
     model_name='final_model',
-    model_type='reg',
+    model_type='regressor',
     y_col,
     imbalanced=True,
     normalize=True,
@@ -195,25 +195,24 @@ def create_model(
     :return: the metrics.
     """
     metrics = None
-    if model_type == 'reg':
+    if model_type == 'regressor':
         if not metric:
             metric = 'RMSE'
         reg = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1-test_size, fold=folds,
                           silent=True)
         best_model = pyreg.compare_models(sort=metric)
         reg_model = pyreg.create_model(best_model)
-        reg_tuned_model = pyreg.tune_model(reg_model)
+        reg_tuned_model = pyreg.tune_model(reg_model, optimize=metric)
         pyreg.plot_model(reg_tuned_model, save=True)
         pyreg.plot_model(reg_tuned_model, plot='feature', save=True)
         pyreg.plot_model(reg_tuned_model, plot='error', save=True)
         final_model = pyreg.finalize_model(reg_tuned_model)
-        if testing_set.bool():
+        if len(testing_set.index) != 0:
             unseen_predictions = pyreg.predict_model(final_model, data=testing_set)
             r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
             rmse = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'RMSE')
-            metrics = ['R2: ' + r2, 'RMSE: ' + rmse]
+            metrics = ['R2: ' + str(r2), 'RMSE: ' + str(rmse)]
         pyreg.save_model(final_model, model_name)
-        pyreg.save_experiment('model_session')
         with open('model.log', 'w') as f:
             f.writelines("%s\n" % output for output in reg)
             f.writelines("%s\n" % output for output in metrics)
@@ -221,24 +220,23 @@ def create_model(
         if not metric:
             metric = 'AUC'
         classifier = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1-test_size,
-                              silent=True)
+                              silent=True, fold=folds)
         best_model = cl.compare_models(sort=metric)
         cl_model = cl.create_model(best_model)
-        cl_tuned_model = pyreg.tune_model(cl_model)
+        cl_tuned_model = pyreg.tune_model(cl_model, optimize=metric)
         cl.plot_model(cl_tuned_model, plot='pr', save=True)
         cl.plot_model(cl_tuned_model, plot='confusion_matrix', save=True)
         cl.plot_model(cl_tuned_model, plot='feature', save=True)
         final_model = cl.finalize_model(cl_tuned_model)
-        if testing_set.bool():
+        if len(testing_set.index) != 0:
             unseen_predictions = cl.predict_model(final_model, data=testing_set)
             auc = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'AUC')
-            accuracy = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'accuracy')
-            metrics = ['AUC: ' + auc, 'Accuracy: ' + accuracy]
+            accuracy = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'Accuracy')
+            metrics = ['AUC: ' + str(auc), 'Accuracy: ' + str(accuracy)]
         cl.save_model(final_model, model_name)
-        cl.save_experiment('model_session')
         with open('model.log', 'w') as f:
             f.writelines("%s\n" % output for output in classifier)
             f.writelines("%s\n" % output for output in metrics)
     else:
-        return Exception('Model requested is not available. Please choose reg or classifier.')
+        return Exception('Model requested is not available. Please choose regressor or classifier.')
     return final_model
