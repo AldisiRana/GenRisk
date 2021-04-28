@@ -23,7 +23,7 @@ Calculate the gene-based scores for a given dataset.
     --output-file toy_example/toy_dataset_scores --weight-func beta --remove-dir
 ```
 required arguments:
-  -a, --annotated-vcf   a file containing variant IDs, genes, alt, deleteriousness scores and allele frequency.
+  -a, --annotated-vcf   a file containing variant IDs, genes, alt, deleteriousness scores, allele frequency and samples info.
   -t, --temp-dir        a temporary directory to save temporary files before merging.
   -o, --output-file     the final output scores matrix.
 
