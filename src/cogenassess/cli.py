@@ -94,24 +94,20 @@ def score_genes(
 
 
 @main.command()
-@click.option('--bed', required=True, help="text file for genotype")
-@click.option('--bim', required=True, help="file with variant information")
-@click.option('--fam', required=True, help="text file for pedigree information")
+@click.option('--vcf', required=True, help="the vcf file.")
 @click.option('--plink', default='plink')
 @click.option('--genes-folder', required=True, help="a folder that contains two files for each gene, w and v files.")
-def run_plink(*, genes_folder, plink, bed, bim, fam):
+def run_plink(*, genes_folder, plink, vcf):
     """
     Get the genes' scores from a folder of genes info.
+    :param vcf: the vcf file
     :param genes_folder: a folder that contains two files for each gene,
     one containing gene and ID (.v) and the other containing the rest of the information (.w)
     :param plink: the directory of plink, if not set in environment
-    :param bed: test file for genotype.
-    :param bim: file with variant information
-    :param fam: text file for pedigree information
     :return:
     """
     click.echo('staring plink processing ...')
-    plink_process(genes_folder=genes_folder, plink=plink, bed=bed, bim=bim, fam=fam)
+    plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=vcf)
     click.echo('plink processing is complete.')
 
 
