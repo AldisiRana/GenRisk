@@ -88,5 +88,27 @@ optional arguments:
   --pvalcol                 the name of the pvalues column. Default=p_value.
 ```
 
-### Prediction model
-TODO
+### Create model
+Create a machine learning model (classifier or regressor) with given dataset
+
+    $cogenassess create-model --data-file toy_example_regressor_features.tsv --output-folder toy_regressor 
+    --test-size 0.25 --test --model-name toy_regressor --target-col trait1 --imbalanced --normalize
+
+```
+required arguments:
+  --data-file               file containing features and target.
+  --output-folder           a folder path to save all outputs.
+  --model-name              the name of the model to be saved.
+  --model-type              the type of model (regressor or classifier).
+  --target-col              the name of the target column in data file.
+
+optional arguments:
+  -h, --help                show this help message and exit
+  --test                    if flagged, a test set will be created for evaluating the final model.
+  --test-size               test size for cross validation and evaluation. Default=0.25
+  --imbalanced              if flagged methods will be used to account for the imbalance.
+  --normalize               if flagged the data will be normalized before training.
+  --folds                   number of cross-validation folds in training. Default=10
+  --metric                  the metric used to choose best model after training. Regressor default=RMSE, classifier default=AUC
+  
+```

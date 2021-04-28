@@ -361,8 +361,8 @@ def create_model(
     :param test_size: the size of testing set.
     :param test: if True the dataset will be split into training and testing for extra evaluation after finalization.
     :param model_name: the name of the model to be saved.
-    :param model_type: the type of model (reg or classifier).
-    :param target_col: the column of the target.
+    :param model_type: the type of model (regressor or classifier).
+    :param target_col: the name of the target column in data file.
     :param imbalanced: if true methods will be used to account for the imbalance.
     :param normalize:  if true the data will be normalized before training
     :param folds: the number of folds used for cross validation
