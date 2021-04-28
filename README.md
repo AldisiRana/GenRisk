@@ -19,15 +19,11 @@ within a phenotype in a population
 ### Score genes
 Calculate the gene-based scores for a given dataset.
 
-    $ cogenassess score_genes --annotated-vcf toy_example/annotated_toy_dataset.vcf --bed toy_example/toy_dataset.bed 
-    --bim toy_example/toy_dataset.bim --fam toy_example/toy_dataset.fam --temp-dir toy_example/toy_dataset/ 
+    $ cogenassess score_genes --annotated-vcf toy_example/annotated_toy_dataset.vcf --temp-dir toy_example/toy_dataset/ 
     --output-file toy_example/toy_dataset_scores --weight-func beta --remove-dir
 ```
 required arguments:
   -a, --annotated-vcf   a file containing variant IDs, genes, alt, deleteriousness scores and allele frequency.
-  --bed                 text file for genotype.
-  --bim                 file with variant information
-  --fam                 text file for pedigree information
   -t, --temp-dir        a temporary directory to save temporary files before merging.
   -o, --output-file     the final output scores matrix.
 

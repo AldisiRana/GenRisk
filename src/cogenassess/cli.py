@@ -21,10 +21,7 @@ def main():
 
 
 @main.command()
-@click.option('-a', '--annotated-file', required=True, help='the annotated file')
-@click.option('--bed', required=True, help="text file for genotype")
-@click.option('--bim', required=True, help="file with variant information")
-@click.option('--fam', required=True, help="text file for pedigree information")
+@click.option('-a', '--annotated-vcf', required=True, help='the annotated vcf')
 @click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
 @click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
 @click.option('-o', '--output-file', required=True, help="the final output scores matrix.")
@@ -42,10 +39,7 @@ def main():
               help="if flagged the temporary directory will be deleted after process completion.")
 def score_genes(
     *,
-    annotated_file,
-    bed,
-    bim,
-    fam,
+    annotated_vcf,
     plink,
     beta_param,
     temp_dir,
@@ -61,10 +55,7 @@ def score_genes(
 ):
     """
     Calculate the gene-based scores for a given dataset.
-    :param annotated_file: a file containing variant IDs, genes, alt, deleteriousness scores and allele frequency.
-    :param bed: text file for genotype.
-    :param bim: file with variant information
-    :param fam: text file for pedigree information
+    :param annotated_vcf: an annotated containing variant IDs, alt, info and samples genotypes.
     :param plink: the directory of plink, if not set in environment
     :param beta_param: the parameters from beta weight function.
     :param temp_dir: a temporary directory to save temporary files before merging.
@@ -81,7 +72,7 @@ def score_genes(
     """
     click.echo('getting information from vcf files')
     genes_folder = get_gene_info(
-        annotated_file=annotated_file,
+        annotated_vcf=annotated_vcf,
         output_dir=temp_dir,
         beta_param=beta_param,
         weight_func=weight_func,
@@ -93,7 +84,7 @@ def score_genes(
         alt_col=alt_col,
     )
     click.echo('calculating gene scores ...')
-    plink_process(genes_folder=genes_folder, plink=plink, bed=bed, bim=bim, fam=fam)
+    plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=annotated_vcf)
     click.echo('combining score files ...')
     df = combine_scores(input_path=temp_dir, output_path=output_file)
     if remove_temp:

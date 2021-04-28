@@ -17,7 +17,7 @@ import urllib.request as urllib
 
 def get_gene_info(
     *,
-    annotated_file,
+    annotated_vcf,
     variant_col,
     af_col,
     alt_col='Alt',
@@ -30,7 +30,7 @@ def get_gene_info(
 ):
     """
     Create temporary files with variant information for each gene, plus the weights calculated.
-    :param annotated_file: a file containing the variant, AF, ALT, Gene, and deleterious score.
+    :param annotated_vcf: a file containing the variant, AF, ALT, Gene, and deleterious score.
     :param variant_col: the name of the variant column.
     :param af_col: the name of the AF column.
     :param alt_col: the name of the ALT column.
@@ -42,7 +42,15 @@ def get_gene_info(
     :param weight_func: the weighting function, beta or log10.
     :return: returns the output directory with all the temporary files.
     """
-    df = pd.read_csv(annotated_file, usecols=[variant_col, alt_col, af_col, del_col, genes_col], sep=r'\s+')
+    df = pd.read_csv(annotated_vcf, usecols=[variant_col, alt_col, 'INFO'], sep=r'\s+', index_col=False)
+    info = df['INFO'].str.split(pat=';', expand=True)
+    for col in info.columns:
+        val = info[col][0].split('=')
+        if len(val) == 1:
+            continue
+        info.rename(columns={col: val[0]}, inplace=True)
+        info[val[0]] = info[val[0]].str.replace(val[0] + '=', r'')
+    df = pd.concat([df, info], axis=1)
     df = df[df[af_col].values.astype(float) < maf_threshold]
     df.replace('.', 0.0, inplace=True)
     if weight_func == 'beta':
@@ -78,7 +86,7 @@ def combine_scores(
     all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(input_path) for name in files]
     profile_files = [f for f in all_files if re.match(r'.+profile$', f)]
     df = pd.read_csv(str(profile_files[0]), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
-    r = re.compile(input_path + "(.*).profile$")
+    r = re.compile("([a-zA-Z0-9_.-]*).profile$")
     gene = r.findall(str(profile_files[0]))
     df.rename(columns={'SCORESUM': gene[0]}, inplace=True)
     pf = profile_files
@@ -97,21 +105,19 @@ def unisci(input_path, df, f):
     :return: the merged dataframe.
     """
     df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
-    r = re.compile(input_path + "(.*).profile$")
+    r = re.compile("([a-zA-Z0-9_.-]*).profile$")
     gene2 = r.findall(str(f))
     df2.rename(columns={'SCORESUM': gene2[0]}, inplace=True)
     df = pd.merge(df, df2, on='IID')
     return df
 
 
-def plink_process(*, genes_folder, plink, bed, bim, fam):
+def plink_process(*, genes_folder, plink, annotated_vcf):
     """
     Use plink to calculate and sum the scores for each gene.
     :param genes_folder: the folder containing the temporary genes files.
     :param plink: the directory of plink (if not default).
-    :param bed: the bed file path.
-    :param bim: the bim file path.
-    :param fam: the fam file path.
+    :param annotated_vcf: vcf with samples information
     :return:
     """
     genes = [line.strip() for line in open(os.path.join(genes_folder, (genes_folder + '.genes')), 'r')]
@@ -119,9 +125,8 @@ def plink_process(*, genes_folder, plink, bed, bim, fam):
         v_file = os.path.join(genes_folder, (gene + '.v'))
         w_file = os.path.join(genes_folder, (gene + '.w'))
         p = subprocess.call(
-            plink + " --bed " + bed + " --bim " + bim +
-            " --fam " + fam + " --extract " + v_file + " --score " + w_file + " 1 2 3 sum --out " +
-            os.path.join(genes_folder, gene), shell=True
+            plink + " --vcf " + annotated_vcf + " --double-id" + " --extract " + v_file + " --score " + w_file +
+            " 1 2 3 sum --out " + os.path.join(genes_folder, gene), shell=True
         )
 
 
