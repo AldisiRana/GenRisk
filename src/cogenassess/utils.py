@@ -91,15 +91,14 @@ def combine_scores(
     df.rename(columns={'SCORESUM': gene[0]}, inplace=True)
     pf = profile_files
     for i in tqdm(range(1, len(pf)-1), desc='merging in process'):
-        df = unisci(input_path, df, pf[i])
+        df = unisci(df, pf[i])
     df.to_csv(output_path, sep='\t', index=False)
     return df
 
 
-def unisci(input_path, df, f):
+def unisci(df, f):
     """
     Merge two dataframes.
-    :param input_path: the path to input directory.
     :param df: the main dataframe with all the scores.
     :param f: the file containing the scores of one gene.
     :return: the merged dataframe.
