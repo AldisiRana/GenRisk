@@ -3,7 +3,9 @@ import os
 import subprocess
 
 import pandas as pd
-from pybiomart import Dataset
+import pycaret.classification as cl
+import pycaret.regression as pyreg
+from pycaret.utils import check_metric
 import scipy.stats as stats
 import statsmodels.api as sm
 from statsmodels.stats.multitest import multipletests
@@ -12,51 +14,6 @@ from tqdm import tqdm
 PATH = os.path.abspath(os.path.join((__file__), os.pardir, os.pardir, os.pardir))
 BETAREG_SHELL = os.path.join(PATH, 'scripts', 'betareg_shell.R')
 PLOT_SHELL = os.path.join(PATH, 'scripts', 'plot_script.R')
-
-
-def normalize_gene_len(
-    *,
-    genes_lengths_file=None,
-    matrix_file,
-    samples_col,
-    output_path
-):
-    """
-    Normalize matrix by gene length.
-
-    :param genes_lengths_file: a file containing genes, and their start and end bps.
-    :param matrix_file: a tsv file containing a matrix of samples and their scores across genes.
-    :param samples_col: column containing the samples IDs.
-    :param output_path: the path to save the normalized matrix.
-    :return: a normalized dataframe.
-    """
-    if genes_lengths_file:
-        genes_df = pd.read_csv(genes_lengths_file, sep=r'\s+')
-    else:
-        gene_dataset = Dataset(name='hsapiens_gene_ensembl', host='http://www.ensembl.org')
-        genes_df = gene_dataset.query(
-            attributes=['external_gene_name', 'start_position', 'end_position'],
-            only_unique=False,
-        )
-    genes_lengths = {
-        row['Gene name']: round((row['Gene end (bp)'] - row['Gene start (bp)']) / 1000, 3)
-        for _, row in genes_df.iterrows()
-    }
-    scores_df = pd.read_csv(matrix_file, sep=r'\s+')
-    unnormalized = []
-    for (name, data) in tqdm(scores_df.iteritems(), desc="Normalizing genes scores"):
-        if name == samples_col:
-            continue
-        if name not in genes_lengths.keys():
-            unnormalized.append(name)
-            continue
-        # normalize genes by length
-        scores_df[name] = round(scores_df[name] / genes_lengths[name], 5)
-    # drop genes with unknown length
-    scores_df = scores_df.drop(unnormalized, axis=1)
-    if output_path:
-        scores_df.to_csv(output_path, sep='\t', index=False)
-    return scores_df
 
 
 def find_pvalue(
@@ -224,3 +181,78 @@ def r_visualize(
          "--genescol_2", genescol_2,
          "--pvalcol", pvalcol]
     )
+
+
+def create_prediction_model(
+    *,
+    model_name='final_model',
+    model_type='regressor',
+    y_col,
+    imbalanced=True,
+    normalize=True,
+    folds=10,
+    training_set,
+    testing_set=None,
+    test_size=0.25,
+    metric=None,
+):
+    """
+    Create a prediction model (classifier or regressor) using the provided dataset.
+    :param model_name: the name of the prediction model.
+    :param model_type: type of model (reg or classifier).
+    :param y_col: the column containing the target (qualitative or quantitative).
+    :param imbalanced: True means data is imbalanced.
+    :param normalize: True if data needs normalization.
+    :param folds: how many folds for cross-validation.
+    :param training_set: the training set for the model.
+    :param testing_set: if exists an extra evaluation step will be done using the testing set.
+    :param test_size: the size to split the training/testing set.
+    :param metric: the metric to evaluate the best model.
+    :return: the metrics.
+    """
+    metrics = None
+    if model_type == 'regressor':
+        if not metric:
+            metric = 'RMSE'
+        reg = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1-test_size, fold=folds,
+                          silent=True)
+        best_model = pyreg.compare_models(sort=metric)
+        reg_model = pyreg.create_model(best_model)
+        reg_tuned_model = pyreg.tune_model(reg_model, optimize=metric)
+        pyreg.plot_model(reg_tuned_model, save=True)
+        pyreg.plot_model(reg_tuned_model, plot='feature', save=True)
+        pyreg.plot_model(reg_tuned_model, plot='error', save=True)
+        final_model = pyreg.finalize_model(reg_tuned_model)
+        if len(testing_set.index) != 0:
+            unseen_predictions = pyreg.predict_model(final_model, data=testing_set)
+            r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
+            rmse = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'RMSE')
+            metrics = ['R2: ' + str(r2), 'RMSE: ' + str(rmse)]
+        pyreg.save_model(final_model, model_name)
+        with open('model.log', 'w') as f:
+            f.writelines("%s\n" % output for output in reg)
+            f.writelines("%s\n" % output for output in metrics)
+    elif model_type == 'classifier':
+        if not metric:
+            metric = 'AUC'
+        classifier = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1-test_size,
+                              silent=True, fold=folds)
+        best_model = cl.compare_models(sort=metric)
+        cl_model = cl.create_model(best_model)
+        cl_tuned_model = pyreg.tune_model(cl_model, optimize=metric)
+        cl.plot_model(cl_tuned_model, plot='pr', save=True)
+        cl.plot_model(cl_tuned_model, plot='confusion_matrix', save=True)
+        cl.plot_model(cl_tuned_model, plot='feature', save=True)
+        final_model = cl.finalize_model(cl_tuned_model)
+        if len(testing_set.index) != 0:
+            unseen_predictions = cl.predict_model(final_model, data=testing_set)
+            auc = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'AUC')
+            accuracy = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'Accuracy')
+            metrics = ['AUC: ' + str(auc), 'Accuracy: ' + str(accuracy)]
+        cl.save_model(final_model, model_name)
+        with open('model.log', 'w') as f:
+            f.writelines("%s\n" % output for output in classifier)
+            f.writelines("%s\n" % output for output in metrics)
+    else:
+        return Exception('Model requested is not available. Please choose regressor or classifier.')
+    return final_model

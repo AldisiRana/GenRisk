@@ -5,12 +5,10 @@ import re
 import subprocess
 
 import pandas as pd
-import pycaret.classification as cl
-import pycaret.regression as pyreg
-from pycaret.utils import check_metric
+from pybiomart import Dataset
 import requests
 import numpy as np
-from scipy.stats import beta
+from scipy.stats import beta, pearsonr
 from tqdm import tqdm
 import urllib.request as urllib
 
@@ -140,7 +138,7 @@ def get_prs(
     output_file,
 ):
     """
-    Get PGS scores from pgscatalog and calculate PRS score for samples.
+    Get PGS from pgscatalog and calculate PRS for samples.
     :param prs_id: the PRS ID in the pgscatalog.
     :param vcf: vcf file with sampels info. OR use bed/bim/fam files.
      :param bed: the bed file path.
@@ -170,77 +168,83 @@ def get_prs(
         )
 
 
-def create_prediction_model(
+def calc_corr(
     *,
-    model_name='final_model',
-    model_type='regressor',
-    y_col,
-    imbalanced=True,
-    normalize=True,
-    folds=10,
-    training_set,
-    testing_set=None,
-    test_size=0.25,
-    metric=None,
+    first_file,
+    second_file,
+    samples_col,
+    output_file,
 ):
     """
-    Create a prediction model (classifier or regressor) using the provided dataset.
-    :param output_folder: the path to the folder to save outputs.
-    :param model_name: the name of the prediction model.
-    :param model_type: type of model (reg or classifier).
-    :param y_col: the column containing the target (qualitative or quantitative).
-    :param imbalanced: True means data is imbalanced.
-    :param normalize: True if data needs normalization.
-    :param folds: how many folds for cross-validation.
-    :param training_set: the training set for the model.
-    :param testing_set: if exists an extra evaluation step will be done using the testing set.
-    :param test_size: the size to split the training/testing set.
-    :param metric: the metric to evaluate the best model.
-    :return: the metrics.
+    Calculate the pearson's correlation between same genes in two scoring matices.
+    :param first_file: the path to the first scores file.
+    :param second_file: the path to the second scores file.
+    :param samples_col: the column containing the samples IDs.
+    :param output_file: the path to the output file with correlation values.
+    :return:
     """
-    metrics = None
-    if model_type == 'regressor':
-        if not metric:
-            metric = 'RMSE'
-        reg = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1-test_size, fold=folds,
-                          silent=True)
-        best_model = pyreg.compare_models(sort=metric)
-        reg_model = pyreg.create_model(best_model)
-        reg_tuned_model = pyreg.tune_model(reg_model, optimize=metric)
-        pyreg.plot_model(reg_tuned_model, save=True)
-        pyreg.plot_model(reg_tuned_model, plot='feature', save=True)
-        pyreg.plot_model(reg_tuned_model, plot='error', save=True)
-        final_model = pyreg.finalize_model(reg_tuned_model)
-        if len(testing_set.index) != 0:
-            unseen_predictions = pyreg.predict_model(final_model, data=testing_set)
-            r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
-            rmse = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'RMSE')
-            metrics = ['R2: ' + str(r2), 'RMSE: ' + str(rmse)]
-        pyreg.save_model(final_model, model_name)
-        with open('model.log', 'w') as f:
-            f.writelines("%s\n" % output for output in reg)
-            f.writelines("%s\n" % output for output in metrics)
-    elif model_type == 'classifier':
-        if not metric:
-            metric = 'AUC'
-        classifier = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1-test_size,
-                              silent=True, fold=folds)
-        best_model = cl.compare_models(sort=metric)
-        cl_model = cl.create_model(best_model)
-        cl_tuned_model = pyreg.tune_model(cl_model, optimize=metric)
-        cl.plot_model(cl_tuned_model, plot='pr', save=True)
-        cl.plot_model(cl_tuned_model, plot='confusion_matrix', save=True)
-        cl.plot_model(cl_tuned_model, plot='feature', save=True)
-        final_model = cl.finalize_model(cl_tuned_model)
-        if len(testing_set.index) != 0:
-            unseen_predictions = cl.predict_model(final_model, data=testing_set)
-            auc = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'AUC')
-            accuracy = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'Accuracy')
-            metrics = ['AUC: ' + str(auc), 'Accuracy: ' + str(accuracy)]
-        cl.save_model(final_model, model_name)
-        with open('model.log', 'w') as f:
-            f.writelines("%s\n" % output for output in classifier)
-            f.writelines("%s\n" % output for output in metrics)
+    with open(first_file) as f:
+        genes_01 = re.split('\s+', f.readline().strip('\n'))
+        genes_01.remove(samples_col)
+    with open(second_file) as f:
+        genes_02 = re.split('\s+', f.readline().strip('\n'))
+        genes_02.remove(samples_col)
+    as_set = set(genes_01)
+    common_genes = as_set.intersection(genes_02)
+    genes = list(common_genes)
+    corr_info = []
+    first_df = pd.read_csv(first_file, sep=r'\s+', index_col=False)
+    second_df = pd.read_csv(second_file, sep=r'\s+', index_col=False)
+    for gene in tqdm(genes, desc='calculating correlation'):
+        gene_df = pd.merge(first_df[[samples_col, gene]], second_df[[samples_col, gene]], on=samples_col)
+        gene_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
+        corr, pval = pearsonr(gene_df[gene + '_x'], gene_df[gene + '_y'])
+        corr_info.append([gene, corr, pval])
+    corr_df = pd.DataFrame(corr_info, columns=['genes', 'corr', 'p_value']).sort_values(by=['p_value'])
+    corr_df.to_csv(output_file, sep='\t', index=False)
+    return corr_df
+
+
+def normalize_gene_len(
+    *,
+    genes_lengths_file=None,
+    matrix_file,
+    samples_col,
+    output_path
+):
+    """
+    Normalize matrix by gene length.
+
+    :param genes_lengths_file: a file containing genes, and their start and end bps.
+    :param matrix_file: a tsv file containing a matrix of samples and their scores across genes.
+    :param samples_col: column containing the samples IDs.
+    :param output_path: the path to save the normalized matrix.
+    :return: a normalized dataframe.
+    """
+    if genes_lengths_file:
+        genes_df = pd.read_csv(genes_lengths_file, sep=r'\s+')
     else:
-        return Exception('Model requested is not available. Please choose regressor or classifier.')
-    return final_model
+        gene_dataset = Dataset(name='hsapiens_gene_ensembl', host='http://www.ensembl.org')
+        genes_df = gene_dataset.query(
+            attributes=['external_gene_name', 'start_position', 'end_position'],
+            only_unique=False,
+        )
+    genes_lengths = {
+        row['Gene name']: round((row['Gene end (bp)'] - row['Gene start (bp)']) / 1000, 3)
+        for _, row in genes_df.iterrows()
+    }
+    scores_df = pd.read_csv(matrix_file, sep=r'\s+')
+    unnormalized = []
+    for (name, data) in tqdm(scores_df.iteritems(), desc="Normalizing genes scores"):
+        if name == samples_col:
+            continue
+        if name not in genes_lengths.keys():
+            unnormalized.append(name)
+            continue
+        # normalize genes by length
+        scores_df[name] = round(scores_df[name] / genes_lengths[name], 5)
+    # drop genes with unknown length
+    scores_df = scores_df.drop(unnormalized, axis=1)
+    if output_path:
+        scores_df.to_csv(output_path, sep='\t', index=False)
+    return scores_df

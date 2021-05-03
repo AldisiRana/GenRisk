@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
-import re
 
 import click
 import shutil
 
 import pandas as pd
-import numpy as np
-from scipy.stats import pearsonr
 from sklearn.model_selection import train_test_split
-from tqdm import tqdm
 
-from .utils import get_gene_info, plink_process, combine_scores, create_prediction_model
-from .pipeline import normalize_gene_len, find_pvalue, betareg_pvalues, r_visualize
+from .utils import get_gene_info, plink_process, combine_scores
+from .pipeline import find_pvalue, betareg_pvalues, r_visualize, create_prediction_model
 
 
 @click.group()
@@ -94,24 +90,6 @@ def score_genes(
 
 
 @main.command()
-@click.option('--vcf', required=True, help="the vcf file.")
-@click.option('--plink', default='plink')
-@click.option('--genes-folder', required=True, help="a folder that contains two files for each gene, w and v files.")
-def run_plink(*, genes_folder, plink, vcf):
-    """
-    Get the genes' scores from a folder of genes info.
-    :param vcf: the vcf file
-    :param genes_folder: a folder that contains two files for each gene,
-    one containing gene and ID (.v) and the other containing the rest of the information (.w)
-    :param plink: the directory of plink, if not set in environment
-    :return:
-    """
-    click.echo('staring plink processing ...')
-    plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=vcf)
-    click.echo('plink processing is complete.')
-
-
-@main.command()
 @click.option('-s', '--scores-file', required=True, help="The scoring file of genes across a population.")
 @click.option('-i', '--genotype-file', required=True, help="File containing information about the cohort.")
 @click.option('-o', '--output-path', required=True, help='the path for the output file.')
@@ -181,97 +159,6 @@ def calculate_pval(
         )
         click.echo('Process is complete.')
         click.echo(df.info())
-
-
-@main.command()
-@click.option('-i', '--input-path', required=True, help="The directory that contains the matrices to merge.")
-@click.option('-o', '--output-path', required=True, help='the path for the output file.')
-@click.option('-r', '--remove-input', is_flag=True, help='if flagged will remove input folder')
-def merge(
-    *,
-    output_path,
-    input_path,
-    remove_input,
-):
-    """
-    This command merges all matrices in a directory into one big matrix.
-    :param output_path: the path of final merged matrix
-    :param input_path: the directory containing the matrices to merge.
-    :param remove_input: if True, the input directory will be removed after merge.
-    :return:
-    """
-    click.echo("Starting the merging process")
-    df = combine_scores(input_path=input_path, output_path=output_path)
-    click.echo(df.info())
-    if remove_input:
-        shutil.rmtree(input_path)
-    click.echo("Merging is done.")
-
-
-@main.command()
-@click.option('-m', '--matrix-file', required=True, help="The scoring matrix to normalize.")
-@click.option('-g', '--genes-lengths-file',
-              help="The file containing the lengths of genes. If not provided it will be produced.")
-@click.option('-o', '--output-path', required=True, help='the path for the output file.')
-@click.option('-s', '--samples-col', default='IID', help='the name of the samples column')
-def normalize(
-    *,
-    matrix_file,
-    genes_lengths_file=None,
-    output_path=None,
-    samples_col
-):
-    """This command normalizes the scoring matrix by gene length."""
-    click.echo("Normalization in process.")
-    normalize_gene_len(
-        matrix_file=matrix_file,
-        genes_lengths_file=genes_lengths_file,
-        output_path=output_path,
-        samples_col=samples_col
-    )
-
-
-@main.command()
-@click.option('--first-file', required=True, help="the path to the first scores file.")
-@click.option('--second-file', required=True, help="the path to the second scores file.")
-@click.option('--samples-col', default='IID', help="the column containing the samples IDs.")
-@click.option('--output-file', required=True, help="the path to the output file with correlation values.")
-def calc_corr(
-    *,
-    first_file,
-    second_file,
-    samples_col,
-    output_file,
-):
-    """
-    Calculate the pearson's correlation between same genes in two scoring matices.
-    :param first_file: the path to the first scores file.
-    :param second_file: the path to the second scores file.
-    :param samples_col: the column containing the samples IDs.
-    :param output_file: the path to the output file with correlation values.
-    :return:
-    """
-    with open(first_file) as f:
-        genes_01 = re.split('\s+', f.readline().strip('\n'))
-        genes_01.remove(samples_col)
-    with open(second_file) as f:
-        genes_02 = re.split('\s+', f.readline().strip('\n'))
-        genes_02.remove(samples_col)
-    as_set = set(genes_01)
-    common_genes = as_set.intersection(genes_02)
-    genes = list(common_genes)
-    corr_info = []
-    first_df = pd.read_csv(first_file, sep=r'\s+', index_col=False)
-    second_df = pd.read_csv(second_file, sep=r'\s+', index_col=False)
-    for gene in tqdm(genes, desc='calculating correlation'):
-        gene_df = pd.merge(first_df[[samples_col, gene]], second_df[[samples_col, gene]], on=samples_col)
-        gene_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
-        corr, pval = pearsonr(gene_df[gene + '_x'], gene_df[gene + '_y'])
-        corr_info.append([gene, corr, pval])
-    corr_df = pd.DataFrame(corr_info, columns=['genes', 'corr', 'p_value']).sort_values(by=['p_value'])
-    corr_df.to_csv(output_file, sep='\t', index=False)
-    click.echo('Process is complete.')
-    click.echo(corr_df.info())
 
 
 @main.command()
