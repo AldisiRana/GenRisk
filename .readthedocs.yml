@@ -11,7 +11,8 @@ sphinx:
 
 python:
   version: 3
-  setup_py_install: true
-  pip_install: true
+  install:
+    - method: setuptools
+      path: .
   extra_requirements:
     - docs
