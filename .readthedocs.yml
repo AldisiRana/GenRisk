@@ -14,5 +14,3 @@ python:
   install:
     - method: setuptools
       path: .
-  extra_requirements:
-    - docs
