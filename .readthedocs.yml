@@ -12,5 +12,5 @@ sphinx:
 python:
   version: 3
   install:
-    - method: setuptools
+    - method: pip
       path: .
