@@ -1,0 +1,12 @@
+pandas
+numpy
+click
+pybiomart
+statsmodels
+tqdm
+pycaret
+scikit-learn
+sphinx
+sphinx-rtd-theme
+sphinx-click
+sphinx-autodoc-typehints
