@@ -28,6 +28,7 @@ def get_gene_info(
 ):
     """
     Create temporary files with variant information for each gene, plus the weights calculated.
+
     :param annotated_vcf: a file containing the variant, AF, ALT, Gene, and deleterious score.
     :param variant_col: the name of the variant column.
     :param af_col: the name of the AF column.
@@ -77,6 +78,7 @@ def combine_scores(
 ):
     """
     Combine the files that contain the scores into one file.
+
     :param input_path: the directory containing scores files.
     :param output_path: the name of the output file.
     :return: dataframe with all the scores.
@@ -89,14 +91,15 @@ def combine_scores(
     df.rename(columns={'SCORESUM': gene[0]}, inplace=True)
     pf = profile_files
     for i in tqdm(range(1, len(pf)-1), desc='merging in process'):
-        df = unisci(df, pf[i])
+        df = uni_profiles(df, pf[i])
     df.to_csv(output_path, sep='\t', index=False)
     return df
 
 
-def unisci(df, f):
+def uni_profiles(df, f):
     """
     Merge two dataframes.
+
     :param df: the main dataframe with all the scores.
     :param f: the file containing the scores of one gene.
     :return: the merged dataframe.
@@ -112,6 +115,7 @@ def unisci(df, f):
 def plink_process(*, genes_folder, plink, annotated_vcf):
     """
     Use plink to calculate and sum the scores for each gene.
+
     :param genes_folder: the folder containing the temporary genes files.
     :param plink: the directory of plink (if not default).
     :param annotated_vcf: vcf with samples information
@@ -139,6 +143,7 @@ def get_prs(
 ):
     """
     Get PGS from pgscatalog and calculate PRS for samples.
+
     :param prs_id: the PRS ID in the pgscatalog.
     :param vcf: vcf file with sampels info. OR use bed/bim/fam files.
      :param bed: the bed file path.
@@ -177,6 +182,7 @@ def calc_corr(
 ):
     """
     Calculate the pearson's correlation between same genes in two scoring matices.
+
     :param first_file: the path to the first scores file.
     :param second_file: the path to the second scores file.
     :param samples_col: the column containing the samples IDs.

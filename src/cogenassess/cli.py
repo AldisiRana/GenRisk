@@ -51,6 +51,7 @@ def score_genes(
 ):
     """
     Calculate the gene-based scores for a given dataset.
+
     :param annotated_vcf: an annotated containing variant IDs, alt, info and samples genotypes.
     :param plink: the directory of plink, if not set in environment
     :param beta_param: the parameters from beta weight function.
@@ -121,6 +122,7 @@ def calculate_pval(
 ):
     """
     Calculate the P-value between two given groups.
+
     :param scores_file: the file containing gene scores.
     :param genotype_file: file containing the phenotype.
     :param output_path: the path for final output.
@@ -180,6 +182,7 @@ def visualize(
 ):
     """
     Visualize manhatten plot and qqplot for the data.
+
     :param pvals_file: the file containing p-values.
     :param info_file: file containing variant/gene info.
     :param genescol_1: the name of the genes column in pvals file.
@@ -230,6 +233,7 @@ def create_model(
 ):
     """
     Create a machine learning model with given dataset.
+
     :param data_file: file containing features and target.
     :param output_folder: a folder path to save all outputs.
     :param test_size: the size of testing set.

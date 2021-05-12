@@ -30,6 +30,7 @@ def find_pvalue(
 ):
     """
     Calculate the significance of a gene in a population using Mann-Whitney-U test.
+
     :param pc_file: if there is an extra file with PC values.
     :param test: the type of statistical test to use, choices are: t-test, mannwhitenyu, GLM, logit.
     :param scores_df: dataframe containing the scores of genes across samples.
@@ -129,6 +130,7 @@ def betareg_pvalues(
 ):
     """
     Calculate association significance between two groups using betareg.
+
     :param scores_file: the path to the scores file.
     :param pheno_file:  the path to the phenotypes and covariates file.
     :param samples_col: the name of the column containing the samples IDs.
@@ -162,6 +164,7 @@ def r_visualize(
 ):
     """
     Visualize the results of association test. Manhattan plot and QQ-plot.
+
     :param genescol_1: the name of the column containing the genes in the pvals_file.
     :param genescol_2: the name of the column containing the genes in the info_file.
     :param info_file: the file containing gene information.
@@ -198,6 +201,7 @@ def create_prediction_model(
 ):
     """
     Create a prediction model (classifier or regressor) using the provided dataset.
+
     :param model_name: the name of the prediction model.
     :param model_type: type of model (reg or classifier).
     :param y_col: the column containing the target (qualitative or quantitative).
