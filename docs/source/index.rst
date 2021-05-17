@@ -14,6 +14,7 @@ Welcome to CoGenAssess's documentation!
    cli
    pipeline
    utils
+   use_example
 
 Indices and tables
 ==================
