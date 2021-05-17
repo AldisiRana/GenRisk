@@ -1,5 +1,5 @@
 Example use case
-================
+##################
 This toy dataset is not real data. It contains about 10,000 SNP and 20 genes,
 2 of which (gene5 and gene17) were synthetically made to produce signals for the included phenotypes.
 The signals and phenotypes were simulated using `SIMU <https://github.com/precimed/simu>`_.
@@ -26,12 +26,58 @@ done on the dataset showed significance in gene5 and geen17 as expected.
 The QQ-plot was also produced using the pipeline:
 
 .. image:: ../../toy_example/toy_dataset_qqplot.jpeg
+    :width: 400
 
 Manhatten plot was not generated because the dataset is small and doesn't contain real data.
 
 Machine learning models
 ***********************
 
-TBA
+We have created two types of models, regression and classification. Both models use the gene-based models as features along with artificially simulated covariates, two of these covariates (cov3 and cov4) have significant association with the phenotypes.
+For the regression model, a quantitative trait was generated, while a binary trait was generated for the classification model.
+For each model, 10 fold cross validation was done on training dataset and an extra evaluation step was done on the testing set.
 
+Classification model
+=====================
 
+The input for the model generation can be found `here <https://github.com/AldisiRana/CoGenAssess/blob/master/toy_example/toy_example_classifier_features.tsv>`_.
+
+Results of model training
+++++++++++++++++++++++++++
+
+Feature importance:
+
+.. image:: ../../toy_example/toy_classifier/Feature Importance.png
+    :width: 400
+
+Precision-recall curve:
+
+.. image:: ../../toy_example/toy_classifier/Precision Recall.png
+    :width: 400
+
+Confusion matrix:
+
+.. image:: ../../toy_example/toy_classifier/Confusion Matrix.png
+    :width: 400
+
+Regression model
+================
+The input for the model generation can be found `here <https://github.com/AldisiRana/CoGenAssess/blob/master/toy_example/toy_example_regressor_features.tsv>`_.
+
+Results for model training
++++++++++++++++++++++++++++
+
+Feature importance:
+
+.. image:: ../../toy_example/toy_regressor/Feature Importance.png
+    :width: 400
+
+Prediction error:
+
+.. image:: ../../toy_example/toy_regressor/Prediction Error.png
+    :width: 400
+
+Residuals:
+
+.. image:: ../../toy_example/toy_regressor/Residuals.png
+    :width: 400

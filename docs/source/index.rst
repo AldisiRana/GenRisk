@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to CoGenAssess's documentation!
-========================================
+########################################
 .. automodule:: cogenassess
 
 .. toctree::
