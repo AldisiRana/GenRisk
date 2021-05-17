@@ -25,7 +25,7 @@ done on the dataset showed significance in gene5 and geen17 as expected.
 
 The QQ-plot was also produced using the pipeline:
 
-.. image:: images/toy_dataset_qqplot.jpeg
+.. image:: ../../toy_example/toy_dataset_qqplot.jpeg
 
 Manhatten plot was not generated because the dataset is small and doesn't contain real data.
 
