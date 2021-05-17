@@ -47,18 +47,21 @@ Results of model training
 
 Feature importance:
 
-.. image:: ../../toy_example/toy_classifier/Feature Importance.png
+.. image:: ../../toy_example/toy_classifier/Feature_Importance.png
     :width: 400
+    :align: center
 
 Precision-recall curve:
 
-.. image:: ../../toy_example/toy_classifier/Precision Recall.png
+.. image:: ../../toy_example/toy_classifier/Precision_Recall.png
     :width: 400
+    :align: center
 
 Confusion matrix:
 
-.. image:: ../../toy_example/toy_classifier/Confusion Matrix.png
+.. image:: ../../toy_example/toy_classifier/Confusion_Matrix.png
     :width: 400
+    :align: center
 
 Regression model
 ================
@@ -69,15 +72,18 @@ Results for model training
 
 Feature importance:
 
-.. image:: ../../toy_example/toy_regressor/Feature Importance.png
+.. image:: ../../toy_example/toy_regressor/Feature_Importance.png
     :width: 400
+    :align: center
 
 Prediction error:
 
-.. image:: ../../toy_example/toy_regressor/Prediction Error.png
+.. image:: ../../toy_example/toy_regressor/Prediction_Error.png
     :width: 400
+    :align: center
 
 Residuals:
 
 .. image:: ../../toy_example/toy_regressor/Residuals.png
     :width: 400
+    :align: center
