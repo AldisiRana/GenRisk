@@ -27,6 +27,7 @@ The QQ-plot was also produced using the pipeline:
 
 .. image:: ../../toy_example/toy_dataset_qqplot.jpeg
     :width: 400
+    :align: center
 
 Manhatten plot was not generated because the dataset is small and doesn't contain real data.
 
@@ -64,7 +65,7 @@ Confusion matrix:
     :align: center
 
 Regression model
-================
+==================
 The input for the model generation can be found `here <https://github.com/AldisiRana/CoGenAssess/blob/master/toy_example/toy_example_regressor_features.tsv>`_.
 
 Results for model training
