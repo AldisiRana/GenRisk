@@ -148,7 +148,7 @@ def betareg_pvalues(
          "--casescol", cases_col,
          "--nprocesses", str(nprocesses),
          "-o", output_path,
-         "--covariates", covariates], shell=True
+         "--covariates", covariates]
     )
 
 
