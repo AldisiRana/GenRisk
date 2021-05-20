@@ -14,8 +14,10 @@ if (!require(purrr)) install.packages("purrr", repos = "https://CRAN.R-project.o
 library(purrr)
 if (!require(utils)) install.packages("utils", repos = "https://CRAN.R-project.org/")
 library(utils)
+if (!require(lmtest)) install.packages("lmtest", repos = "https://CRAN.R-project.org/")
 library(lmtest)
-
+if (!require(parallel)) install.packages("lmtest", repos = "https://CRAN.R-project.org/")
+library(parallel)
 
 option_list = list(
   make_option(c("-s", "--scoresfile"), type="character",
@@ -24,7 +26,6 @@ option_list = list(
               help="output file name [default= %default]", metavar="character"),
   make_option(c("--phenofile"), type="character",
               help="phenotypes file path", default = NULL),
-  make_option(c("--pcfile"), type='character', help="covariates file path", default = NULL),
   make_option(c("--samplescol"), type='character', help="name of samples column", default="IID"),
   make_option(c("--casescol"), type='character', help="name of cases column", default="cases"),
   make_option(c("--covariates"), type='character', help="all covariates for calculation, seperated by comma", default="PC1,PC2,age"),
@@ -43,15 +44,10 @@ mydata=read.table(opt$scoresfile, header=TRUE)
 mydata[is.na(mydata)] = 0
 
 pheno=fread(opt$phenofile)
-if (!is.null(opt$pcfile)){
-  pc=fread(opt$pcfile)
-}
 
 covariates = c(opt$casescol, strsplit(opt$covariates, ",")[[1]])
 
 epsilon=0.001
-
-
 
 normalize <- function(gene)
 {
@@ -70,10 +66,7 @@ rm(mydata)
 message("merging dataframes")
 completed=merge(output,pheno,by=opt$samplescol)
 rm(pheno)
-if (exists(as.character(expression(pc)))){
-  completed=merge(completed,pc,by=opt$samplescol)
-  rm(pc)
-}
+
 
 message("Calculating pvalues ...")
 genes_list <- names(completed)[2:ncol(output)]
@@ -97,6 +90,6 @@ apply_betareg <- function(x){
   return(results)
 }
 
-models = lapply(genes_list, possibly(apply_betareg,NA_real_))
+models = mclapply(genes_list, possibly(apply_betareg,NA_real_))
 
 message("Done")
