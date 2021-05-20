@@ -64,6 +64,7 @@ normalize <- function(gene)
 message("rescaling scores ...")
 output=apply(mydata,2,normalize)
 output=as.data.table(output)
+output[[opt$samplescol]] = mydata[[opt$samplescol]]
 rm(mydata)
 
 message("merging dataframes")
