@@ -96,6 +96,6 @@ apply_betareg <- function(x){
   return(results)
 }
 
-models = mclapply(genes_list, possibly(apply_betareg,NA_real_))
+models = lapply(genes_list, possibly(apply_betareg,NA_real_))
 
 message("Done")
