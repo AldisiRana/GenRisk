@@ -112,7 +112,7 @@ def uni_profiles(df, f):
     return df
 
 
-def plink_process(*, genes_folder, plink, annotated_vcf):
+def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None):
     """
     Use plink to calculate and sum the scores for each gene.
 
@@ -122,11 +122,15 @@ def plink_process(*, genes_folder, plink, annotated_vcf):
     :return:
     """
     genes = [line.strip() for line in open(os.path.join(genes_folder, (genes_folder + '.genes')), 'r')]
+    if bfiles:
+        input_files = " --bfile " + bfiles
+    else:
+        input_files = " --vcf " + annotated_vcf
     for gene in tqdm(genes, desc='calculating genes scores'):
         v_file = os.path.join(genes_folder, (gene + '.v'))
         w_file = os.path.join(genes_folder, (gene + '.w'))
         p = subprocess.call(
-            plink + " --vcf " + annotated_vcf + " --double-id" + " --extract " + v_file + " --score " + w_file +
+            plink + input_files + " --double-id" + " --extract " + v_file + " --score " + w_file +
             " 1 2 3 sum --out " + os.path.join(genes_folder, gene), shell=True
         )
 

@@ -18,6 +18,7 @@ def main():
 
 @main.command()
 @click.option('-a', '--annotated-vcf', required=True, help='the annotated vcf')
+@click.option('-b', '--bfiles', default=None)
 @click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
 @click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
 @click.option('-o', '--output-file', required=True, help="the final output scores matrix.")
@@ -36,6 +37,7 @@ def main():
 def score_genes(
     *,
     annotated_vcf,
+    bfiles,
     plink,
     beta_param,
     temp_dir,
@@ -81,7 +83,7 @@ def score_genes(
         alt_col=alt_col,
     )
     click.echo('calculating gene scores ...')
-    plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=annotated_vcf)
+    plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=annotated_vcf, bfiles=bfiles)
     click.echo('combining score files ...')
     df = combine_scores(input_path=temp_dir, output_path=output_file)
     if remove_temp:
