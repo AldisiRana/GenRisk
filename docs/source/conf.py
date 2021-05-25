@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('../../src'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'cogenassess'
+project = 'genrisk'
 copyright = '2021, Rana Aldisi'
 author = 'Rana Aldisi'
 

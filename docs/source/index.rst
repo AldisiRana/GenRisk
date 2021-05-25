@@ -5,7 +5,7 @@
 
 Welcome to CoGenAssess's documentation!
 ########################################
-.. automodule:: cogenassess
+.. automodule:: genrisk
 
 .. toctree::
    :maxdepth: 2

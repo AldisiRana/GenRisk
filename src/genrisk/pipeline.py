@@ -24,14 +24,15 @@ def find_pvalue(
     genes=None,
     cases_column,
     samples_column,
-    pc_file=None,
     test='mannwhitneyu',
     adj_pval,
+    covariates=None,
+    cases=None,
+    controls=None
 ):
     """
     Calculate the significance of a gene in a population using Mann-Whitney-U test.
 
-    :param pc_file: if there is an extra file with PC values.
     :param test: the type of statistical test to use, choices are: t-test, mannwhitenyu, GLM, logit.
     :param scores_df: dataframe containing the scores of genes across samples.
     :param genotype_file: a file containing the information of the sample.
@@ -40,19 +41,31 @@ def find_pvalue(
     :param cases_column: the name of the column containing cases and controls information.
     :param samples_column: the name of the column contining samples IDs.
     :param adj_pval: the method for pvalue adjustment.
+    :param controls: the name of the controls category.
+    :param cases:  the name of the cases category.
+    :param covariates: the covariates of the phenotype.
+
     :return: dataframe with genes and their p_values
     """
     genotype_df = pd.read_csv(genotype_file, sep=r'\s+', usecols=[samples_column, cases_column])
+    genotype_df.dropna(subset=[cases_column], inplace=True)
     merged_df = pd.merge(genotype_df, scores_df, on=samples_column)
     df_by_cases = merged_df.groupby(cases_column)
-    cases = list(df_by_cases.groups.keys())
+    if covariates:
+        covariates = covariates.split(',')
+    if cases and controls:
+        cc = [cases, controls]
+    else:
+        cc = list(df_by_cases.groups.keys())
     p_values = []
     if genes is None:
         genes = scores_df.columns.tolist()[1:]
     if test == 'mannwhitneyu':
+        if len(cc) > 2:
+            Warning('There are more than two categories here. We will only consider the first two categories.')
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            case_0 = df_by_cases.get_group(cases[0])[gene].tolist()
-            case_1 = df_by_cases.get_group(cases[1])[gene].tolist()
+            case_0 = df_by_cases.get_group(cc[0])[gene].tolist()
+            case_1 = df_by_cases.get_group(cc[1])[gene].tolist()
             try:
                 u_statistic, p_val = stats.mannwhitneyu(case_0, case_1, alternative='greater')
             except:
@@ -60,9 +73,11 @@ def find_pvalue(
             p_values.append([gene, u_statistic, p_val])
         p_values_df = pd.DataFrame(p_values, columns=['genes', 'statistic', 'p_value']).sort_values(by=['p_value'])
     elif test == 'ttest_ind':
+        if len(cc) > 2:
+            Warning('There are more than two categories here. We will only consider the first two categories.')
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            case_0 = df_by_cases.get_group(cases[0])[gene].tolist()
-            case_1 = df_by_cases.get_group(cases[1])[gene].tolist()
+            case_0 = df_by_cases.get_group(cc[0])[gene].tolist()
+            case_1 = df_by_cases.get_group(cc[1])[gene].tolist()
             try:
                 statistic, p_val = stats.ttest_ind(case_0, case_1)
             except:
@@ -70,12 +85,9 @@ def find_pvalue(
             p_values.append([gene, statistic, p_val])
         p_values_df = pd.DataFrame(p_values, columns=['genes', 'statistic', 'p_value']).sort_values(by=['p_value'])
     elif test == 'logit':
-        if not pc_file:
-            raise Exception("Need principle components file.")
-        pc_df = pd.read_csv(pc_file, sep=r'\s+', index_col=False)
-        merged_df = pd.merge(merged_df, pc_df, on=samples_column)
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            X = merged_df[[gene, 'PC1', 'PC2', 'PC3']]
+            cols = [gene] + covariates
+            X = merged_df[[cols]]
             X = sm.add_constant(X)
             Y = merged_df[[cases_column]]
             try:
@@ -86,16 +98,12 @@ def find_pvalue(
             pval = list(result.pvalues)
             # add std err
             p_values.append([gene] + pval)
-        p_values_df = pd.DataFrame(
-            p_values, columns=['genes', 'const_pval', 'p_value', 'PC1_pval', 'PC2_pvcal', 'PC3_pval']
-        ).sort_values(by=['p_value'])
+        cols = ['genes', 'const_pval', 'p_value'] + covariates
+        p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     elif test == 'glm':
-        if not pc_file:
-            raise Exception("Need principle components file.")
-        pc_df = pd.read_csv(pc_file, sep=r'\s+', index_col=False)
-        merged_df = pd.merge(merged_df, pc_df, on=samples_column)
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            X = merged_df[[gene, 'PC1', 'PC2', 'PC3']]
+            cols = [gene] + covariates
+            X = merged_df[[cols]]
             X = sm.add_constant(X)
             Y = merged_df[[cases_column]]
             try:
@@ -106,9 +114,8 @@ def find_pvalue(
             pval = list(result.pvalues)
             beta_coef = list(result.params)[1]
             p_values.append([gene] + pval + [beta_coef])
-        p_values_df = pd.DataFrame(
-            p_values, columns=['genes', 'const_pval', 'p_value', 'PC1_pval', 'PC2_pvcal', 'PC3_pval', 'beta_coef']
-        ).sort_values(by=['p_value'])
+        cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef']
+        p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     else:
         raise Exception("The test you selected is not valid.")
     if adj_pval:

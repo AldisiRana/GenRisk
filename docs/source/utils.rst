@@ -1,5 +1,5 @@
 Utilities
 ##########
-.. autofunction:: cogenassess.utils.normalize_gene_len
-.. autofunction:: cogenassess.utils.calc_corr
-.. autofunction:: cogenassess.utils.get_prs
+.. autofunction:: genrisk.utils.normalize_gene_len
+.. autofunction:: genrisk.utils.calc_corr
+.. autofunction:: genrisk.utils.get_prs

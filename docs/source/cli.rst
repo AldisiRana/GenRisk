@@ -1,6 +1,6 @@
 Command Line Interface
 #######################
-.. click:: cogenassess.cli:main
-   :prog: cogenassess
+.. click:: genrisk.cli:main
+   :prog: genrisk
    :show-nested:
   

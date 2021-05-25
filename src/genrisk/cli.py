@@ -13,7 +13,7 @@ from .pipeline import find_pvalue, betareg_pvalues, r_visualize, create_predicti
 
 @click.group()
 def main():
-    """Handle cogenassess functions."""
+    """Handle genrisk functions."""
 
 
 @main.command()
@@ -99,10 +99,9 @@ def score_genes(
 @click.option('-t', '--test', required=True,
               type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'glm', 'betareg']),
               help='statistical test for calculating P value.')
-@click.option('-c', '--cases-column', required=True, help="the name of the column that contains the case/control type.")
+@click.option('-c', '--cases-column', required=True,
+              help="the name of the column that contains the case/control or quantitative vals.")
 @click.option('-m', '--samples-column', required=True, help="the name of the column that contains the samples.")
-@click.option('-p', '--pc-file', default=None,
-              help="Principle components values for logistic regression. if not in genotype file")
 @click.option('--adj-pval', type=click.Choice(
     ['bonferroni', 'sidak', 'holm-sidak', 'holm',
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
@@ -116,7 +115,6 @@ def calculate_pval(
     cases_column,
     samples_column,
     test,
-    pc_file,
     adj_pval,
     covariates,
 ):
@@ -130,7 +128,6 @@ def calculate_pval(
     :param cases_column: the name of the column with phenotypes.
     :param samples_column: the name of the column with sample IDs. All files need to have the same format.
     :param test: the test used to calculate pvalue.
-    :param pc_file: the file with PC (alternatively the file with covariates to use in test).
     :param adj_pval: the adjustment method used (if any).
     :param covariates: the column names of covariates to use, with comma in between. (e.g: PC1,PC2,age)
     :return:
@@ -146,7 +143,6 @@ def calculate_pval(
         )
     else:
         scores_df = pd.read_csv(scores_file, sep=r'\s+')
-
         click.echo("The process for calculating the p_values will start now.")
         df = find_pvalue(
             scores_df=scores_df,
@@ -156,8 +152,8 @@ def calculate_pval(
             cases_column=cases_column,
             samples_column=samples_column,
             test=test,
-            pc_file=pc_file,
             adj_pval=adj_pval,
+            covariates=covariates,
         )
         click.echo('Process is complete.')
         click.echo(df.info())
@@ -217,6 +213,7 @@ def visualize(
 @click.option('--normalize', is_flag=True, help='if flagged the data will be normalized before training.')
 @click.option('--folds', default=10, type=int, help='number of cross-validation folds in training.')
 @click.option('--metric', help='the metric used to choose best model after training.')
+@click.option('--samples-col', default='IID')
 def create_model(
     *,
     data_file,
@@ -230,10 +227,12 @@ def create_model(
     normalize,
     folds,
     metric,
+    samples_col,
 ):
     """
     Create a machine learning model with given dataset.
 
+    :param samples_col: the name of the column with samples identifiers.
     :param data_file: file containing features and target.
     :param output_folder: a folder path to save all outputs.
     :param test_size: the size of testing set.
@@ -247,7 +246,7 @@ def create_model(
     :param metric: the metric used to choose best model after training.
     :return: the final model
     """
-    training_set = pd.read_csv(data_file, sep='\s+', index_col=False)
+    training_set = pd.read_csv(data_file, sep='\s+', index_col=samples_col)
     testing_set = pd.DataFrame()
     if test:
         training_set, testing_set = train_test_split(training_set, test_size=test_size)
@@ -267,6 +266,7 @@ def create_model(
     )
     return model
 
+# Add function for testing model
 
 if __name__ == '__main__':
     main()

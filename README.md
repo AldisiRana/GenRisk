@@ -10,16 +10,16 @@ within a phenotype in a population
 
 
 ## Installation
-``CoGenAssess`` can be installed on python3+ from the latest code on [GitHub](https://github.com/AldisiRana/CoGenAssess) with:
+``GenRisk`` can be installed on python3+ from the latest code on [GitHub](https://github.com/AldisiRana/GenRisk) with:
 
-    $ pip install git+https://github.com/AldisiRana/CoGenAssess.git
+    $ pip install git+https://github.com/AldisiRana/GenRisk.git
 
 ## Usage
 
 ### Score genes
 Calculate the gene-based scores for a given dataset.
 
-    $ cogenassess score_genes --annotated-vcf toy_example/annotated_toy_dataset.vcf --temp-dir toy_example/toy_dataset/ 
+    $ genrisk score_genes --annotated-vcf toy_example/annotated_toy_dataset.vcf --temp-dir toy_example/toy_dataset/ 
     --output-file toy_example/toy_dataset_scores --weight-func beta --remove-dir
 ```
 required arguments:
@@ -45,7 +45,7 @@ optional arguments:
 ### Calculate p-values
 This function calculates the p-values across the genes between two given groups
     
-    $ cogenassess calculate-pval --scores-file toy_example/toy_dataset_scores --gentype-file toy_example/toy.pheno 
+    $ genrisk calculate-pval --scores-file toy_example/toy_dataset_scores --gentype-file toy_example/toy.pheno 
     --cases-column trait1 --samples-column IID --test betareg --output-path toy_dataset_betareg.tsv
 ```
 required arguments:
@@ -67,7 +67,7 @@ optional arguments:
 ### Visualize
 Visualize manhatten plot and qqplot for the data.
 
-    $cogenassess visualize --pvals-file toy_example/toy_dataset_scores --info-file annotated_toy_dataset.vcf
+    $ genrisk visualize --pvals-file toy_example/toy_dataset_scores --info-file annotated_toy_dataset.vcf
     --qq-output toy_example/toy_dataset_qqplot.jpg --manhattan-output toy_example/toy_dataset_manhattanplot.jpg 
 
 ```
@@ -87,7 +87,7 @@ optional arguments:
 ### Create model
 Create a machine learning model (classifier or regressor) with given dataset
 
-    $cogenassess create-model --data-file toy_example_regressor_features.tsv --output-folder toy_regressor 
+    $ genrisk create-model --data-file toy_example_regressor_features.tsv --output-folder toy_regressor 
     --test-size 0.25 --test --model-name toy_regressor --target-col trait1 --imbalanced --normalize
 
 ```

@@ -15,12 +15,12 @@ It should also contain samples genotypes. This information is important for the 
 
 Gene-based scores
 *****************
-The gene-based scores can be found `here <https://github.com/AldisiRana/CoGenAssess/blob/master/toy_example/toy_dataset_scores>`_.
+The gene-based scores can be found `here <https://github.com/AldisiRana/GenRisk/blob/master/toy_example/toy_dataset_scores>`_.
 These scores are used as input for the association analysis and as features for the machine learning models.
 
 Association analysis
 ********************
-The association analysis (`found here <https://github.com/AldisiRana/CoGenAssess/blob/master/toy_example/toy_dataset_betareg_pvals.tsv>`_)
+The association analysis (`found here <https://github.com/AldisiRana/GenRisk/blob/master/toy_example/toy_dataset_betareg_pvals.tsv>`_)
 done on the dataset showed significance in gene5 and geen17 as expected.
 
 The QQ-plot was also produced using the pipeline:
@@ -41,7 +41,7 @@ For each model, 10 fold cross validation was done on training dataset and an ext
 Classification model
 =====================
 
-The input for the model generation can be found `here <https://github.com/AldisiRana/CoGenAssess/blob/master/toy_example/toy_example_classifier_features.tsv>`_.
+The input for the model generation can be found `here <https://github.com/AldisiRana/GenRisk/blob/master/toy_example/toy_example_classifier_features.tsv>`_.
 
 Results of model training
 ++++++++++++++++++++++++++
@@ -66,7 +66,7 @@ Confusion matrix:
 
 Regression model
 ==================
-The input for the model generation can be found `here <https://github.com/AldisiRana/CoGenAssess/blob/master/toy_example/toy_example_regressor_features.tsv>`_.
+The input for the model generation can be found `here <https://github.com/AldisiRana/GenRisk/blob/master/toy_example/toy_example_regressor_features.tsv>`_.
 
 Results for model training
 +++++++++++++++++++++++++++
