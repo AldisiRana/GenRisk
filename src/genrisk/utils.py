@@ -41,7 +41,7 @@ def get_gene_info(
     :param weight_func: the weighting function, beta or log10.
     :return: returns the output directory with all the temporary files.
     """
-    df = pd.read_csv(annotated_vcf, usecols=[variant_col, alt_col, 'INFO'], skiprows=3, sep=r'\s+', index_col=False)
+    df = pd.read_csv(annotated_vcf, usecols=[variant_col, alt_col, 'INFO'], skiprows=10, sep=r'\s+', index_col=False)
     info = df['INFO'].str.split(pat=';', expand=True)
     for col in info.columns:
         val = info[col][0].split('=')
