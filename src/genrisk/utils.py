@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 
+import gzip
 import pandas as pd
 from pybiomart import Dataset
 import requests
@@ -41,8 +42,24 @@ def get_gene_info(
     :param weight_func: the weighting function, beta or log10.
     :return: returns the output directory with all the temporary files.
     """
-    df = pd.read_csv(annotated_vcf, usecols=[variant_col, alt_col, 'INFO'], skiprows=10, sep=r'\s+', index_col=False)
+    skip = 0
+    if annotated_vcf.endswith('.gz'):
+        with gzip.open(annotated_vcf, 'r') as fin:
+            for line in fin:
+                if line.decode('utf-8').startswith('##'):
+                    skip += 1
+    else:
+        with open(annotated_vcf, 'r') as file:
+            for line in file:
+                if line.startswith('##'):
+                    skip += 1
+    df = pd.read_csv(annotated_vcf, usecols=[variant_col, alt_col, 'INFO'], skiprows=skip, sep=r'\s+', index_col=False)
     info = df['INFO'].str.split(pat=';', expand=True)
+    missing_info = info[info.isnull().any(axis=1)].index
+    df.drop(missing_info, inplace=True)
+    df.reset_index(drop=True, inplace=True)
+    info.drop(missing_info, inplace=True)
+    info.reset_index(drop=True, inplace=True)
     for col in info.columns:
         val = info[col][0].split('=')
         if len(val) == 1:
