@@ -87,7 +87,7 @@ optional arguments:
 ### Create model
 Create a machine learning model (classifier or regressor) with given dataset
 
-    $ genrisk create-model --data-file toy_example_regressor_features.tsv --output-folder toy_regressor 
+    $ genrisk create-model --data-file toy_example_regressor_features.tsv --model-type regressor --output-folder toy_regressor 
     --test-size 0.25 --test --model-name toy_regressor --target-col trait1 --imbalanced --normalize
 
 ```
