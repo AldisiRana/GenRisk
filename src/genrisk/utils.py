@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 
+import gzip
 import os
 import re
 import subprocess
+import urllib.request as urllib
 
-import gzip
-import pandas as pd
-from pybiomart import Dataset
-import requests
 import numpy as np
+import pandas as pd
+import requests
+from pybiomart import Dataset
 from scipy.stats import beta, pearsonr
 from tqdm import tqdm
-import urllib.request as urllib
 
 
 def get_gene_info(
@@ -84,7 +84,8 @@ def get_gene_info(
     [df[df[genes_col] == gene][[variant_col, alt_col, 'score', genes_col]].to_csv(os.path.join(output_dir, (
         str(gene) + '.w')), index=False, sep='\t') for gene in tqdm(genes, desc="writing w gene files")]
     [df[df[genes_col] == gene][[variant_col, alt_col]].to_csv(os.path.join(output_dir, (str(gene) + '.v')),
-        index=False, sep='\t') for gene in tqdm(genes, desc="writing v gene files")]
+                                                              index=False, sep='\t') for gene in
+     tqdm(genes, desc="writing v gene files")]
     return output_dir
 
 
@@ -107,7 +108,7 @@ def combine_scores(
     gene = r.findall(str(profile_files[0]))
     df.rename(columns={'SCORESUM': gene[0]}, inplace=True)
     pf = profile_files
-    for i in tqdm(range(1, len(pf)-1), desc='merging in process'):
+    for i in tqdm(range(1, len(pf) - 1), desc='merging in process'):
         df = uni_profiles(df, pf[i])
     df.to_csv(output_path, sep='\t', index=False)
     return df
@@ -180,7 +181,7 @@ def get_prs(
     if resp.status_code != 200 or not prs_info:
         raise Exception('The PRS score might be wrong!')
     url = prs_info['ftp_scoring_file']
-    prs_file = prs_id+'.gz'
+    prs_file = prs_id + '.gz'
     urllib.urlretrieve(url, prs_file)
     # unpack file
     if vcf:

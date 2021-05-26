@@ -5,9 +5,9 @@ import subprocess
 import pandas as pd
 import pycaret.classification as cl
 import pycaret.regression as pyreg
-from pycaret.utils import check_metric
 import scipy.stats as stats
 import statsmodels.api as sm
+from pycaret.utils import check_metric
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm
 
@@ -225,7 +225,7 @@ def create_prediction_model(
     if model_type == 'regressor':
         if not metric:
             metric = 'RMSE'
-        setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1-test_size, fold=folds,
+        setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1 - test_size, fold=folds,
                             silent=True, log_experiment=True)
         best_model = pyreg.compare_models(sort=metric)
         reg_model = pyreg.create_model(best_model)
@@ -248,7 +248,7 @@ def create_prediction_model(
     elif model_type == 'classifier':
         if not metric:
             metric = 'AUC'
-        setup = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1-test_size,
+        setup = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1 - test_size,
                          silent=True, fold=folds, log_experiment=True)
         best_model = cl.compare_models(sort=metric)
         cl_model = cl.create_model(best_model)
@@ -263,8 +263,8 @@ def create_prediction_model(
             accuracy = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'Accuracy')
             metrics = ['AUC: ' + str(auc), 'Accuracy: ' + str(accuracy)]
         cl.save_model(final_model, model_name)
-        cl.pull().to_csv(model_name+'_evaluation.tsv', sep='\t', index=False)
-        cl.get_logs().to_csv(model_name+'_logs.logs', sep='\t', index=False)
+        cl.pull().to_csv(model_name + '_evaluation.tsv', sep='\t', index=False)
+        cl.get_logs().to_csv(model_name + '_logs.logs', sep='\t', index=False)
     else:
         return Exception('Model requested is not available. Please choose regressor or classifier.')
     return metrics, final_model

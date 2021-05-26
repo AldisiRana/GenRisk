@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
 import shutil
-import joblib
 
 import click
-import pandas as pd
+import joblib
 import matplotlib.pyplot as plt
+import pandas as pd
 import sklearn.metrics as metrics
 from sklearn.model_selection import train_test_split
 
@@ -298,7 +298,7 @@ def test_model(
         plt.savefig('classifier_confusion_matrix.png')
         click.echo('Model testing results:')
         click.echo(report)
-        click.echo('accuracy= '+str(acc))
+        click.echo('accuracy= ' + str(acc))
     else:
         explained_variance = metrics.explained_variance_score(y_true, y_pred)
         r2 = metrics.r2_score(y_true, y_pred)
