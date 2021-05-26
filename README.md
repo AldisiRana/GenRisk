@@ -1,6 +1,6 @@
-# CoGenAssess
+# GenRisk
 
-CoGenAssess is a package that implements different gene-based scoring schemes to analyze and find significant genes 
+GenRisk is a package that implements different gene-based scoring schemes to analyze and find significant genes 
 within a phenotype in a population
 
 ## Requirements
