@@ -1,0 +1,31 @@
+artifact_path: model
+flavors:
+  python_function:
+    env: conda.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    python_version: 3.7.5
+  sklearn:
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 0.23.2
+run_id: d0c8d90228b34f05af382be564642b19
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  type: dataframe
+signature:
+  inputs: '[{"name": "gene2", "type": "double"}, {"name": "None", "type": "double"},
+    {"name": "gene9", "type": "double"}, {"name": "gene13", "type": "double"}, {"name":
+    "gene10", "type": "double"}, {"name": "gene14", "type": "double"}, {"name": "gene4",
+    "type": "double"}, {"name": "gene20", "type": "double"}, {"name": "gene11", "type":
+    "double"}, {"name": "gene18", "type": "double"}, {"name": "gene1", "type": "double"},
+    {"name": "gene6", "type": "double"}, {"name": "gene17", "type": "double"}, {"name":
+    "gene8", "type": "double"}, {"name": "gene12", "type": "double"}, {"name": "gene19",
+    "type": "double"}, {"name": "gene15", "type": "double"}, {"name": "gene7", "type":
+    "double"}, {"name": "gene16", "type": "double"}, {"name": "gene5", "type": "double"},
+    {"name": "cov1", "type": "long"}, {"name": "cov2", "type": "double"}, {"name":
+    "cov3", "type": "double"}, {"name": "cov4", "type": "double"}, {"name": "PRS",
+    "type": "double"}]'
+  outputs: null
+utc_time_created: '2021-05-26 13:28:42.450610'

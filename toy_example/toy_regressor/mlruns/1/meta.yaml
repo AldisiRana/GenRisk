@@ -1,0 +1,4 @@
+artifact_location: file:///C:/Users/aldis/Documents/GitHub/CoGenAssess/toy_example/toy_regressor_01/mlruns/1
+experiment_id: '1'
+lifecycle_stage: active
+name: reg-default-name

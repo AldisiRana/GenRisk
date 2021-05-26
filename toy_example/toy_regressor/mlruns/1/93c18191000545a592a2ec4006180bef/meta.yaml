@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/aldis/Documents/GitHub/CoGenAssess/toy_example/toy_regressor_01/mlruns/1/93c18191000545a592a2ec4006180bef/artifacts
+end_time: 1622035719893
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+name: ''
+run_id: 93c18191000545a592a2ec4006180bef
+run_uuid: 93c18191000545a592a2ec4006180bef
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1622035719230
+status: 3
+tags: []
+user_id: aldis

@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/aldis/Documents/GitHub/CoGenAssess/toy_example/toy_classifier_01/mlruns/1/d1e56bee7c3e4c5db0566660b2747607/artifacts
+end_time: 1622036177198
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+name: ''
+run_id: d1e56bee7c3e4c5db0566660b2747607
+run_uuid: d1e56bee7c3e4c5db0566660b2747607
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1622036176222
+status: 3
+tags: []
+user_id: aldis
