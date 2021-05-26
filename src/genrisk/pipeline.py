@@ -225,8 +225,8 @@ def create_prediction_model(
     if model_type == 'regressor':
         if not metric:
             metric = 'RMSE'
-        reg = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1-test_size, fold=folds,
-                          silent=True)
+        setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1-test_size, fold=folds,
+                            silent=True, log_experiment=True)
         best_model = pyreg.compare_models(sort=metric)
         reg_model = pyreg.create_model(best_model)
         reg_tuned_model = pyreg.tune_model(reg_model, optimize=metric)
@@ -240,14 +240,16 @@ def create_prediction_model(
             rmse = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'RMSE')
             metrics = ['R2: ' + str(r2), 'RMSE: ' + str(rmse)]
         pyreg.save_model(final_model, model_name)
-        with open('model.log', 'w') as f:
-            f.writelines("%s\n" % output for output in reg)
+        pyreg.pull().to_csv(model_name + '_evaluation.tsv', sep='\t', index=False)
+        pyreg.get_logs().to_csv(model_name + '_logs.logs', sep='\t', index=False)
+        with open(model_name + '.log', 'w') as f:
+            f.writelines("%s\n" % output for output in setup)
             f.writelines("%s\n" % output for output in metrics)
     elif model_type == 'classifier':
         if not metric:
             metric = 'AUC'
-        classifier = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1-test_size,
-                              silent=True, fold=folds)
+        setup = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1-test_size,
+                         silent=True, fold=folds, log_experiment=True)
         best_model = cl.compare_models(sort=metric)
         cl_model = cl.create_model(best_model)
         cl_tuned_model = pyreg.tune_model(cl_model, optimize=metric)
@@ -261,9 +263,8 @@ def create_prediction_model(
             accuracy = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'Accuracy')
             metrics = ['AUC: ' + str(auc), 'Accuracy: ' + str(accuracy)]
         cl.save_model(final_model, model_name)
-        with open('model.log', 'w') as f:
-            f.writelines("%s\n" % output for output in classifier)
-            f.writelines("%s\n" % output for output in metrics)
+        cl.pull().to_csv(model_name+'_evaluation.tsv', sep='\t', index=False)
+        cl.get_logs().to_csv(model_name+'_logs.logs', sep='\t', index=False)
     else:
         return Exception('Model requested is not available. Please choose regressor or classifier.')
-    return final_model
+    return metrics, final_model

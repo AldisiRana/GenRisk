@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 import os
+import shutil
+import joblib
 
 import click
-import shutil
-
 import pandas as pd
+import matplotlib.pyplot as plt
+import sklearn.metrics as metrics
 from sklearn.model_selection import train_test_split
 
-from .utils import get_gene_info, plink_process, combine_scores
 from .pipeline import find_pvalue, betareg_pvalues, r_visualize, create_prediction_model
+from .utils import get_gene_info, plink_process, combine_scores
 
 
 @click.group()
@@ -32,8 +34,6 @@ def main():
 @click.option('--del-col', default='CADD_raw', help="the column containing the deleteriousness score.")
 @click.option('--alt-col', default='Alt', help="the column containing the alternate base.")
 @click.option('--maf-threshold', default=0.01, help="the threshold for minor allele frequency.")
-@click.option('--remove-temp', is_flag=True,
-              help="if flagged the temporary directory will be deleted after process completion.")
 def score_genes(
     *,
     annotated_vcf,
@@ -49,7 +49,6 @@ def score_genes(
     del_col,
     alt_col,
     maf_threshold,
-    remove_temp,
 ):
     """
     Calculate the gene-based scores for a given dataset.
@@ -69,6 +68,7 @@ def score_genes(
     :param remove_temp: if True temporary directory will be deleted after process completion.
     :return: the final dataframe information.
     """
+    confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
     click.echo('getting information from vcf files')
     genes_folder = get_gene_info(
         annotated_vcf=annotated_vcf,
@@ -86,7 +86,7 @@ def score_genes(
     plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=annotated_vcf, bfiles=bfiles)
     click.echo('combining score files ...')
     df = combine_scores(input_path=temp_dir, output_path=output_file)
-    if remove_temp:
+    if confirm:
         shutil.rmtree(temp_dir)
     click.echo('process is complete.')
     return df.info()
@@ -254,7 +254,7 @@ def create_model(
         training_set, testing_set = train_test_split(training_set, test_size=test_size)
     os.mkdir(output_folder)
     os.chdir(output_folder)
-    model = create_prediction_model(
+    results, model = create_prediction_model(
         model_name=model_name,
         model_type=model_type,
         imbalanced=imbalanced,
@@ -266,9 +266,54 @@ def create_model(
         testing_set=testing_set,
         test_size=test_size,
     )
-    return model
+    return results, model
 
-# Add function for testing model
+
+@main.command()
+@click.option('-t', '--model-type', required=True, type=click.Choice(['regressor', 'classifier']),
+              help='type of prediction model.')
+@click.option('-i', '--input-file', required=True, help='testing dataset')
+@click.option('-l', '--label-col', required=True, help='the target/phenotype/label column')
+@click.option('-m', '--model-path', required=True, help='path to the trained model.')
+@click.option('-s', '--samples-col', default='IID', help='the samples column.')
+def test_model(
+    *,
+    model_path,
+    input_file,
+    model_type,
+    label_col,
+    samples_col
+):
+    model = joblib.load(model_path)
+    testing_df = pd.read_csv(input_file, sep=r'\s+', index_col=samples_col)
+    y_true = testing_df[label_col]
+    x_set = testing_df.drop(columns=label_col)
+    y_pred = model.predict(x_set)
+    if model_type == 'classifier':
+        report = metrics.classification_report(y_true, y_pred)
+        acc = metrics.accuracy_score(y_true, y_pred)
+        confusion = metrics.plot_confusion_matrix(x_set, y_true)
+        confusion.ax_.set_title('Classifier confusion matrix')
+        plt.show()
+        plt.savefig('classifier_confusion_matrix.png')
+        click.echo('Model testing results:')
+        click.echo(report)
+        click.echo('accuracy= '+str(acc))
+    else:
+        explained_variance = metrics.explained_variance_score(y_true, y_pred)
+        r2 = metrics.r2_score(y_true, y_pred)
+        rmse = metrics.mean_squared_error(y_true, y_pred)
+        plt.scatter(y_pred, y_true, alpha=0.5)
+        plt.title('Actual vs predicted scatterplot')
+        plt.xlabel('Predicted')
+        plt.ylabel('Actual')
+        plt.show()
+        plt.savefig('regressor_scatterplot.png')
+        click.echo('Model testing results:')
+        click.echo("explained variance score= " + str(explained_variance))
+        click.echo('R^2= ' + str(r2))
+        click.echo('RMSE= ' + str(rmse))
+
 
 if __name__ == '__main__':
     main()
