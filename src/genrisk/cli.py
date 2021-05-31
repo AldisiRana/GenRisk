@@ -322,9 +322,9 @@ def get_prs(
 ):
     download = click.confirm('Do you want to download PGS file?')
     if download:
-        pgs_id = click.prompt('Please input PGS ID: ', type=str)
+        pgs_id = click.prompt('Please input PGS ID', type=str)
         pgs_file = download_pgs(prs_id=pgs_id)
-        p = subprocess.call('zcat ' + pgs_file + ' | head -n 15')
+        p = subprocess.call('zcat ' + pgs_file + ' | head -n 15', shell=True)
         id_col = click.prompt('Please provide the ID column number')
         allele = click.prompt('Please provide the effect allele column number')
         weight = click.prompt('Please provide the effect weight column number')

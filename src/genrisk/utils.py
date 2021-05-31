@@ -4,6 +4,7 @@ import gzip
 import os
 import re
 import subprocess
+import urllib.request as urllib
 
 import numpy as np
 import pandas as pd
@@ -169,6 +170,7 @@ def download_pgs(
         raise Exception('The PRS score might be wrong!')
     url = prs_info['ftp_scoring_file']
     prs_file = prs_id + '.gz'
+    urllib.urlretrieve(url, prs_file)
     return prs_file
 
 
