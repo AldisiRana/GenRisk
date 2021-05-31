@@ -108,3 +108,36 @@ optional arguments:
   --metric                  the metric used to choose best model after training. Regressor default=RMSE, classifier default=AUC
   
 ```
+
+### Test model
+Evaluate a machine learning model with a given dataset.
+
+    $ genrisk test-model --model-path regressor_model.pkl --input-file testing_dataset.tsv --model-type regressor 
+    --labels-col target --samples-col IID
+
+```
+required arguments:
+  -t, --model-type           type of prediction model.
+  -i, --input-file           the testing dataset.
+  -l, --label-col            the target/phenotype/label column
+  -m, --model-path           the path to the ML model.
+
+optional arguments:
+  -h, --help                 show this help message and exit
+  -s, --samples-col          the samples column.
+  
+```
+
+
+### Get PRS scores
+Gets a PGS file (provided by the user or downloaded from pgscatalog) then calculates the PRS scores for dataset.
+Note: This command is interactive.
+
+    $ genrisk get-prs
+
+```
+
+optional arguments:
+  -h, --help                 show this help message and exit
+  --plink                    provide plink path if not default in environment.
+```

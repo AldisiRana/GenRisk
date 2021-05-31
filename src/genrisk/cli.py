@@ -285,6 +285,16 @@ def test_model(
     label_col,
     samples_col
 ):
+    """
+    Evaluate a machine learning model with a given dataset.
+
+    :param model_path: the path to the ML model.
+    :param input_file: the testing dataset.
+    :param model_type: the type of model (classifier or regressor)
+    :param label_col: the labels/target column.
+    :param samples_col: the sample ids column.
+    :return:
+    """
     model = joblib.load(model_path)
     testing_df = pd.read_csv(input_file, sep=r'\s+', index_col=samples_col)
     y_true = testing_df[label_col]
@@ -317,14 +327,26 @@ def test_model(
 
 
 @main.command()
+@click.option('-p', '--plink', default='plink')
 def get_prs(
-    plink='plink'
+    *,
+    plink,
 ):
+    """
+    This command gets a pgs file (provided by the user or downloaded) then calculates the PRS scores for dataset.
+    This command is interactive.
+
+    :param plink: provide plink path if not default in environment.
+    :return:
+    """
     download = click.confirm('Do you want to download PGS file?')
     if download:
         pgs_id = click.prompt('Please input PGS ID', type=str)
         pgs_file = download_pgs(prs_id=pgs_id)
-        p = subprocess.call('zcat ' + pgs_file + ' | head -n 15', shell=True)
+        p = subprocess.run(["zcat", pgs_file, "|", 'head', '-n', "15"], shell=True)
+        if p.returncode != 0:
+            click.echo('The PGS file could not be viewed using cmd, please view it manually.')
+        click.echo('Please check the PGS file viewed and provide us with the needed columns.')
         id_col = click.prompt('Please provide the ID column number')
         allele = click.prompt('Please provide the effect allele column number')
         weight = click.prompt('Please provide the effect weight column number')
