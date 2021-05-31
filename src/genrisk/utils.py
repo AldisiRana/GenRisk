@@ -4,7 +4,6 @@ import gzip
 import os
 import re
 import subprocess
-import urllib.request as urllib
 
 import numpy as np
 import pandas as pd
@@ -153,26 +152,14 @@ def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None):
         )
 
 
-def get_prs(
+def download_pgs(
     *,
     prs_id,
-    vcf=None,
-    bed=None,
-    bim=None,
-    fam=None,
-    plink,
-    output_file,
 ):
     """
-    Get PGS from pgscatalog and calculate PRS for samples.
+    Get PGS from pgscatalog
 
     :param prs_id: the PRS ID in the pgscatalog.
-    :param vcf: vcf file with sampels info. OR use bed/bim/fam files.
-     :param bed: the bed file path.
-    :param bim: the bim file path.
-    :param fam: the fam file path.
-    :param plink:
-    :param output_file: the path to the output scores file.
     :return:
     """
     # make sure that the columns are present and matching
@@ -182,17 +169,7 @@ def get_prs(
         raise Exception('The PRS score might be wrong!')
     url = prs_info['ftp_scoring_file']
     prs_file = prs_id + '.gz'
-    urllib.urlretrieve(url, prs_file)
-    # unpack file
-    if vcf:
-        p = subprocess.call(
-            plink + " --vcf " + vcf + " --score " + prs_file + " 1 2 3 sum --out " + output_file, shell=True
-        )
-    else:
-        p = subprocess.call(
-            plink + " --bed " + bed + " --bim " + bim + " --fam " + fam + " --score " + prs_file + " 1 2 3 sum --out " +
-            output_file, shell=True
-        )
+    return prs_file
 
 
 def calc_corr(

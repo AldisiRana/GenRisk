@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import shutil
+import subprocess
 
 import click
 import joblib
@@ -10,7 +11,7 @@ import sklearn.metrics as metrics
 from sklearn.model_selection import train_test_split
 
 from .pipeline import find_pvalue, betareg_pvalues, r_visualize, create_prediction_model
-from .utils import get_gene_info, plink_process, combine_scores
+from .utils import get_gene_info, plink_process, combine_scores, download_pgs
 
 
 @click.group()
@@ -313,6 +314,45 @@ def test_model(
         click.echo("explained variance score= " + str(explained_variance))
         click.echo('R^2= ' + str(r2))
         click.echo('RMSE= ' + str(rmse))
+
+
+@main.command()
+def get_prs(
+    plink='plink'
+):
+    download = click.confirm('Do you want to download PGS file?')
+    if download:
+        pgs_id = click.prompt('Please input PGS ID: ', type=str)
+        pgs_file = download_pgs(prs_id=pgs_id)
+        p = subprocess.call('zcat ' + pgs_file + ' | head -n 15')
+        id_col = click.prompt('Please provide the ID column number')
+        allele = click.prompt('Please provide the effect allele column number')
+        weight = click.prompt('Please provide the effect weight column number')
+    else:
+        pgs_file = click.prompt('Please provide path to PGS file', type=str)
+        id_col = click.prompt('Please provide the ID column number')
+        allele = click.prompt('Please provide the effect allele column number')
+        weight = click.prompt('Please provide the effect weight column number')
+    cols = ' '.join([str(id_col), str(allele), str(weight)])
+    file_type = click.prompt('Do you have a VCF file or binary files?', type=click.Choice(['vcf', 'bfile']))
+    input_file = click.prompt('Please provide the path to input file', type=str)
+    confirm = click.confirm('Please be aware that variant ID in both input file and pgs file need to match.'
+                            'Do you want to continue?')
+    if confirm:
+        output_file = click.prompt('Please provide an output file path', type=str)
+        if file_type == 'vcf':
+            p = subprocess.call(
+                plink + " --vcf " + input_file + " --score " + pgs_file + " " + cols + " sum --out " + output_file,
+                shell=True
+            )
+        else:
+            p = subprocess.call(
+                plink + " --bfile " + input_file + " --score " + pgs_file + " " + cols + " sum --out " + output_file,
+                shell=True
+            )
+    else:
+        click.echo('Ok. You still have the PGS file (if downloaded) but the scores were not calculated.')
+    click.echo('Process is complete. Have a nice day!')
 
 
 if __name__ == '__main__':
