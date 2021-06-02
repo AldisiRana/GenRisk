@@ -108,11 +108,8 @@ def find_pvalue(
             X = merged_df[cols]
             X = sm.add_constant(X)
             Y = merged_df[[cases_column]]
-            try:
-                linear_model = sm.OLS(Y, X)
-                result = linear_model.fit()
-            except:
-                continue
+            linear_model = sm.OLS(Y, X)
+            result = linear_model.fit()
             pval = list(result.pvalues)
             beta_coef = list(result.params)[1]
             std_err = result.bse[1]
@@ -137,7 +134,7 @@ def find_pvalue(
         cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     else:
-        raise Exception("The test you selected is not valid.")
+        raise Exception("The test you selected is not available.")
     if adj_pval:
         adjusted = multipletests(list(p_values_df['p_value']), method=adj_pval)
         p_values_df[adj_pval + '_adj_pval'] = list(adjusted)[1]
@@ -151,7 +148,6 @@ def betareg_pvalues(
     pheno_file,
     samples_col,
     cases_col,
-    nprocesses=3,
     output_path,
     covariates
 ):
@@ -162,7 +158,6 @@ def betareg_pvalues(
     :param pheno_file:  the path to the phenotypes and covariates file.
     :param samples_col: the name of the column containing the samples IDs.
     :param cases_col: the name of the column containing the case/controls.
-    :param nprocesses: the number of processes used in parallel.
     :param output_path: the path to the output file.
     :param covariates: the covariates used in calculations, written with no space and comma in between (e.g PC1,PC2)
     :return:
@@ -173,7 +168,6 @@ def betareg_pvalues(
          "--phenofile", pheno_file,
          "--samplescol", samples_col,
          "--casescol", cases_col,
-         "--nprocesses", str(nprocesses),
          "-o", output_path,
          "--covariates", covariates]
     )

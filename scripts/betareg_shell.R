@@ -28,9 +28,8 @@ option_list = list(
               help="phenotypes file path", default = NULL),
   make_option(c("--samplescol"), type='character', help="name of samples column", default="IID"),
   make_option(c("--casescol"), type='character', help="name of cases column", default="cases"),
-  make_option(c("--covariates"), type='character', help="all covariates for calculation, seperated by comma", default="PC1,PC2,age"),
-  make_option(c("--nprocesses"), type='integer', default=3)
-); 
+  make_option(c("--covariates"), type='character', help="all covariates for calculation, seperated by comma", default="PC1,PC2,age")
+);
 
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
