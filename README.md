@@ -45,7 +45,7 @@ optional arguments:
 ### Calculate p-values
 This function calculates the p-values across the genes between two given groups
     
-    $ genrisk calculate-pval --scores-file toy_example/toy_dataset_scores --gentype-file toy_example/toy.pheno 
+    $ genrisk find-association --scores-file toy_example/toy_dataset_scores --gentype-file toy_example/toy.pheno 
     --cases-column trait1 --samples-column IID --test betareg --output-path toy_dataset_betareg.tsv
 ```
 required arguments:

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import subprocess
+import random
 
 import pandas as pd
 import pycaret.classification as cl
@@ -18,8 +19,8 @@ PLOT_SHELL = os.path.join(PATH, 'scripts', 'plot_script.R')
 
 def find_pvalue(
     *,
-    scores_df,
-    genotype_file,
+    scores_file,
+    info_file,
     output_file,
     genes=None,
     cases_column,
@@ -34,8 +35,8 @@ def find_pvalue(
     Calculate the significance of a gene in a population using Mann-Whitney-U test.
 
     :param test: the type of statistical test to use, choices are: t-test, mannwhitenyu, GLM, logit.
-    :param scores_df: dataframe containing the scores of genes across samples.
-    :param genotype_file: a file containing the information of the sample.
+    :param scores_file: dataframe containing the scores of genes across samples.
+    :param info_file: a file containing the information of the sample.
     :param output_file: a path to save the output file.
     :param genes: a list of the genes to calculate the significance. if None will calculate for all genes.
     :param cases_column: the name of the column containing cases and controls information.
@@ -47,9 +48,10 @@ def find_pvalue(
 
     :return: dataframe with genes and their p_values
     """
-    genotype_df = pd.read_csv(genotype_file, sep=r'\s+', usecols=[samples_column, cases_column])
+    scores_df = pd.read_csv(scores_file, sep=r'\s+')
+    genotype_df = pd.read_csv(info_file, sep=r'\s+')
     genotype_df.dropna(subset=[cases_column], inplace=True)
-    merged_df = pd.merge(genotype_df, scores_df, on=samples_column)
+    merged_df = genotype_df.merge(scores_df, on=samples_column)
     df_by_cases = merged_df.groupby(cases_column)
     if covariates:
         covariates = covariates.split(',')
@@ -87,7 +89,7 @@ def find_pvalue(
     elif test == 'logit':
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
             cols = [gene] + covariates
-            X = merged_df[[cols]]
+            X = merged_df[cols]
             X = sm.add_constant(X)
             Y = merged_df[[cases_column]]
             try:
@@ -96,14 +98,31 @@ def find_pvalue(
             except:
                 continue
             pval = list(result.pvalues)
-            # add std err
-            p_values.append([gene] + pval)
-        cols = ['genes', 'const_pval', 'p_value'] + covariates
+            std_err = result.bse[1]
+            p_values.append([gene] + pval + [std_err])
+        cols = ['genes', 'const_pval', 'p_value'] + covariates + ['std_err']
+        p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
+    elif test == 'linear':
+        for gene in tqdm(genes, desc='Calculating p_values for genes'):
+            cols = [gene] + covariates
+            X = merged_df[cols]
+            X = sm.add_constant(X)
+            Y = merged_df[[cases_column]]
+            try:
+                linear_model = sm.OLS(Y, X)
+                result = linear_model.fit()
+            except:
+                continue
+            pval = list(result.pvalues)
+            beta_coef = list(result.params)[1]
+            std_err = result.bse[1]
+            p_values.append([gene] + pval + [beta_coef, std_err])
+        cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     elif test == 'glm':
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
             cols = [gene] + covariates
-            X = merged_df[[cols]]
+            X = merged_df[cols]
             X = sm.add_constant(X)
             Y = merged_df[[cases_column]]
             try:
@@ -113,8 +132,9 @@ def find_pvalue(
                 continue
             pval = list(result.pvalues)
             beta_coef = list(result.params)[1]
-            p_values.append([gene] + pval + [beta_coef])
-        cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef']
+            std_err = result.bse[1]
+            p_values.append([gene] + pval + [beta_coef, std_err])
+        cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     else:
         raise Exception("The test you selected is not valid.")
@@ -226,7 +246,7 @@ def create_prediction_model(
         if not metric:
             metric = 'RMSE'
         setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1 - test_size, fold=folds,
-                            silent=True, log_experiment=True)
+                            silent=True, log_experiment=True, session_id=random.randint(1,  2147483647))
         best_model = pyreg.compare_models(sort=metric)
         reg_model = pyreg.create_model(best_model)
         reg_tuned_model = pyreg.tune_model(reg_model, optimize=metric)
@@ -242,14 +262,11 @@ def create_prediction_model(
         pyreg.save_model(final_model, model_name)
         pyreg.pull().to_csv(model_name + '_evaluation.tsv', sep='\t', index=False)
         pyreg.get_logs().to_csv(model_name + '_logs.logs', sep='\t', index=False)
-        with open(model_name + '.log', 'w') as f:
-            f.writelines("%s\n" % output for output in setup)
-            f.writelines("%s\n" % output for output in metrics)
     elif model_type == 'classifier':
         if not metric:
             metric = 'AUC'
         setup = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1 - test_size,
-                         silent=True, fold=folds, log_experiment=True)
+                         silent=True, fold=folds, log_experiment=True, session_id=random.randint(1,  2147483647))
         best_model = cl.compare_models(sort=metric)
         cl_model = cl.create_model(best_model)
         cl_tuned_model = pyreg.tune_model(cl_model, optimize=metric)

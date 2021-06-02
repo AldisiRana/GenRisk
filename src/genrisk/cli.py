@@ -95,12 +95,12 @@ def score_genes(
 
 @main.command()
 @click.option('-s', '--scores-file', required=True, help="The scoring file of genes across a population.")
-@click.option('-i', '--genotype-file', required=True, help="File containing information about the cohort.")
+@click.option('-i', '--info-file', required=True, help="File containing information about the cohort.")
 @click.option('-o', '--output-path', required=True, help='the path for the output file.')
 @click.option('-g', '--genes',
               help="a list containing the genes to calculate. if not provided all genes will be used.")
 @click.option('-t', '--test', required=True,
-              type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'glm', 'betareg']),
+              type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'glm', 'betareg', 'linear']),
               help='statistical test for calculating P value.')
 @click.option('-c', '--cases-column', required=True,
               help="the name of the column that contains the case/control or quantitative vals.")
@@ -109,10 +109,10 @@ def score_genes(
     ['bonferroni', 'sidak', 'holm-sidak', 'holm',
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
 @click.option('--covariates', default='PC1,PC2', help="the covariates used for calculation")
-def calculate_pval(
+def find_association(
     *,
     scores_file,
-    genotype_file,
+    info_file,
     output_path,
     genes,
     cases_column,
@@ -125,7 +125,7 @@ def calculate_pval(
     Calculate the P-value between two given groups.
 
     :param scores_file: the file containing gene scores.
-    :param genotype_file: file containing the phenotype.
+    :param info_file: file containing the phenotype.
     :param output_path: the path for final output.
     :param genes: a list of genes to calculate. if not, all genes in scoring file will be used.
     :param cases_column: the name of the column with phenotypes.
@@ -138,19 +138,18 @@ def calculate_pval(
     if test == 'betareg':
         betareg_pvalues(
             scores_file=scores_file,
-            pheno_file=genotype_file,
+            pheno_file=info_file,
             cases_col=cases_column,
             samples_col=samples_column,
             output_path=output_path,
             covariates=covariates
         )
     else:
-        scores_df = pd.read_csv(scores_file, sep=r'\s+')
         click.echo("The process for calculating the p_values will start now.")
         df = find_pvalue(
-            scores_df=scores_df,
+            scores_file=scores_file,
             output_file=output_path,
-            genotype_file=genotype_file,
+            info_file=info_file,
             genes=genes,
             cases_column=cases_column,
             samples_column=samples_column,
