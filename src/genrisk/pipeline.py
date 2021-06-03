@@ -109,7 +109,7 @@ def find_pvalue(
             X = merged_df[cols]
             X = sm.add_constant(X)
             Y = merged_df[[cases_column]]
-            linear_model = sm.OLS(Y, X)
+            linear_model = sm.OLS(Y, X, missing='drop')
             result = linear_model.fit()
             pval = list(result.pvalues)
             beta_coef = list(result.params)[1]
