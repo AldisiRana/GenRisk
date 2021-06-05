@@ -55,6 +55,7 @@ def find_pvalue(
     merged_df = genotype_df.merge(scores_df, how='inner', on=samples_column)
     merged_df.replace([np.inf, -np.inf], 0, inplace=True)
     merged_df.fillna(0, inplace=True)
+    merged_df = merged_df.loc[:, merged_df.var() != 0]
     df_by_cases = merged_df.groupby(cases_column)
     if covariates:
         covariates = covariates.split(',')
@@ -95,11 +96,8 @@ def find_pvalue(
             X = merged_df[cols]
             X = sm.add_constant(X)
             Y = merged_df[[cases_column]]
-            try:
-                logit_model = sm.Logit(Y, X)
-                result = logit_model.fit()
-            except:
-                continue
+            logit_model = sm.Logit(Y, X)
+            result = logit_model.fit()
             pval = list(result.pvalues)
             std_err = result.bse[1]
             p_values.append([gene] + pval + [std_err])
@@ -111,7 +109,7 @@ def find_pvalue(
             X = merged_df[cols]
             X = sm.add_constant(X)
             Y = merged_df[[cases_column]]
-            linear_model = sm.OLS(Y, X, missing='drop')
+            linear_model = sm.OLS(Y, X)
             result = linear_model.fit()
             pval = list(result.pvalues)
             beta_coef = list(result.params)[1]
@@ -125,11 +123,8 @@ def find_pvalue(
             X = merged_df[cols]
             X = sm.add_constant(X)
             Y = merged_df[[cases_column]]
-            try:
-                glm_model = sm.GLM(Y, X)
-                result = glm_model.fit()
-            except:
-                continue
+            glm_model = sm.GLM(Y, X)
+            result = glm_model.fit()
             pval = list(result.pvalues)
             beta_coef = list(result.params)[1]
             std_err = result.bse[1]
@@ -243,7 +238,7 @@ def create_prediction_model(
         if not metric:
             metric = 'RMSE'
         setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1 - test_size, fold=folds,
-                            silent=True, log_experiment=True, session_id=random.randint(1,  2147483647))
+                            silent=True, log_experiment=True, session_id=random.randint(1, 2147483647))
         best_model = pyreg.compare_models(sort=metric)
         reg_model = pyreg.create_model(best_model)
         reg_tuned_model = pyreg.tune_model(reg_model, optimize=metric)
@@ -263,7 +258,7 @@ def create_prediction_model(
         if not metric:
             metric = 'AUC'
         setup = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1 - test_size,
-                         silent=True, fold=folds, log_experiment=True, session_id=random.randint(1,  2147483647))
+                         silent=True, fold=folds, log_experiment=True, session_id=random.randint(1, 2147483647))
         best_model = cl.compare_models(sort=metric)
         cl_model = cl.create_model(best_model)
         cl_tuned_model = pyreg.tune_model(cl_model, optimize=metric)
