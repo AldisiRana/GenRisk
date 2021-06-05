@@ -50,12 +50,12 @@ def find_pvalue(
     :return: dataframe with genes and their p_values
     """
     scores_df = pd.read_csv(scores_file, sep=r'\s+')
+    scores_df = scores_df.loc[:, scores_df.var() != 0]
     genotype_df = pd.read_csv(info_file, sep=r'\s+')
     genotype_df.dropna(subset=[cases_column], inplace=True)
     merged_df = genotype_df.merge(scores_df, how='inner', on=samples_column)
     merged_df.replace([np.inf, -np.inf], 0, inplace=True)
     merged_df.fillna(0, inplace=True)
-    merged_df = merged_df.loc[:, merged_df.var() != 0]
     df_by_cases = merged_df.groupby(cases_column)
     if covariates:
         covariates = covariates.split(',')
