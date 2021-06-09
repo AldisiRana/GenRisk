@@ -50,6 +50,8 @@ def find_pvalue(
     :return: dataframe with genes and their p_values
     """
     scores_df = pd.read_csv(scores_file, sep=r'\s+')
+    scores_df.replace([np.inf, -np.inf], 0, inplace=True)
+    scores_df.fillna(0, inplace=True)
     scores_df = scores_df.loc[:, scores_df.var() != 0]
     genotype_df = pd.read_csv(info_file, sep=r'\s+')
     genotype_df.dropna(subset=[cases_column], inplace=True)
@@ -91,11 +93,11 @@ def find_pvalue(
             p_values.append([gene, statistic, p_val])
         p_values_df = pd.DataFrame(p_values, columns=['genes', 'statistic', 'p_value']).sort_values(by=['p_value'])
     elif test == 'logit':
+        Y = merged_df[[cases_column]]
+        X = merged_df[covariates]
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            cols = [gene] + covariates
-            X = merged_df[cols]
+            X[gene] = merged_df[gene]
             X = sm.add_constant(X)
-            Y = merged_df[[cases_column]]
             logit_model = sm.Logit(Y, X)
             result = logit_model.fit()
             pval = list(result.pvalues)
@@ -104,11 +106,11 @@ def find_pvalue(
         cols = ['genes', 'const_pval', 'p_value'] + covariates + ['std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     elif test == 'linear':
+        Y = merged_df[[cases_column]]
+        X = merged_df[covariates]
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            cols = [gene] + covariates
-            X = merged_df[cols]
+            X[gene] = merged_df[gene]
             X = sm.add_constant(X)
-            Y = merged_df[[cases_column]]
             linear_model = sm.OLS(Y, X)
             result = linear_model.fit()
             pval = list(result.pvalues)
@@ -118,11 +120,11 @@ def find_pvalue(
         cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     elif test == 'glm':
+        Y = merged_df[[cases_column]]
+        X = merged_df[covariates]
         for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            cols = [gene] + covariates
-            X = merged_df[cols]
+            X[gene] = merged_df[gene]
             X = sm.add_constant(X)
-            Y = merged_df[[cases_column]]
             glm_model = sm.GLM(Y, X)
             result = glm_model.fit()
             pval = list(result.pvalues)
