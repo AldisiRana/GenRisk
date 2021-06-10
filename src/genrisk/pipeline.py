@@ -105,9 +105,10 @@ def find_pvalue(
         Y = merged_df[[cases_column]]
         X = merged_df[covariates]
         genes_df = merged_df[genes]
+        del merged_df
         pool = multiprocessing.Pool(processes=4)
         partial_func = partial(run_linear, X=X, Y=Y)
-        p_values = pool.map(partial_func, genes_df.iteritems())
+        p_values = list(pool.imap(partial_func, genes_df.iteritems()))
         cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     elif test == 'glm':
