@@ -2,7 +2,9 @@
 import os
 import subprocess
 import random
+import multiprocessing
 
+from functools import partial
 import numpy as np
 import pandas as pd
 import pycaret.classification as cl
@@ -52,12 +54,15 @@ def find_pvalue(
     scores_df = pd.read_csv(scores_file, sep=r'\s+')
     scores_df.replace([np.inf, -np.inf], 0, inplace=True)
     scores_df.fillna(0, inplace=True)
-    scores_df = scores_df.loc[:, scores_df.var() != 0]
+    scores_df = scores_df.loc[:, (scores_df != scores_df.iloc[0]).any()]
     genotype_df = pd.read_csv(info_file, sep=r'\s+')
     genotype_df.dropna(subset=[cases_column], inplace=True)
     merged_df = genotype_df.merge(scores_df, how='inner', on=samples_column)
     merged_df.replace([np.inf, -np.inf], 0, inplace=True)
     merged_df.fillna(0, inplace=True)
+    if genes is None:
+        genes = scores_df.columns.tolist()[1:]
+    del scores_df
     df_by_cases = merged_df.groupby(cases_column)
     if covariates:
         covariates = covariates.split(',')
@@ -66,8 +71,6 @@ def find_pvalue(
     else:
         cc = list(df_by_cases.groups.keys())
     p_values = []
-    if genes is None:
-        genes = scores_df.columns.tolist()[1:]
     if test == 'mannwhitneyu':
         if len(cc) > 2:
             Warning('There are more than two categories here. We will only consider the first two categories.')
@@ -101,7 +104,10 @@ def find_pvalue(
     elif test == 'linear':
         Y = merged_df[[cases_column]]
         X = merged_df[covariates]
-        p_values = [run_linear(merged_df[gene], X, Y) for gene in tqdm(genes, desc='Calculating p_values for genes')]
+        genes_df = merged_df[genes]
+        pool = multiprocessing.Pool(processes=4)
+        partial_func = partial(run_linear, X=X, Y=Y)
+        p_values = pool.map(partial_func, genes_df.iteritems())
         cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     elif test == 'glm':
@@ -120,14 +126,14 @@ def find_pvalue(
 
 
 def run_linear(gene_col, X, Y):
-    X[gene_col.name] = gene_col
+    X[gene_col[0]] = gene_col[1]
     X = sm.add_constant(X)
     linear_model = sm.OLS(Y, X)
     result = linear_model.fit()
     pval = list(result.pvalues)
     beta_coef = list(result.params)[1]
     std_err = result.bse[1]
-    return [gene_col.name] + pval + [beta_coef, std_err]
+    return [gene_col[0]] + pval + [beta_coef, std_err]
 
 
 def run_glm(gene_col, X, Y):
