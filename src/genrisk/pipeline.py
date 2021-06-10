@@ -95,42 +95,19 @@ def find_pvalue(
     elif test == 'logit':
         Y = merged_df[[cases_column]]
         X = merged_df[covariates]
-        for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            X[gene] = merged_df[gene]
-            X = sm.add_constant(X)
-            logit_model = sm.Logit(Y, X)
-            result = logit_model.fit()
-            pval = list(result.pvalues)
-            std_err = result.bse[1]
-            p_values.append([gene] + pval + [std_err])
+        p_values = [run_logit(merged_df[gene], X, Y) for gene in tqdm(genes, desc='Calculating p_values for genes')]
         cols = ['genes', 'const_pval', 'p_value'] + covariates + ['std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     elif test == 'linear':
         Y = merged_df[[cases_column]]
         X = merged_df[covariates]
-        for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            X[gene] = merged_df[gene]
-            X = sm.add_constant(X)
-            linear_model = sm.OLS(Y, X)
-            result = linear_model.fit()
-            pval = list(result.pvalues)
-            beta_coef = list(result.params)[1]
-            std_err = result.bse[1]
-            p_values.append([gene] + pval + [beta_coef, std_err])
+        p_values = [run_linear(merged_df[gene], X, Y) for gene in tqdm(genes, desc='Calculating p_values for genes')]
         cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     elif test == 'glm':
         Y = merged_df[[cases_column]]
         X = merged_df[covariates]
-        for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            X[gene] = merged_df[gene]
-            X = sm.add_constant(X)
-            glm_model = sm.GLM(Y, X)
-            result = glm_model.fit()
-            pval = list(result.pvalues)
-            beta_coef = list(result.params)[1]
-            std_err = result.bse[1]
-            p_values.append([gene] + pval + [beta_coef, std_err])
+        p_values = [run_glm(merged_df[gene], X, Y) for gene in tqdm(genes, desc='Calculating p_values for genes')]
         cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     else:
@@ -140,6 +117,38 @@ def find_pvalue(
         p_values_df[adj_pval + '_adj_pval'] = list(adjusted)[1]
     p_values_df.to_csv(output_file, sep='\t', index=False)
     return p_values_df
+
+
+def run_linear(gene_col, X, Y):
+    X[gene_col.name] = gene_col
+    X = sm.add_constant(X)
+    linear_model = sm.OLS(Y, X)
+    result = linear_model.fit()
+    pval = list(result.pvalues)
+    beta_coef = list(result.params)[1]
+    std_err = result.bse[1]
+    return [gene_col.name] + pval + [beta_coef, std_err]
+
+
+def run_glm(gene_col, X, Y):
+    X[gene_col.name] = gene_col
+    X = sm.add_constant(X)
+    glm_model = sm.GLM(Y, X)
+    result = glm_model.fit()
+    pval = list(result.pvalues)
+    beta_coef = list(result.params)[1]
+    std_err = result.bse[1]
+    return [gene_col.name] + pval + [beta_coef, std_err]
+
+
+def run_logit(gene_col, X, Y):
+    X[gene_col.name] = gene_col
+    X = sm.add_constant(X)
+    logit_model = sm.Logit(Y, X)
+    result = logit_model.fit()
+    pval = list(result.pvalues)
+    std_err = result.bse[1]
+    return [gene_col.name] + pval + [std_err]
 
 
 def betareg_pvalues(
