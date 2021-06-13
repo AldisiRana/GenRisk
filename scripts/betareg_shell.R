@@ -28,6 +28,7 @@ option_list = list(
               help="phenotypes file path", default = NULL),
   make_option(c("--samplescol"), type='character', help="name of samples column", default="IID"),
   make_option(c("--casescol"), type='character', help="name of cases column", default="cases"),
+  make_option(c("--processes"), type='integer', help="number of processes", default=1),
   make_option(c("--covariates"), type='character', help="all covariates for calculation, seperated by comma", default="PC1,PC2,age")
 );
 
@@ -89,6 +90,6 @@ apply_betareg <- function(x){
   return(results)
 }
 
-models = mclapply(genes_list, possibly(apply_betareg,NA_real_))
+models = mclapply(genes_list, possibly(apply_betareg,NA_real_), mc.cores=opt$processes)
 
 message("Done")

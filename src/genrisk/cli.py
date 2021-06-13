@@ -109,6 +109,7 @@ def score_genes(
     ['bonferroni', 'sidak', 'holm-sidak', 'holm',
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
 @click.option('--covariates', default='PC1,PC2', help="the covariates used for calculation")
+@click.option('-p', '--processes', type=int, default=1, help='number of processes for parallelization')
 def find_association(
     *,
     scores_file,
@@ -120,6 +121,7 @@ def find_association(
     test,
     adj_pval,
     covariates,
+    processes,
 ):
     """
     Calculate the P-value between two given groups.
@@ -142,7 +144,8 @@ def find_association(
             cases_col=cases_column,
             samples_col=samples_column,
             output_path=output_path,
-            covariates=covariates
+            covariates=covariates,
+            processes=processes,
         )
     else:
         click.echo("The process for calculating the p_values will start now.")
@@ -156,6 +159,7 @@ def find_association(
             test=test,
             adj_pval=adj_pval,
             covariates=covariates,
+            processes=processes,
         )
         click.echo('Process is complete.')
         click.echo(df.info())

@@ -32,7 +32,8 @@ def find_pvalue(
     adj_pval,
     covariates=None,
     cases=None,
-    controls=None
+    controls=None,
+    processes=1,
 ):
     """
     Calculate the significance of a gene in a population using Mann-Whitney-U test.
@@ -98,7 +99,11 @@ def find_pvalue(
     elif test == 'logit':
         Y = merged_df[[cases_column]]
         X = merged_df[covariates]
-        p_values = [run_logit(merged_df[gene], X, Y) for gene in tqdm(genes, desc='Calculating p_values for genes')]
+        genes_df = merged_df[genes]
+        del merged_df
+        pool = multiprocessing.Pool(processes=processes)
+        partial_func = partial(run_logit, X=X, Y=Y)
+        p_values = list(pool.imap(partial_func, genes_df.iteritems()))
         cols = ['genes', 'const_pval', 'p_value'] + covariates + ['std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     elif test == 'linear':
@@ -106,7 +111,7 @@ def find_pvalue(
         X = merged_df[covariates]
         genes_df = merged_df[genes]
         del merged_df
-        pool = multiprocessing.Pool(processes=4)
+        pool = multiprocessing.Pool(processes=processes)
         partial_func = partial(run_linear, X=X, Y=Y)
         p_values = list(pool.imap(partial_func, genes_df.iteritems()))
         cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
@@ -114,7 +119,11 @@ def find_pvalue(
     elif test == 'glm':
         Y = merged_df[[cases_column]]
         X = merged_df[covariates]
-        p_values = [run_glm(merged_df[gene], X, Y) for gene in tqdm(genes, desc='Calculating p_values for genes')]
+        genes_df = merged_df[genes]
+        del merged_df
+        pool = multiprocessing.Pool(processes=processes)
+        partial_func = partial(run_glm, X=X, Y=Y)
+        p_values = list(pool.imap(partial_func, genes_df.iteritems()))
         cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     else:
@@ -165,7 +174,8 @@ def betareg_pvalues(
     samples_col,
     cases_col,
     output_path,
-    covariates
+    covariates,
+    processes
 ):
     """
     Calculate association significance between two groups using betareg.
@@ -185,7 +195,8 @@ def betareg_pvalues(
          "--samplescol", samples_col,
          "--casescol", cases_col,
          "-o", output_path,
-         "--covariates", covariates]
+         "--covariates", covariates,
+         "--processes", processes]
     )
 
 
