@@ -14,10 +14,10 @@ if (!require(purrr)) install.packages("purrr", repos = "https://CRAN.R-project.o
 library(purrr)
 if (!require(utils)) install.packages("utils", repos = "https://CRAN.R-project.org/")
 library(utils)
-if (!require(lmtest)) install.packages("lmtest", repos = "https://CRAN.R-project.org/")
-library(lmtest)
-if (!require(parallel)) install.packages("lmtest", repos = "https://CRAN.R-project.org/")
+if (!require(parallel)) install.packages("parallel", repos = "https://CRAN.R-project.org/")
 library(parallel)
+if (!require(lmtest)) install.packages("lmtest", repos = "https://CRAN.R-project.org/")
+
 
 option_list = list(
   make_option(c("-s", "--scoresfile"), type="character",
@@ -75,7 +75,9 @@ completed <- completed[, ..cols]
 completed<-completed[complete.cases(completed),]
 rm(output)
 
-write("genes\tcoeff\tp_value\tstderr", file=opt$outputfile)
+output <- opt$outputfile
+write("genes\tcoeff\tp_value\tstderr", file=output)
+
 
 apply_betareg <- function(x){
   cols = c(x, covariates)
@@ -86,10 +88,26 @@ apply_betareg <- function(x){
   pval=tryCatch(coeftest(betaMod)[2,4], error=function(err) NA)
   stderr=tryCatch(coeftest(betaMod)[2,2], error=function(err) NA)
   results = c(x,coefficient,pval,stderr)
-  write(paste(results, collapse = "\t"), file=opt$outputfile, append=TRUE)
+  write(paste(results, collapse = "\t"), file=output, append=TRUE)
   return(results)
 }
 
-models = mclapply(genes_list, possibly(apply_betareg,NA_real_), mc.cores=opt$processes)
+
+cl <- makeCluster(opt$processes)
+
+clusterEvalQ(cl, {
+    library(data.table)
+    library('betareg')
+    library(purrr)
+    library(utils)
+    library(lmtest)
+})
+
+clusterExport(cl, c("covariates", "completed", "output"))
+
+models <- parLapply(cl, genes_list, possibly(apply_betareg,NA_real_))
+#models = mclapply(genes_list, possibly(apply_betareg,NA_real_), mc.cores=opt$processes)
+
+stopCluster(cl)
 
 message("Done")
