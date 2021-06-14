@@ -55,7 +55,7 @@ def find_pvalue(
     scores_df = pd.read_csv(scores_file, sep=r'\s+')
     scores_df.replace([np.inf, -np.inf], 0, inplace=True)
     scores_df.fillna(0, inplace=True)
-    scores_df = scores_df.loc[:, (scores_df != scores_df.iloc[0]).any()]
+    scores_df = scores_df.loc[:, scores_df.var() != 0.0]
     genotype_df = pd.read_csv(info_file, sep=r'\s+')
     genotype_df.dropna(subset=[cases_column], inplace=True)
     merged_df = genotype_df.merge(scores_df, how='inner', on=samples_column)
