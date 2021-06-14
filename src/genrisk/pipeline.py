@@ -104,7 +104,7 @@ def find_pvalue(
         pool = multiprocessing.Pool(processes=processes)
         partial_func = partial(run_logit, X=X, Y=Y)
         p_values = list(pool.imap(partial_func, genes_df.iteritems()))
-        cols = ['genes', 'const_pval', 'p_value'] + covariates + ['std_err']
+        cols = ['genes', 'const_pval'] + covariates + ['p_value' + 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     elif test == 'linear':
         Y = merged_df[[cases_column]]
@@ -114,7 +114,7 @@ def find_pvalue(
         pool = multiprocessing.Pool(processes=processes)
         partial_func = partial(run_linear, X=X, Y=Y)
         p_values = list(pool.imap(partial_func, genes_df.iteritems()))
-        cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
+        cols = ['genes', 'const_pval'] + covariates + ['p_value', 'beta_coef', 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     elif test == 'glm':
         Y = merged_df[[cases_column]]
@@ -124,7 +124,7 @@ def find_pvalue(
         pool = multiprocessing.Pool(processes=processes)
         partial_func = partial(run_glm, X=X, Y=Y)
         p_values = list(pool.imap(partial_func, genes_df.iteritems()))
-        cols = ['genes', 'const_pval', 'p_value'] + covariates + ['beta_coef', 'std_err']
+        cols = ['genes', 'const_pval'] + covariates + ['p_value', 'beta_coef', 'std_err']
         p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     else:
         raise Exception("The test you selected is not available.")
