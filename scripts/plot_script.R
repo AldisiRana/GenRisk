@@ -20,11 +20,13 @@ option_list = list(
               help="pvalues file path", metavar="character"),
   make_option(c("-i", "--info_file"), type="character",
               help="info file path", metavar="character"),
-  make_option(c("--pvalcol"), type="character"),
+  make_option(c("--pvalcol"), default='p_value', type="character", help='name of p_values column'),
   make_option(c("--genescol_1"), type='character', help="name of genes column in pvals file", default="gene"),
   make_option(c("--genescol_2"), type='character', help="name of genes column in info file", default="Gene.refGene"),
-  make_option(c("--manhattan_output"), type='character'),
-  make_option(c("--qq_output"), type='character')
+  make_option(c("--manhattan_output"), type='character', help="path to output manhattan plot image, should end with .jpeg"),
+  make_option(c("--qq_output"), type='character', help="path to output manhattan plot image, should end with .jpeg"),
+  make_option(c("--chr_col"), type='character', default='Chr', help='name of column with Chr number'),
+  make_option(c("--pos_col"), type='character', default='Start', help='name of column with start position')
 ); 
 
 
@@ -43,10 +45,16 @@ complete_df[complete_df == 'X'] = 23
 complete_df[complete_df == 'Y'] = 24
 complete_df$Chr <- as.integer(complete_df$Chr)
 
+plot_max = -log10(1e-09)
+
+if (-log10(min(complete_df[,opt$pvalcol], na.rm=T)) > -log10(1e-09)){
+  plot_max = -log10(min(complete_df[,opt$pvalcol], na.rm=T))
+}
+  
 jpeg(opt$manhattan_output, res=300, width = 12, height = 6, units = 'in')
-manhattan(complete_df,chr='Chr', bp="Start", snp=opt$genescol_1, p=opt$pvalcol,
-          ylim = c(0, -log10(1e-06)), chrlabs = NULL,
-          suggestiveline = -log10(1e-03), genomewideline = -log10(1e-05), logp = TRUE, main=opt$pvals_file, highlight=T, annotatePval=1, annotateTop=T)
+manhattan(complete_df,chr=opt$chr_col, bp=opt$pos_col, snp=opt$genescol_1, p=opt$pvalcol,
+          ylim = c(0, plot_max), chrlabs = NULL,
+          suggestiveline = -log10(1.00e-05), genomewideline = -log10(5.00e-08), logp = TRUE, main=opt$pvals_file, highlight=T, annotatePval=1, annotateTop=T)
 dev.off()
 lambda=median(qchisq(complete_df[[opt$pvalcol]], df=1, lower.tail=FALSE)) / qchisq(0.5, 1)
 jpeg(opt$qq_output, res=300, width = 6, height = 6, units = 'in')

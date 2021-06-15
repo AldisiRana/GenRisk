@@ -173,6 +173,8 @@ def find_association(
 @click.option('--qq-output', required=True, help="the name of the qq plot file.")
 @click.option('--manhattan-output', required=True, help="the name of the manhatten plot file.")
 @click.option('--pvalcol', default='p_value', help="the name of the pvalues column.")
+@click.option('--chr-col', default='Chr', help='the name of the chromosomes column')
+@click.option('--pos-col', default='Start', help='the name of the position/start of the gene column')
 def visualize(
     pvals_file,
     info_file,
@@ -181,6 +183,8 @@ def visualize(
     qq_output,
     manhattan_output,
     pvalcol,
+    chr_col,
+    pos_col,
 ):
     """
     Visualize manhatten plot and qqplot for the data.
@@ -202,6 +206,8 @@ def visualize(
         qq_output=qq_output,
         manhattan_output=manhattan_output,
         pvalcol=pvalcol,
+        chr_col=chr_col,
+        pos_col=pos_col,
     )
 
 

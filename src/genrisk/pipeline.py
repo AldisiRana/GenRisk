@@ -208,7 +208,9 @@ def r_visualize(
     pvals_file,
     qq_output,
     manhattan_output,
-    pvalcol
+    pvalcol,
+    chr_col,
+    pos_col,
 ):
     """
     Visualize the results of association test. Manhattan plot and QQ-plot.
@@ -230,7 +232,9 @@ def r_visualize(
          "--manhattan_output", manhattan_output,
          "--genescol_1", genescol_1,
          "--genescol_2", genescol_2,
-         "--pvalcol", pvalcol]
+         "--pvalcol", pvalcol,
+         "--chr_col", chr_col,
+         "--pos_col", pos_col]
     )
 
 
