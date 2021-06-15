@@ -46,9 +46,9 @@ complete_df[complete_df == 'Y'] = 24
 complete_df$Chr <- as.integer(complete_df$Chr)
 
 plot_max = -log10(1e-09)
-
-if (-log10(min(complete_df[,opt$pvalcol], na.rm=T)) > -log10(1e-09)){
-  plot_max = -log10(min(complete_df[,opt$pvalcol], na.rm=T))
+p = opt$pvalcol
+if (-log10(min(complete_df[, ..p], na.rm=T)) > -log10(1e-09)){
+  plot_max = -log10(min(complete_df[, ..p], na.rm=T))
 }
   
 jpeg(opt$manhattan_output, res=300, width = 12, height = 6, units = 'in')
@@ -56,9 +56,9 @@ manhattan(complete_df,chr=opt$chr_col, bp=opt$pos_col, snp=opt$genescol_1, p=opt
           ylim = c(0, plot_max), chrlabs = NULL,
           suggestiveline = -log10(1.00e-05), genomewideline = -log10(5.00e-08), logp = TRUE, main=opt$pvals_file, highlight=T, annotatePval=1, annotateTop=T)
 dev.off()
-lambda=median(qchisq(complete_df[[opt$pvalcol]], df=1, lower.tail=FALSE)) / qchisq(0.5, 1)
+lambda=median(qchisq(na.omit(complete_df[[opt$pvalcol]]), df=1, lower.tail=FALSE)) / qchisq(0.5, 1)
 jpeg(opt$qq_output, res=300, width = 6, height = 6, units = 'in')
-qq(complete_df[[opt$pvalcol]],main=as.character(lambda))
+qq(na.omit(complete_df[[opt$pvalcol]]),main=toString(lambda))
 dev.off()
 
 
