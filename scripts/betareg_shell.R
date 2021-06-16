@@ -68,7 +68,6 @@ completed=merge(output,pheno,by=opt$samplescol)
 rm(pheno)
 
 
-message("Calculating pvalues ...")
 genes_list <- names(completed)[2:ncol(output)]
 cols <- c(opt$samplescol, genes_list, covariates)
 completed <- completed[, ..cols]
@@ -92,7 +91,7 @@ apply_betareg <- function(x){
   return(results)
 }
 
-
+message("Calculating pvalues ...")
 cl <- makeCluster(opt$processes)
 
 clusterEvalQ(cl, {
