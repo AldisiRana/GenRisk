@@ -294,7 +294,7 @@ def create_prediction_model(
                          silent=True, fold=folds, log_experiment=True, session_id=random.randint(1, 2147483647))
         best_model = cl.compare_models(sort=metric)
         cl_model = cl.create_model(best_model)
-        cl_tuned_model = pyreg.tune_model(cl_model, optimize=metric)
+        cl_tuned_model = cl.tune_model(cl_model, optimize=metric)
         cl.plot_model(cl_tuned_model, plot='pr', save=True)
         cl.plot_model(cl_tuned_model, plot='confusion_matrix', save=True)
         cl.plot_model(cl_tuned_model, plot='feature', save=True)
