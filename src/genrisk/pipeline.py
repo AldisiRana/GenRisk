@@ -247,7 +247,7 @@ def create_prediction_model(
     normalize=True,
     folds=10,
     training_set,
-    testing_set=None,
+    testing_set=pd.DataFrame(),
     test_size=0.25,
     metric=None,
 ):
