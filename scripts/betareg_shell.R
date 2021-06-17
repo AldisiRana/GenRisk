@@ -104,6 +104,8 @@ clusterEvalQ(cl, {
 
 clusterExport(cl, c("covariates", "completed", "output"))
 
+rm(completed)
+
 models <- parLapply(cl, genes_list, possibly(apply_betareg,NA_real_))
 #models = mclapply(genes_list, possibly(apply_betareg,NA_real_), mc.cores=opt$processes)
 

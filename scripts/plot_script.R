@@ -45,10 +45,10 @@ complete_df[complete_df == 'X'] = 23
 complete_df[complete_df == 'Y'] = 24
 complete_df$Chr <- as.integer(complete_df$Chr)
 
-plot_max = -log10(1e-09)
+plot_max = -log10(1e-09)+1
 p = opt$pvalcol
 if (-log10(min(complete_df[, ..p], na.rm=T)) > -log10(1e-09)){
-  plot_max = -log10(min(complete_df[, ..p], na.rm=T))
+  plot_max = -log10(min(complete_df[, ..p], na.rm=T))+1
 }
   
 jpeg(opt$manhattan_output, res=300, width = 12, height = 6, units = 'in')
