@@ -281,7 +281,7 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
     plot.ax.set_ylim(0.0, max(data["-logp"]) + 1)
 
     for ind in data.nlargest(10, ['-logp']).index:
-        plt.text(data.i[ind] + 0.2, data['-logp'][ind] + 0.2, data.gene[ind], rotation=20, horizontalalignment='left',
+        plt.text(data.i[ind] + 0.2, data['-logp'][ind] + 0.2, data[genes_col][ind], rotation=20, horizontalalignment='left',
                  size='medium', color='black')
     chrom_df = data.groupby(chr_col)['i'].median()
     plot.ax.set_xlabel(chr_col)
