@@ -7,9 +7,12 @@ import subprocess
 import urllib.request as urllib
 
 import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
+from qmplot import qqplot
 import requests
 from pybiomart import Dataset
+import seaborn as sns
 from scipy.stats import beta, pearsonr
 from tqdm import tqdm
 
@@ -255,3 +258,49 @@ def normalize_gene_len(
     if output_path:
         scores_df.to_csv(output_path, sep='\t', index=False)
     return scores_df
+
+
+def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_output):
+    data.drop_duplicates(subset=[genes_col], inplace=True)
+    data['-logp'] = - np.log10(data[pvals_col])
+    data = data.dropna(how="any", axis=0)
+    data[chr_col].replace('X', 23, inplace=True)
+    data[chr_col] = data[chr_col].astype('int64')
+    data = data.sort_values([chr_col, pos_col])
+    data.reset_index(inplace=True, drop=True)
+    data['i'] = data.index
+    # Generate Manhattan plot: (#optional tweaks for relplot: linewidth=0, s=9)
+    sns.set_style("white")
+    custom_palette = sns.color_palette(
+        ["#000000", "#808080", "#000000", "#808080", "#000000", "#808080", "#000000", "#808080", "#000000", "#808080",
+         "#000000", "#808080", "#000000", "#808080", "#000000", "#808080", "#000000", "#808080", "#000000", "#808080",
+         "#000000", "#808080", "#000000"])
+    plot = sns.relplot(data=data, x='i', y='-logp', aspect=3.7,
+                       hue=chr_col, palette=custom_palette, kind='scatter', legend=None)
+    plot.fig.suptitle(manhattan_output.split('.')[0])
+    plot.ax.set_ylim(0.0, max(data["-logp"]) + 1)
+
+    for ind in data.nlargest(10, ['-logp']).index:
+        plt.text(data.i[ind] + 0.2, data['-logp'][ind] + 0.2, data.gene[ind], rotation=20, horizontalalignment='left',
+                 size='medium', color='black')
+    chrom_df = data.groupby(chr_col)['i'].median()
+    plot.ax.set_xlabel(chr_col)
+    plot.ax.set_xticks(chrom_df)
+    plot.ax.set_xticklabels(chrom_df.index)
+    plot.ax.axhline(-np.log10(1.00e-05), c='blue', ls='--')
+    plot.ax.axhline(-np.log10(5.00e-08), c='red', ls='--')
+    plot.savefig(manhattan_output)
+
+
+def draw_qqplot(*, pvals, qq_output):
+    pvals.dropna(inplace=True)
+    f, ax = plt.subplots(figsize=(6, 6), facecolor="w", edgecolor="k")
+    qqplot(data=pvals,
+           marker="o",
+           title=qq_output,
+           xlabel=r"Expected $-log_{10}{(P)}$",
+           ylabel=r"Observed $-log_{10}{(P)}$",
+           dpi=300,
+           figname="output_QQ_plot.png",
+           ax=ax)
+

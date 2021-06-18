@@ -11,7 +11,7 @@ import sklearn.metrics as metrics
 from sklearn.model_selection import train_test_split
 
 from .pipeline import find_pvalue, betareg_pvalues, r_visualize, create_prediction_model
-from .utils import get_gene_info, plink_process, combine_scores, download_pgs
+from .utils import get_gene_info, plink_process, combine_scores, download_pgs, draw_qqplot, draw_manhattan
 
 
 @click.group()
@@ -198,17 +198,27 @@ def visualize(
     :param pvalcol: the name of the pvalues column.
     :return:
     """
-    r_visualize(
-        pvals_file=pvals_file,
-        info_file=info_file,
-        genescol_1=genescol_1,
-        genescol_2=genescol_2,
-        qq_output=qq_output,
-        manhattan_output=manhattan_output,
-        pvalcol=pvalcol,
-        chr_col=chr_col,
-        pos_col=pos_col,
-    )
+    pvals_df = pd.read_csv(pvals_file, sep=r'\s+', index_col=False)
+    draw_qqplot(pvals=pvals_df[pvalcol], qq_output=qq_output)
+    info_df = pd.read_csv(info_file, sep=r'\s+', index_col=False)
+    merged = pd.merge(pvals_df, info_df, left_on=genescol_1, right_on=genescol_2, how='inner')
+    draw_manhattan(data=merged,
+                   chr_col=chr_col,
+                   pos_col=pos_col,
+                   pvals_col=pvalcol,
+                   genes_col=genescol_1,
+                   manhattan_output=manhattan_output)
+    # r_visualize(
+    #     pvals_file=pvals_file,
+    #     info_file=info_file,
+    #     genescol_1=genescol_1,
+    #     genescol_2=genescol_2,
+    #     qq_output=qq_output,
+    #     manhattan_output=manhattan_output,
+    #     pvalcol=pvalcol,
+    #     chr_col=chr_col,
+    #     pos_col=pos_col,
+    # )
 
 
 @main.command()
