@@ -6,6 +6,7 @@ import re
 import subprocess
 import urllib.request as urllib
 
+from adjustText import adjust_text
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -280,9 +281,12 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
     plot.fig.suptitle(manhattan_output.split('.')[0])
     plot.ax.set_ylim(0.0, max(data["-logp"]) + 1)
 
+    anno = []
     for ind in data.nlargest(10, ['-logp']).index:
-        plt.text(data.i[ind] + 0.2, data['-logp'][ind] + 0.2, data[genes_col][ind], rotation=20, horizontalalignment='left',
-                 size='medium', color='black')
+        anno.append(
+            plt.text(data.i[ind] + 0.2, data['-logp'][ind] + 0.2, data[genes_col][ind],
+                     horizontalalignment='left', size='medium',color='black'))
+    adjust_text(anno, only_move={'points': 'y', 'texts': 'y'}, arrowprops=dict(arrowstyle="->", color='b', lw=0.5))
     chrom_df = data.groupby(chr_col)['i'].median()
     plot.ax.set_xlabel(chr_col)
     plot.ax.set_xticks(chrom_df)
