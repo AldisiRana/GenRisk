@@ -200,7 +200,7 @@ def visualize(
     """
     pvals_df = pd.read_csv(pvals_file, sep=r'\s+', index_col=False)
     draw_qqplot(pvals=pvals_df[pvalcol], qq_output=qq_output)
-    info_df = pd.read_csv(info_file, sep=r'\s+', index_col=False)
+    info_df = pd.read_csv(info_file, sep="\t", index_col=False)
     merged = pd.merge(pvals_df, info_df, left_on=genescol_1, right_on=genescol_2, how='inner')
     draw_manhattan(data=merged,
                    chr_col=chr_col,
