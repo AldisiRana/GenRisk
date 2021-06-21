@@ -54,38 +54,20 @@ def score_genes(
     """
     Calculate the gene-based scores for a given dataset.
 
-    Parameters
-    ----------
-    annotated_vcf : str
-        an annotated containing variant IDs, alt, info and samples genotypes.
-    bfiles : str
-        the path to bfiles (bim, bam, fam) all should have same name.
-    plink : str, default='plink'
-        the directory of plink, if not set in environment
-    beta_param : tuple, default=(1,25)
-        the parameters from beta weight function.
-    temp_dir : str
-        a temporary directory to save temporary files before merging.
-    output_file : str
-        the final output scores matrix.
-    weight_func : str, default='beta'
-        the weighting function used in score calculation.
-    variant_col : str, default='SNP'
-        the column containing the variant IDs.
-    gene_col : str, default='Gene.refGene'
-        the column containing gene names.
-    af_col : str, default='MAF'
-        the column containing allele frequency.
-    del_col : str, default='CADD_raw'
-        the column containing deleteriousness score.
-    alt_col : str, default='Alt'
-        the column containing alternate base.
-    maf_threshold : float, default=0.01
-        The threshold for minor allele frequency
-
-    Returns
-    -------
-        the final dataframe information.
+    :param annotated_vcf: an annotated containing variant IDs, alt, info and samples genotypes.
+    :param plink: the directory of plink, if not set in environment
+    :param beta_param: the parameters from beta weight function.
+    :param temp_dir: a temporary directory to save temporary files before merging.
+    :param output_file: the final output scores matrix.
+    :param weight_func: the weighting function used in score calculation.
+    :param variant_col: the column containing the variant IDs.
+    :param gene_col: the column containing gene names.
+    :param af_col: the column containing allele frequency.
+    :param del_col: the column containing deleteriousness score.
+    :param alt_col: the column containing alternate base.
+    :param maf_threshold: the threshold for minor allele frequency.
+    :param remove_temp: if True temporary directory will be deleted after process completion.
+    :return: the final dataframe information.
     """
     confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
     click.echo('getting information from vcf files')
@@ -144,31 +126,16 @@ def find_association(
     """
     Calculate the P-value between two given groups.
 
-    Parameters
-    ----------
-    scores_file : str
-        the file containing gene scores.
-    info_file : str
-        file containing the phenotype and covariates (if applicable).
-    output_path : str
-        the path for association analysis output.
-    genes : list, optional
-        a list of genes to calculate. if not, all genes in scoring file will be used.
-    cases_column : str
-        the name of the column with phenotypes.
-    samples_column : str
-        the name of the column with sample IDs. All files need to have the same format.
-    test : str
-        the test used to calculate pvalue.
-    adj_pval : str
-        the adjustment method used (if any).
-    covariates: str, default='PC1,PC2'
-        the column names of covariates to use, with comma in between. (e.g: PC1,PC2,ag
-    processes: int, default=1
-
-    Returns
-    -------
-
+    :param scores_file: the file containing gene scores.
+    :param info_file: file containing the phenotype.
+    :param output_path: the path for final output.
+    :param genes: a list of genes to calculate. if not, all genes in scoring file will be used.
+    :param cases_column: the name of the column with phenotypes.
+    :param samples_column: the name of the column with sample IDs. All files need to have the same format.
+    :param test: the test used to calculate pvalue.
+    :param adj_pval: the adjustment method used (if any).
+    :param covariates: the column names of covariates to use, with comma in between. (e.g: PC1,PC2,age)
+    :return:
     """
     if test == 'betareg':
         betareg_pvalues(
@@ -222,30 +189,14 @@ def visualize(
     """
     Visualize manhatten plot and qqplot for the data.
 
-    Parameters
-    ----------
-    pvals_file : str
-        the file containing p-values.
-    info_file : str
-        file containing variant/gene info.
-    genescol_1 : str
-        the name of the genes column in pvals file.
-    genescol_2 : str
-        the name of the genes column in info file.
-    qq_output : str
-        the name of the qq plot file.
-    manhattan_output : str
-        the name of the manhatten plot file.
-    pval_col : str
-        the name of the pvalues column.
-    chr_col : str
-        the name of the chromosomes column.
-    pos_col : str
-        the name of the position/start column.
-
-    Returns
-    -------
-
+    :param pvals_file: the file containing p-values.
+    :param info_file: file containing variant/gene info.
+    :param genescol_1: the name of the genes column in pvals file.
+    :param genescol_2: the name of the genes column in info file.
+    :param qq_output: the name of the qq plot file.
+    :param manhattan_output: the name of the manhatten plot file.
+    :param pvalcol: the name of the pvalues column.
+    :return:
     """
     pvals_df = pd.read_csv(pvals_file, sep=r'\s+', index_col=False)
     if qq_output:
@@ -298,36 +249,19 @@ def create_model(
     """
     Create a machine learning model with given dataset.
 
-    Parameters
-    ----------
-    data_file : str
-        file containing features and target.
-    output_folder: str
-        a folder path to save all outputs.
-    test_size : float, default=0.25
-        the size of testing set.
-    test : bool
-        if True the dataset will be split into training and testing for extra evaluation after finalization.
-    model_name : str
-        the name of the model to be saved.
-    model_type : str
-        the type of model (regressor or classifier).
-    target_col : str
-        the name of the target column in data file.
-    imbalanced : bool
-        if true methods will be used to account for the imbalance.
-    normalize : bool
-        if true the data will be normalized before training
-    folds : int, default=10
-        the number of folds used for cross validation
-    metric : str, default=None
-        the metric used to choose best model after training.
-    samples_col : str, default='IID'
-        the name of the column with samples identifiers.
-
-    Returns
-    -------
-        the final model
+    :param samples_col: the name of the column with samples identifiers.
+    :param data_file: file containing features and target.
+    :param output_folder: a folder path to save all outputs.
+    :param test_size: the size of testing set.
+    :param test: if True the dataset will be split into training and testing for extra evaluation after finalization.
+    :param model_name: the name of the model to be saved.
+    :param model_type: the type of model (regressor or classifier).
+    :param target_col: the name of the target column in data file.
+    :param imbalanced: if true methods will be used to account for the imbalance.
+    :param normalize:  if true the data will be normalized before training
+    :param folds: the number of folds used for cross validation
+    :param metric: the metric used to choose best model after training.
+    :return: the final model
     """
     training_set = pd.read_csv(data_file, sep='\s+', index_col=samples_col)
     testing_set = pd.DataFrame()
@@ -364,30 +298,19 @@ def test_model(
     input_file,
     model_type,
     label_col,
+    samples_col
     samples_col,
     output_file,
 ):
     """
     Evaluate a machine learning model with a given dataset.
 
-    Parameters
-    ----------
-    model_path : str
-        the path to the ML model.
-    input_file : str
-        the testing dataset.
-    model_type : str
-        the type of model (classifier or regressor)
-    label_col : str
-        the labels/target column.
-    samples_col : str, default='IID'
-        the sample ids column.
-    output_file : str
-        the path to output file.
-    
-    Returns
-    -------
-        the testing dataframe with predicted values.
+    :param model_path: the path to the ML model.
+    :param input_file: the testing dataset.
+    :param model_type: the type of model (classifier or regressor)
+    :param label_col: the labels/target column.
+    :param samples_col: the sample ids column.
+    :return:
     """
     model = joblib.load(model_path)
     testing_df = pd.read_csv(input_file, sep=r'\s+', index_col=samples_col)
@@ -433,14 +356,8 @@ def get_prs(
     This command gets a pgs file (provided by the user or downloaded) then calculates the PRS scores for dataset.
     This command is interactive.
 
-    Parameters
-    ----------
-    plink : str, optional
-        provide plink path if not default in environment.
-
-    Returns
-    -------
-
+    :param plink: provide plink path if not default in environment.
+    :return:
     """
     download = click.confirm('Do you want to download PGS file?')
     if download:
