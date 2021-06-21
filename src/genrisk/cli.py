@@ -305,7 +305,6 @@ def test_model(
     input_file,
     model_type,
     label_col,
-    samples_col
     samples_col,
     output_file,
 ):
