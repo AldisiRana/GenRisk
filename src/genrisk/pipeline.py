@@ -135,6 +135,15 @@ def find_pvalue(
 
 
 def run_linear(gene_col, X, Y):
+    """
+    Helper function to run linear regression association.
+
+    :param gene_col: a tuple from df.iteritems()
+    :param X: the covariates.
+    :param Y: the target.
+
+    :return: a list with gene name, pvalues, coefs and std err.
+    """
     X[gene_col[0]] = gene_col[1]
     X = sm.add_constant(X)
     linear_model = sm.OLS(Y, X)
@@ -146,6 +155,15 @@ def run_linear(gene_col, X, Y):
 
 
 def run_glm(gene_col, X, Y):
+    """
+    Helper function to run Generalize linear model regression association.
+
+    :param gene_col: a tuple from df.iteritems()
+    :param X: the covariates.
+    :param Y: the target.
+
+    :return: a list with gene name, pvalues, coefs and std err.
+    """
     X[gene_col.name] = gene_col
     X = sm.add_constant(X)
     glm_model = sm.GLM(Y, X)
@@ -157,6 +175,15 @@ def run_glm(gene_col, X, Y):
 
 
 def run_logit(gene_col, X, Y):
+    """
+    Helper function to run logistic regression association.
+
+    :param gene_col: a tuple from df.iteritems()
+    :param X: the covariates.
+    :param Y: the target.
+
+    :return: a list with gene name, pvalues, and std err.
+    """
     X[gene_col.name] = gene_col
     X = sm.add_constant(X)
     logit_model = sm.Logit(Y, X)
@@ -185,6 +212,8 @@ def betareg_pvalues(
     :param cases_col: the name of the column containing the case/controls.
     :param output_path: the path to the output file.
     :param covariates: the covariates used in calculations, written with no space and comma in between (e.g PC1,PC2)
+    :param processes: number of processes to parallelize.
+
     :return:
     """
     p = subprocess.call(
