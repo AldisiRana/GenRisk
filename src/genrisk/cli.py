@@ -10,7 +10,7 @@ import pandas as pd
 import sklearn.metrics as metrics
 from sklearn.model_selection import train_test_split
 
-from .pipeline import find_pvalue, betareg_pvalues, r_visualize, create_prediction_model
+from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model
 from .utils import get_gene_info, plink_process, combine_scores, download_pgs, draw_qqplot, draw_manhattan
 
 
