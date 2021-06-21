@@ -142,7 +142,7 @@ def run_linear(gene_col, X, Y):
     result = linear_model.fit()
     pval = list(result.pvalues)
     beta_coef = list(result.params)[-1]
-    std_err = result.bse[1]
+    std_err = result.bse[-1]
     return [gene_col[0]] + pval + [beta_coef, std_err]
 
 
@@ -153,7 +153,7 @@ def run_glm(gene_col, X, Y):
     result = glm_model.fit()
     pval = list(result.pvalues)
     beta_coef = list(result.params)[-1]
-    std_err = result.bse[1]
+    std_err = result.bse[-1]
     return [gene_col.name] + pval + [beta_coef, std_err]
 
 
@@ -163,7 +163,7 @@ def run_logit(gene_col, X, Y):
     logit_model = sm.Logit(Y, X)
     result = logit_model.fit()
     pval = list(result.pvalues)
-    std_err = result.bse[1]
+    std_err = result.bse[-1]
     return [gene_col.name] + pval + [std_err]
 
 
@@ -275,10 +275,10 @@ def create_prediction_model(
         best_model = pyreg.compare_models(sort=metric)
         reg_model = pyreg.create_model(best_model)
         reg_tuned_model = pyreg.tune_model(reg_model, optimize=metric)
-        pyreg.plot_model(reg_tuned_model, save=True)
-        pyreg.plot_model(reg_tuned_model, plot='feature', save=True)
-        pyreg.plot_model(reg_tuned_model, plot='error', save=True)
         final_model = pyreg.finalize_model(reg_tuned_model)
+        pyreg.plot_model(final_model, save=True)
+        pyreg.plot_model(final_model, plot='feature', save=True)
+        pyreg.plot_model(final_model, plot='error', save=True)
         if len(testing_set.index) != 0:
             unseen_predictions = pyreg.predict_model(final_model, data=testing_set)
             r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
@@ -295,10 +295,10 @@ def create_prediction_model(
         best_model = cl.compare_models(sort=metric)
         cl_model = cl.create_model(best_model)
         cl_tuned_model = cl.tune_model(cl_model, optimize=metric)
-        cl.plot_model(cl_tuned_model, plot='pr', save=True)
-        cl.plot_model(cl_tuned_model, plot='confusion_matrix', save=True)
-        cl.plot_model(cl_tuned_model, plot='feature', save=True)
         final_model = cl.finalize_model(cl_tuned_model)
+        cl.plot_model(final_model, plot='pr', save=True)
+        cl.plot_model(final_model, plot='confusion_matrix', save=True)
+        cl.plot_model(final_model, plot='feature', save=True)
         if len(testing_set.index) != 0:
             unseen_predictions = cl.predict_model(final_model, data=testing_set)
             auc = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'AUC')
