@@ -285,8 +285,8 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
     for ind in data.nlargest(10, ['-logp']).index:
         anno.append(
             plt.text(data.i[ind] + 0.2, data['-logp'][ind] + 0.2, data[genes_col][ind],
-                     horizontalalignment='left', size='medium',color='black'))
-    adjust_text(anno, only_move={'points': 'y', 'texts': 'y'}, arrowprops=dict(arrowstyle="->", color='b', lw=0.5))
+                     horizontalalignment='left', size='medium', rotation=20, color='black'))
+    adjust_text(anno, arrowprops=dict(arrowstyle="->", color='b', lw=0.5))
     chrom_df = data.groupby(chr_col)['i'].median()
     plot.ax.set_xlabel(chr_col)
     plot.ax.set_xticks(chrom_df)
