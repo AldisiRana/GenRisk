@@ -166,15 +166,15 @@ def find_association(
 
 
 @main.command()
-@click.option('--pvals-file', required=True, help="the file containing p-values.")
-@click.option('--info-file', required=True, help="file containing variant/gene info.")
+@click.option('-p', '--pvals-file', required=True, help="the file containing p-values.")
+@click.option('-i', '--info-file', help="file containing variant/gene info.")
 @click.option('--genescol-1', default='gene', help="the name of the genes column in pvals file.")
 @click.option('--genescol-2', default='Gene.refGene', help="the name of the genes column in info file.")
-@click.option('--qq-output', required=True, help="the name of the qq plot file.")
-@click.option('--manhattan-output', required=True, help="the name of the manhatten plot file.")
-@click.option('--pvalcol', default='p_value', help="the name of the pvalues column.")
-@click.option('--chr-col', default='Chr', help='the name of the chromosomes column')
-@click.option('--pos-col', default='Start', help='the name of the position/start of the gene column')
+@click.option('-q', '--qq-output', default=None, help="the name of the qq plot file.")
+@click.option('-m', '--manhattan-output', default=None, help="the name of the manhatten plot file.")
+@click.option('-v', '--pval-col', default='p_value', help="the name of the pvalues column.")
+@click.option('-c', '--chr-col', default='Chr', help='the name of the chromosomes column')
+@click.option('-s', '--pos-col', default='Start', help='the name of the position/start of the gene column')
 def visualize(
     pvals_file,
     info_file,
@@ -182,7 +182,7 @@ def visualize(
     genescol_2,
     qq_output,
     manhattan_output,
-    pvalcol,
+    pval_col,
     chr_col,
     pos_col,
 ):
@@ -199,26 +199,21 @@ def visualize(
     :return:
     """
     pvals_df = pd.read_csv(pvals_file, sep=r'\s+', index_col=False)
-    draw_qqplot(pvals=pvals_df[pvalcol], qq_output=qq_output)
-    info_df = pd.read_csv(info_file, sep="\t", index_col=False)
-    merged = pd.merge(pvals_df, info_df, left_on=genescol_1, right_on=genescol_2, how='inner')
-    draw_manhattan(data=merged,
-                   chr_col=chr_col,
-                   pos_col=pos_col,
-                   pvals_col=pvalcol,
-                   genes_col=genescol_1,
-                   manhattan_output=manhattan_output)
-    # r_visualize(
-    #     pvals_file=pvals_file,
-    #     info_file=info_file,
-    #     genescol_1=genescol_1,
-    #     genescol_2=genescol_2,
-    #     qq_output=qq_output,
-    #     manhattan_output=manhattan_output,
-    #     pvalcol=pvalcol,
-    #     chr_col=chr_col,
-    #     pos_col=pos_col,
-    # )
+    if qq_output:
+        draw_qqplot(pvals=pvals_df[pval_col], qq_output=qq_output)
+    if manhattan_output:
+        if not info_file:
+            raise Exception('Please provide a file with gene information to generate manhattan plot.')
+        info_df = pd.read_csv(info_file, sep="\t", index_col=False)
+        merged = pd.merge(pvals_df, info_df, left_on=genescol_1, right_on=genescol_2, how='inner')
+        draw_manhattan(
+            data=merged,
+            chr_col=chr_col,
+            pos_col=pos_col,
+            pvals_col=pval_col,
+            genes_col=genescol_1,
+            manhattan_output=manhattan_output
+        )
 
 
 @main.command()
