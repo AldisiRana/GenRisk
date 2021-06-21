@@ -66,7 +66,7 @@ def score_genes(
     :param del_col: the column containing deleteriousness score.
     :param alt_col: the column containing alternate base.
     :param maf_threshold: the threshold for minor allele frequency.
-    :param remove_temp: if True temporary directory will be deleted after process completion.
+
     :return: the final dataframe information.
     """
     confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
@@ -135,6 +135,8 @@ def find_association(
     :param test: the test used to calculate pvalue.
     :param adj_pval: the adjustment method used (if any).
     :param covariates: the column names of covariates to use, with comma in between. (e.g: PC1,PC2,age)
+    :param processes: number of processes for parallelization.
+
     :return:
     """
     if test == 'betareg':
@@ -195,8 +197,12 @@ def visualize(
     :param genescol_2: the name of the genes column in info file.
     :param qq_output: the name of the qq plot file.
     :param manhattan_output: the name of the manhatten plot file.
-    :param pvalcol: the name of the pvalues column.
+    :param pval_col: the name of the pvalues column.
+    :param pos_col: the name of the position/start column.
+    :param chr_col: the name of chromosomes column.
+
     :return:
+
     """
     pvals_df = pd.read_csv(pvals_file, sep=r'\s+', index_col=False)
     if qq_output:
@@ -261,6 +267,7 @@ def create_model(
     :param normalize:  if true the data will be normalized before training
     :param folds: the number of folds used for cross validation
     :param metric: the metric used to choose best model after training.
+
     :return: the final model
     """
     training_set = pd.read_csv(data_file, sep='\s+', index_col=samples_col)
@@ -310,6 +317,7 @@ def test_model(
     :param model_type: the type of model (classifier or regressor)
     :param label_col: the labels/target column.
     :param samples_col: the sample ids column.
+
     :return:
     """
     model = joblib.load(model_path)
@@ -357,6 +365,7 @@ def get_prs(
     This command is interactive.
 
     :param plink: provide plink path if not default in environment.
+
     :return:
     """
     download = click.confirm('Do you want to download PGS file?')
