@@ -291,6 +291,7 @@ def create_model(
 @click.option('-l', '--label-col', required=True, help='the target/phenotype/label column')
 @click.option('-m', '--model-path', required=True, help='path to the trained model.')
 @click.option('-s', '--samples-col', default='IID', help='the samples column.')
+@click.option('-o', '--output-file', default=None, help='the path to output file.')
 def test_model(
     *,
     model_path,
@@ -298,6 +299,8 @@ def test_model(
     model_type,
     label_col,
     samples_col
+    samples_col,
+    output_file,
 ):
     """
     Evaluate a machine learning model with a given dataset.
@@ -338,6 +341,9 @@ def test_model(
         click.echo("explained variance score= " + str(explained_variance))
         click.echo('R^2= ' + str(r2))
         click.echo('RMSE= ' + str(rmse))
+    testing_df['predicted'] = y_pred
+    testing_df.to_csv(output_file, sep='\t')
+    return testing_df
 
 
 @main.command()

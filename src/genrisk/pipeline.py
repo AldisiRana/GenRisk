@@ -17,7 +17,6 @@ from tqdm import tqdm
 
 PATH = os.path.abspath(os.path.join((__file__), os.pardir, os.pardir, os.pardir))
 BETAREG_SHELL = os.path.join(PATH, 'scripts', 'betareg_shell.R')
-PLOT_SHELL = os.path.join(PATH, 'scripts', 'plot_script.R')
 
 
 def find_pvalue(
@@ -200,44 +199,6 @@ def betareg_pvalues(
     )
 
 
-def r_visualize(
-    *,
-    genescol_1,
-    genescol_2,
-    info_file,
-    pvals_file,
-    qq_output,
-    manhattan_output,
-    pvalcol,
-    chr_col,
-    pos_col,
-):
-    """
-    Visualize the results of association test. Manhattan plot and QQ-plot.
-
-    :param genescol_1: the name of the column containing the genes in the pvals_file.
-    :param genescol_2: the name of the column containing the genes in the info_file.
-    :param info_file: the file containing gene information.
-    :param pvals_file: file containing the pvalues.
-    :param qq_output: the name for the qq plot file.
-    :param manhattan_output: the name for manhattan plot file.
-    :param pvalcol: the column containing the pvalues.
-    :return:
-    """
-    subprocess.run(
-        ["Rscript", PLOT_SHELL,
-         "-p", pvals_file,
-         "-i", info_file,
-         "--qq_output", qq_output,
-         "--manhattan_output", manhattan_output,
-         "--genescol_1", genescol_1,
-         "--genescol_2", genescol_2,
-         "--pvalcol", pvalcol,
-         "--chr_col", chr_col,
-         "--pos_col", pos_col]
-    )
-
-
 def create_prediction_model(
     *,
     model_name='final_model',
@@ -284,6 +245,7 @@ def create_prediction_model(
             r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
             rmse = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'RMSE')
             metrics = ['R2: ' + str(r2), 'RMSE: ' + str(rmse)]
+            unseen_predictions.to_csv('testing_results.tsv', sep='\t', index=False)
         pyreg.save_model(final_model, model_name)
         pyreg.pull().to_csv(model_name + '_evaluation.tsv', sep='\t', index=False)
         pyreg.get_logs().to_csv(model_name + '_logs.logs', sep='\t', index=False)
