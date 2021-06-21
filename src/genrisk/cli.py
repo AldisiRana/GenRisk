@@ -384,7 +384,7 @@ def test_model(
         the sample ids column.
     output_file : str
         the path to output file.
-
+    
     Returns
     -------
         the testing dataframe with predicted values.
