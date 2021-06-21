@@ -261,7 +261,7 @@ def create_prediction_model(
         if not metric:
             metric = 'RMSE'
         setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1 - test_size, fold=folds,
-                            silent=True, log_experiment=True, session_id=random.randint(1, 2147483647))
+                            silent=True, session_id=random.randint(1, 2147483647))
         best_model = pyreg.compare_models(sort=metric)
         reg_model = pyreg.create_model(best_model)
         reg_tuned_model = pyreg.tune_model(reg_model, optimize=metric)
@@ -277,12 +277,16 @@ def create_prediction_model(
             unseen_predictions.to_csv('testing_results.tsv', sep='\t', index=False)
         pyreg.save_model(final_model, model_name)
         pyreg.pull().to_csv(model_name + '_evaluation.tsv', sep='\t', index=False)
-        pyreg.get_logs().to_csv(model_name + '_logs.logs', sep='\t', index=False)
+        setup[0].to_csv(model_name + '_training_set.tsv', sep='\t')
+        setup[1].to_csv(model_name + '_testing_set.tsv', sep='\t')
+        setup[17][0].to_csv(model_name + '_setup.tsv', sep='\t')
+        setup[17][1].to_csv(model_name + '_compare_models.tsv', sep='\t')
+        setup[17][1].to_csv(model_name + '_tuned_model.tsv', sep='\t')
     elif model_type == 'classifier':
         if not metric:
             metric = 'AUC'
         setup = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1 - test_size,
-                         silent=True, fold=folds, log_experiment=True, session_id=random.randint(1, 2147483647))
+                         silent=True, fold=folds, session_id=random.randint(1, 2147483647))
         best_model = cl.compare_models(sort=metric)
         cl_model = cl.create_model(best_model)
         cl_tuned_model = cl.tune_model(cl_model, optimize=metric)
@@ -297,7 +301,11 @@ def create_prediction_model(
             metrics = ['AUC: ' + str(auc), 'Accuracy: ' + str(accuracy)]
         cl.save_model(final_model, model_name)
         cl.pull().to_csv(model_name + '_evaluation.tsv', sep='\t', index=False)
-        cl.get_logs().to_csv(model_name + '_logs.logs', sep='\t', index=False)
+        setup[0].to_csv(model_name + '_training_set.tsv', sep='\t')
+        setup[1].to_csv(model_name + '_testing_set.tsv', sep='\t')
+        setup[17][0].to_csv(model_name + '_setup.tsv', sep='\t')
+        setup[17][1].to_csv(model_name + '_compare_models.tsv', sep='\t')
+        setup[17][1].to_csv(model_name + '_tuned_model.tsv', sep='\t')
     else:
         return Exception('Model requested is not available. Please choose regressor or classifier.')
     return metrics, final_model
