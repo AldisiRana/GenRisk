@@ -141,7 +141,7 @@ def run_linear(gene_col, X, Y):
     linear_model = sm.OLS(Y, X)
     result = linear_model.fit()
     pval = list(result.pvalues)
-    beta_coef = list(result.params)[1]
+    beta_coef = list(result.params)[-1]
     std_err = result.bse[1]
     return [gene_col[0]] + pval + [beta_coef, std_err]
 
@@ -152,7 +152,7 @@ def run_glm(gene_col, X, Y):
     glm_model = sm.GLM(Y, X)
     result = glm_model.fit()
     pval = list(result.pvalues)
-    beta_coef = list(result.params)[1]
+    beta_coef = list(result.params)[-1]
     std_err = result.bse[1]
     return [gene_col.name] + pval + [beta_coef, std_err]
 
