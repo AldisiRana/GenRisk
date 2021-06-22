@@ -274,14 +274,14 @@ def create_prediction_model(
             r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
             rmse = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'RMSE')
             metrics = ['R2: ' + str(r2), 'RMSE: ' + str(rmse)]
-            unseen_predictions.to_csv('testing_results.tsv', sep='\t', index=False)
+            unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=False)
         pyreg.save_model(final_model, model_name)
         pyreg.pull().to_csv(model_name + '_evaluation.tsv', sep='\t', index=False)
-        setup[0].to_csv(model_name + '_training_set.tsv', sep='\t')
-        setup[1].to_csv(model_name + '_testing_set.tsv', sep='\t')
-        setup[17][0].to_csv(model_name + '_setup.tsv', sep='\t')
-        setup[17][1].to_csv(model_name + '_compare_models.tsv', sep='\t')
-        setup[17][1].to_csv(model_name + '_tuned_model.tsv', sep='\t')
+        setup_list = list(setup)
+        setup_list[:] = [x for x in setup_list if type(x) == list]
+        setup[3][0][1].to_csv(model_name + '_setup.tsv', sep='\t')
+        setup[2][1].to_csv(model_name + '_compare_models.tsv', sep='\t')
+        setup[0][-1].to_csv(model_name + '_tuned_model.tsv', sep='\t')
     elif model_type == 'classifier':
         if not metric:
             metric = 'AUC'
@@ -299,13 +299,14 @@ def create_prediction_model(
             auc = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'AUC')
             accuracy = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'Accuracy')
             metrics = ['AUC: ' + str(auc), 'Accuracy: ' + str(accuracy)]
+            unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=False)
         cl.save_model(final_model, model_name)
         cl.pull().to_csv(model_name + '_evaluation.tsv', sep='\t', index=False)
-        setup[0].to_csv(model_name + '_training_set.tsv', sep='\t')
-        setup[1].to_csv(model_name + '_testing_set.tsv', sep='\t')
-        setup[17][0].to_csv(model_name + '_setup.tsv', sep='\t')
-        setup[17][1].to_csv(model_name + '_compare_models.tsv', sep='\t')
-        setup[17][1].to_csv(model_name + '_tuned_model.tsv', sep='\t')
+        setup_list = list(setup)
+        setup_list[:] = [x for x in setup_list if type(x) == list]
+        setup[3][0][1].to_csv(model_name + '_setup.tsv', sep='\t')
+        setup[2][1].to_csv(model_name + '_compare_models.tsv', sep='\t')
+        setup[0][-1].to_csv(model_name + '_tuned_model.tsv', sep='\t')
     else:
         return Exception('Model requested is not available. Please choose regressor or classifier.')
     return metrics, final_model
