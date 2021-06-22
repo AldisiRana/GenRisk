@@ -44,6 +44,7 @@ def get_gene_info(
     :param maf_threshold: the minor allele frequency threshold, default is 0.01.
     :param beta_param: the parameters of the beta function, if chosen for weighting.
     :param weight_func: the weighting function, beta or log10.
+
     :return: returns the output directory with all the temporary files.
     """
     skip = 0
@@ -103,6 +104,7 @@ def combine_scores(
 
     :param input_path: the directory containing scores files.
     :param output_path: the name of the output file.
+
     :return: dataframe with all the scores.
     """
     all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(input_path) for name in files]
@@ -124,6 +126,7 @@ def uni_profiles(df, f):
 
     :param df: the main dataframe with all the scores.
     :param f: the file containing the scores of one gene.
+
     :return: the merged dataframe.
     """
     df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
@@ -141,6 +144,7 @@ def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None):
     :param genes_folder: the folder containing the temporary genes files.
     :param plink: the directory of plink (if not default).
     :param annotated_vcf: vcf with samples information
+
     :return:
     """
     genes = [line.strip() for line in open(os.path.join(genes_folder, (genes_folder + '.genes')), 'r')]
@@ -165,6 +169,7 @@ def download_pgs(
     Get PGS from pgscatalog
 
     :param prs_id: the PRS ID in the pgscatalog.
+
     :return:
     """
     # make sure that the columns are present and matching
@@ -192,6 +197,7 @@ def calc_corr(
     :param second_file: the path to the second scores file.
     :param samples_col: the column containing the samples IDs.
     :param output_file: the path to the output file with correlation values.
+
     :return:
     """
     with open(first_file) as f:
@@ -204,8 +210,8 @@ def calc_corr(
     common_genes = as_set.intersection(genes_02)
     genes = list(common_genes)
     corr_info = []
-    first_df = pd.read_csv(first_file, sep=r'\s+', index_col=False)
-    second_df = pd.read_csv(second_file, sep=r'\s+', index_col=False)
+    first_df = pd.read_csv(first_file, sep='\t', index_col=False)
+    second_df = pd.read_csv(second_file, sep='\t', index_col=False)
     for gene in tqdm(genes, desc='calculating correlation'):
         gene_df = pd.merge(first_df[[samples_col, gene]], second_df[[samples_col, gene]], on=samples_col)
         gene_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
@@ -230,10 +236,11 @@ def normalize_gene_len(
     :param matrix_file: a tsv file containing a matrix of samples and their scores across genes.
     :param samples_col: column containing the samples IDs.
     :param output_path: the path to save the normalized matrix.
+
     :return: a normalized dataframe.
     """
     if genes_lengths_file:
-        genes_df = pd.read_csv(genes_lengths_file, sep=r'\s+')
+        genes_df = pd.read_csv(genes_lengths_file, sep='\t')
     else:
         gene_dataset = Dataset(name='hsapiens_gene_ensembl', host='http://www.ensembl.org')
         genes_df = gene_dataset.query(
@@ -262,6 +269,18 @@ def normalize_gene_len(
 
 
 def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_output):
+    """
+    Generate  manhattan plot from a given dataset.
+
+    :param data: a dataframe with pvalues and gene information.
+    :param chr_col: the column with the chromosomes.
+    :param pos_col: the column containing the position/start.
+    :param pvals_col: the column containing the p_values.
+    :param genes_col: the column containing gene names.
+    :param manhattan_output: the path to output the manhattan plot image.
+
+    :return:
+    """
     data.drop_duplicates(subset=[genes_col], inplace=True)
     data['-logp'] = - np.log10(data[pvals_col])
     data = data.dropna(how="any", axis=0)
@@ -297,6 +316,14 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
 
 
 def draw_qqplot(*, pvals, qq_output):
+    """
+    Generate QQ-plot for given data.
+
+    :param pvals: the list of p_values.
+    :param qq_output: the path to output the QQplot image.
+
+    :return:
+    """
     pvals.dropna(inplace=True)
     f, ax = plt.subplots(figsize=(6, 6), facecolor="w", edgecolor="k")
     qqplot(data=pvals,

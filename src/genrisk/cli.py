@@ -204,7 +204,7 @@ def visualize(
     :return:
 
     """
-    pvals_df = pd.read_csv(pvals_file, sep=r'\s+', index_col=False)
+    pvals_df = pd.read_csv(pvals_file, sep='\t', index_col=False)
     if qq_output:
         draw_qqplot(pvals=pvals_df[pval_col], qq_output=qq_output)
     if manhattan_output:
@@ -270,7 +270,7 @@ def create_model(
 
     :return: the final model
     """
-    training_set = pd.read_csv(data_file, sep='\s+', index_col=samples_col)
+    training_set = pd.read_csv(data_file, sep='\t', index_col=samples_col)
     testing_set = pd.DataFrame()
     if test:
         training_set, testing_set = train_test_split(training_set, test_size=test_size)
@@ -320,7 +320,7 @@ def test_model(
     :return:
     """
     model = joblib.load(model_path)
-    testing_df = pd.read_csv(input_file, sep=r'\s+', index_col=samples_col)
+    testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col)
     y_true = testing_df[label_col]
     x_set = testing_df.drop(columns=label_col)
     y_pred = model.predict(x_set)
