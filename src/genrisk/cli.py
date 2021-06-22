@@ -338,8 +338,9 @@ def test_model(
     else:
         r2 = metrics.r2_score(y_true, y_pred)
         rmse = metrics.mean_squared_error(y_true, y_pred)
-        # plt.scatter(y_pred, y_true, alpha=0.5)
-        plt.plot(np.unique(y_pred), np.poly1d(np.polyfit(y_pred, y_true, 1))(np.unique(y_pred)))
+        plt.scatter(y_pred, y_true, alpha=0.5)
+        m, b = np.polyfit(y_pred.values, y_true.values, 1)
+        plt.plot(y_pred, m * y_pred + b)
         plt.title('Actual vs predicted scatterplot')
         plt.xlabel('Predicted')
         plt.ylabel('Actual')
