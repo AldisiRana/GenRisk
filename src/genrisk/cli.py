@@ -335,7 +335,6 @@ def test_model(
         click.echo(report)
         click.echo('accuracy= ' + str(acc))
     else:
-        explained_variance = metrics.explained_variance_score(y_true, y_pred)
         r2 = metrics.r2_score(y_true, y_pred)
         rmse = metrics.mean_squared_error(y_true, y_pred)
         plt.scatter(y_pred, y_true, alpha=0.5)
@@ -344,7 +343,6 @@ def test_model(
         plt.ylabel('Actual')
         plt.savefig(output_file.split('.')[0] + 'regressor_scatterplot.png')
         click.echo('Model testing results:')
-        click.echo("explained variance score= " + str(explained_variance))
         click.echo('R^2= ' + str(r2))
         click.echo('RMSE= ' + str(rmse))
     testing_df['predicted'] = y_pred
