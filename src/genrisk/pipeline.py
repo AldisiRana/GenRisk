@@ -270,11 +270,11 @@ def model_testing(
     testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col)
     x_set = testing_df.drop(columns=label_col)
     if model_type == 'classifier':
-        unseen_predictions = cl.predict_model(model, data=testing_df)
-        report = metrics.classification_report(unseen_predictions[label_col], unseen_predictions.Label)
-        acc = metrics.accuracy_score(unseen_predictions[label_col], unseen_predictions.Label)
-        auc = metrics.auc(unseen_predictions[label_col], unseen_predictions.Label)
-        confusion = metrics.plot_confusion_matrix(x_set, unseen_predictions[label_col])
+        unseen_predictions = cl.predict_model(model, data=x_set)
+        report = metrics.classification_report(testing_df[label_col], unseen_predictions.Label)
+        acc = metrics.accuracy_score(testing_df[label_col], unseen_predictions.Label)
+        auc = metrics.auc(testing_df[label_col], unseen_predictions.Label)
+        confusion = metrics.plot_confusion_matrix(x_set, testing_df[label_col])
         confusion.ax_.set_title('Classifier confusion matrix')
         plt.show()
         plt.savefig(input_file.split('.')[0] + '_classifier_confusion_matrix.png')
@@ -285,11 +285,11 @@ def model_testing(
         textfile.write('Accuracy = ' + str(acc) + '\n')
         textfile.close()
     else:
-        unseen_predictions = pyreg.predict_model(model, data=testing_df)
-        r2 = metrics.r2_score(unseen_predictions[label_col], unseen_predictions.Label)
-        rmse = metrics.mean_squared_error(unseen_predictions[label_col], unseen_predictions.Label, squared=False)
-        plt.scatter(unseen_predictions.Label, unseen_predictions[label_col], alpha=0.5)
-        m, b = np.polyfit(unseen_predictions.Label, unseen_predictions[label_col], 1)
+        unseen_predictions = pyreg.predict_model(model, data=x_set)
+        r2 = metrics.r2_score(testing_df[label_col], unseen_predictions.Label)
+        rmse = metrics.mean_squared_error(testing_df[label_col], unseen_predictions.Label, squared=False)
+        plt.scatter(unseen_predictions.Label, testing_df[label_col], alpha=0.5)
+        m, b = np.polyfit(unseen_predictions.Label, testing_df[label_col], 1)
         plt.plot(unseen_predictions.Label, m * unseen_predictions.Label + b, 'r')
         plt.title('Actual vs predicted scatterplot')
         plt.xlabel('Predicted')
@@ -300,4 +300,5 @@ def model_testing(
         textfile.write('R^2 = ' + str(r2) + '\n')
         textfile.write('RMSE = ' + str(rmse) + '\n')
         textfile.close()
-    return unseen_predictions
+    prediction_df = unseen_predictions[['Label']]
+    return prediction_df
