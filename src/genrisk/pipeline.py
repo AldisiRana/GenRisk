@@ -262,7 +262,6 @@ def create_prediction_model(
             metric = 'RMSE'
         setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1 - test_size, fold=folds,
                             silent=True, session_id=random.randint(1, 2147483647))
-        pyreg.pull().to_csv(model_name + '_setup.tsv', sep='\t', index=False)
         best_model = pyreg.compare_models(sort=metric)
         pyreg.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)
         reg_model = pyreg.create_model(best_model)
