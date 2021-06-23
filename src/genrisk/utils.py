@@ -6,14 +6,14 @@ import re
 import subprocess
 import urllib.request as urllib
 
-from adjustText import adjust_text
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-from qmplot import qqplot
 import requests
-from pybiomart import Dataset
 import seaborn as sns
+from adjustText import adjust_text
+from pybiomart import Dataset
+from qmplot import qqplot
 from scipy.stats import beta, pearsonr
 from tqdm import tqdm
 
@@ -334,4 +334,3 @@ def draw_qqplot(*, pvals, qq_output):
            dpi=300,
            figname=qq_output,
            ax=ax)
-

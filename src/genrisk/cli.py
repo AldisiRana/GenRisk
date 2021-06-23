@@ -273,7 +273,7 @@ def create_model(
         training_set, testing_set = train_test_split(training_set, test_size=test_size)
     os.mkdir(output_folder)
     os.chdir(output_folder)
-    results, model = create_prediction_model(
+    model = create_prediction_model(
         model_name=model_name,
         model_type=model_type,
         imbalanced=imbalanced,
@@ -285,7 +285,7 @@ def create_model(
         testing_set=testing_set,
         test_size=test_size,
     )
-    return results, model
+    return model
 
 
 @main.command()
