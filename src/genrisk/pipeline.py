@@ -325,7 +325,6 @@ def model_testing(
     x_set = testing_df.drop(columns=label_col)
     if model_type == 'classifier':
         unseen_predictions = cl.predict_model(model, data=testing_df)
-        unseen_predictions.to_csv(input_file + '_testing_results.tsv', sep='\t', index=False)
         report = metrics.classification_report(unseen_predictions[label_col], unseen_predictions.Label)
         acc = metrics.accuracy_score(unseen_predictions[label_col], unseen_predictions.Label)
         auc = metrics.auc(unseen_predictions[label_col], unseen_predictions.Label)
@@ -341,7 +340,6 @@ def model_testing(
         textfile.close()
     else:
         unseen_predictions = pyreg.predict_model(model, data=testing_df)
-        unseen_predictions.to_csv(input_file + '_testing_results.tsv', sep='\t', index=False)
         r2 = metrics.r2_score(unseen_predictions[label_col], unseen_predictions.Label)
         rmse = metrics.mean_squared_error(unseen_predictions[label_col], unseen_predictions.Label, squared=False)
         plt.scatter(unseen_predictions.Label, unseen_predictions[label_col], alpha=0.5)
