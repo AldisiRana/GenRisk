@@ -220,20 +220,20 @@ def visualize(
 
 
 @main.command()
-@click.option('--data-file', required=True, help='file with all features and target for training model.')
-@click.option('--output-folder', required=True, help='path of folder that will contain all outputs.')
-@click.option('--test-size', default=0.25, help='test size for cross validation and evaluation.')
-@click.option('--test', is_flag=True,
+@click.option('-d', '--data-file', required=True, help='file with all features and target for training model.')
+@click.option('-o', '--output-folder', required=True, help='path of folder that will contain all outputs.')
+@click.option('-i', '--test-size', default=0.25, help='test size for cross validation and evaluation.')
+@click.option('-t', '--test', is_flag=True,
               help='if flagged, a test set will be created for evaluating the final model.')
-@click.option('--model-name', required=True, help='name of model file.')
-@click.option('--model-type', required=True, type=click.Choice(['regressor', 'classifier']),
+@click.option('-n', '--model-name', required=True, help='name of model file.')
+@click.option('-m', '--model-type', required=True, type=click.Choice(['regressor', 'classifier']),
               help='type of prediction model.')
-@click.option('--target-col', required=True, help='name of target column in data_file.')
-@click.option('--imbalanced', is_flag=True, help='if flagged methods will be used to account for the imbalance.')
+@click.option('-l', '--target-col', required=True, help='name of target column in data_file.')
+@click.option('-b', '--imbalanced', is_flag=True, help='if flagged methods will be used to account for the imbalance.')
 @click.option('--normalize', is_flag=True, help='if flagged the data will be normalized before training.')
-@click.option('--folds', default=10, type=int, help='number of cross-validation folds in training.')
+@click.option('-f', '--folds', default=10, type=int, help='number of cross-validation folds in training.')
 @click.option('--metric', help='the metric used to choose best model after training.')
-@click.option('--samples-col', default='IID')
+@click.option('-s', '--samples-col', default='IID')
 def create_model(
     *,
     data_file,
