@@ -262,13 +262,17 @@ def create_prediction_model(
             metric = 'RMSE'
         setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1 - test_size, fold=folds,
                             silent=True, session_id=random.randint(1, 2147483647))
+        pyreg.pull().to_csv(model_name + '_setup.tsv', sep='\t', index=False)
         best_model = pyreg.compare_models(sort=metric)
+        pyreg.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)
         reg_model = pyreg.create_model(best_model)
         reg_tuned_model = pyreg.tune_model(reg_model, optimize=metric)
+        pyreg.pull().to_csv(model_name + '_tuned_model.tsv', sep='\t', index=False)
         final_model = pyreg.finalize_model(reg_tuned_model)
         pyreg.plot_model(final_model, save=True)
         pyreg.plot_model(final_model, plot='feature', save=True)
         pyreg.plot_model(final_model, plot='error', save=True)
+        pyreg.pull().to_csv(model_name + '_evaluation.tsv', sep='\t', index=False)
         if len(testing_set.index) != 0:
             unseen_predictions = pyreg.predict_model(final_model, data=testing_set)
             r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
@@ -276,12 +280,6 @@ def create_prediction_model(
             metrics = ['R2: ' + str(r2), 'RMSE: ' + str(rmse)]
             unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=False)
         pyreg.save_model(final_model, model_name)
-        pyreg.pull().to_csv(model_name + '_evaluation.tsv', sep='\t', index=False)
-        setup_list = list(setup)
-        setup_list[:] = [x for x in setup_list if type(x) == list]
-        setup[3][0][1].to_csv(model_name + '_setup.tsv', sep='\t')
-        setup[2][1].to_csv(model_name + '_compare_models.tsv', sep='\t')
-        setup[0][-1].to_csv(model_name + '_tuned_model.tsv', sep='\t')
     elif model_type == 'classifier':
         if not metric:
             metric = 'AUC'
