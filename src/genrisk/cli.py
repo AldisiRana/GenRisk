@@ -4,14 +4,10 @@ import shutil
 import subprocess
 
 import click
-import joblib
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import sklearn.metrics as metrics
 from sklearn.model_selection import train_test_split
 
-from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model
+from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, model_testing
 from .utils import get_gene_info, plink_process, combine_scores, download_pgs, draw_qqplot, draw_manhattan
 
 
@@ -320,35 +316,13 @@ def test_model(
 
     :return:
     """
-    model = joblib.load(model_path)
-    testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col)
-    y_true = testing_df[label_col]
-    x_set = testing_df.drop(columns=label_col)
-    y_pred = model.predict(x_set)
-    if model_type == 'classifier':
-        report = metrics.classification_report(y_true, y_pred)
-        acc = metrics.accuracy_score(y_true, y_pred)
-        confusion = metrics.plot_confusion_matrix(x_set, y_true)
-        confusion.ax_.set_title('Classifier confusion matrix')
-        plt.show()
-        plt.savefig('classifier_confusion_matrix.png')
-        click.echo('Model testing results:')
-        click.echo(report)
-        click.echo('accuracy= ' + str(acc))
-    else:
-        r2 = metrics.r2_score(y_true, y_pred)
-        rmse = metrics.mean_squared_error(y_true, y_pred, squared=False)
-        plt.scatter(y_pred, y_true, alpha=0.5)
-        m, b = np.polyfit(y_pred, y_true, 1)
-        plt.plot(y_pred, m * y_pred + b, 'r')
-        plt.title('Actual vs predicted scatterplot')
-        plt.xlabel('Predicted')
-        plt.ylabel('Actual')
-        plt.savefig(output_file.split('.')[0] + '_regressor_scatterplot.png')
-        click.echo('Model testing results:')
-        click.echo('R^2= ' + str(r2))
-        click.echo('RMSE= ' + str(rmse))
-    testing_df['predicted'] = y_pred
+    testing_df = model_testing(
+        model_path=model_path,
+        input_file=input_file,
+        label_col=label_col,
+        samples_col=samples_col,
+        model_type=model_type,
+    )
     testing_df.to_csv(output_file, sep='\t')
     return testing_df
 

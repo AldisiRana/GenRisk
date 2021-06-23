@@ -4,14 +4,18 @@ import subprocess
 import random
 import multiprocessing
 
+import joblib
+import matplotlib.pyplot as plt
 from functools import partial
 import numpy as np
+
 import pandas as pd
 import pycaret.classification as cl
 import pycaret.regression as pyreg
 import scipy.stats as stats
 import statsmodels.api as sm
 from pycaret.utils import check_metric
+import sklearn.metrics as metrics
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm
 
@@ -271,7 +275,6 @@ def create_prediction_model(
         pyreg.plot_model(final_model, save=True)
         pyreg.plot_model(final_model, plot='feature', save=True)
         pyreg.plot_model(final_model, plot='error', save=True)
-        pyreg.pull().to_csv(model_name + '_evaluation.tsv', sep='\t', index=False)
         if len(testing_set.index) != 0:
             unseen_predictions = pyreg.predict_model(final_model, data=testing_set)
             r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
@@ -307,3 +310,51 @@ def create_prediction_model(
     else:
         return Exception('Model requested is not available. Please choose regressor or classifier.')
     return metrics, final_model
+
+
+def model_testing(
+    *,
+    model_path,
+    input_file,
+    samples_col,
+    label_col,
+    model_type
+):
+    model = joblib.load(model_path)
+    testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col)
+    x_set = testing_df.drop(columns=label_col)
+    if model_type == 'classifier':
+        unseen_predictions = cl.predict_model(model, data=testing_df)
+        unseen_predictions.to_csv(input_file + '_testing_results.tsv', sep='\t', index=False)
+        report = metrics.classification_report(unseen_predictions[label_col], unseen_predictions.Label)
+        acc = metrics.accuracy_score(unseen_predictions[label_col], unseen_predictions.Label)
+        auc = metrics.auc(unseen_predictions[label_col], unseen_predictions.Label)
+        confusion = metrics.plot_confusion_matrix(x_set, unseen_predictions[label_col])
+        confusion.ax_.set_title('Classifier confusion matrix')
+        plt.show()
+        plt.savefig(input_file.split('.')[0] + '_classifier_confusion_matrix.png')
+        textfile = open(input_file.split('.')[0] + "_report.txt", "w")
+        textfile.write('Testing model report: \n')
+        textfile.write(report + '\n')
+        textfile.write('AUC = ' + str(auc) + '\n')
+        textfile.write('Accuracy = ' + str(acc) + '\n')
+        textfile.close()
+    else:
+        unseen_predictions = pyreg.predict_model(model, data=testing_df)
+        unseen_predictions.to_csv(input_file + '_testing_results.tsv', sep='\t', index=False)
+        r2 = metrics.r2_score(unseen_predictions[label_col], unseen_predictions.Label)
+        rmse = metrics.mean_squared_error(unseen_predictions[label_col], unseen_predictions.Label, squared=False)
+        plt.scatter(unseen_predictions.Label, unseen_predictions[label_col], alpha=0.5)
+        m, b = np.polyfit(unseen_predictions.Label, unseen_predictions[label_col], 1)
+        plt.plot(unseen_predictions.Label, m * unseen_predictions.Label + b, 'r')
+        plt.title('Actual vs predicted scatterplot')
+        plt.xlabel('Predicted')
+        plt.ylabel('Actual')
+        plt.savefig(input_file.split('.')[0] + '_regressor_scatterplot.png')
+        textfile = open(input_file.split('.')[0] + "_report.txt", "w")
+        textfile.write('Testing model report: \n')
+        textfile.write('R^2 = ' + str(r2) + '\n')
+        textfile.write('RMSE = ' + str(rmse) + '\n')
+        textfile.close()
+    return unseen_predictions
+
