@@ -17,6 +17,8 @@ from qmplot import qqplot
 from scipy.stats import beta, pearsonr
 from tqdm import tqdm
 
+from .helpers import uni_profiles
+
 
 def get_gene_info(
     *,
@@ -117,23 +119,6 @@ def combine_scores(
     for i in tqdm(range(1, len(pf) - 1), desc='merging in process'):
         df = uni_profiles(df, pf[i])
     df.to_csv(output_path, sep='\t', index=False)
-    return df
-
-
-def uni_profiles(df, f):
-    """
-    Merge two dataframes.
-
-    :param df: the main dataframe with all the scores.
-    :param f: the file containing the scores of one gene.
-
-    :return: the merged dataframe.
-    """
-    df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
-    r = re.compile("([a-zA-Z0-9_.-]*).profile$")
-    gene2 = r.findall(str(f))
-    df2.rename(columns={'SCORESUM': gene2[0]}, inplace=True)
-    df = pd.merge(df, df2, on='IID')
     return df
 
 

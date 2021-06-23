@@ -13,10 +13,11 @@ import pycaret.classification as cl
 import pycaret.regression as pyreg
 import scipy.stats as stats
 import sklearn.metrics as metrics
-import statsmodels.api as sm
 from pycaret.utils import check_metric
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm
+
+from .helpers import run_logit, run_linear, run_glm
 
 PATH = os.path.abspath(os.path.join((__file__), os.pardir, os.pardir, os.pardir))
 BETAREG_SHELL = os.path.join(PATH, 'scripts', 'betareg_shell.R')
@@ -51,6 +52,7 @@ def find_pvalue(
     :param controls: the name of the controls category.
     :param cases:  the name of the cases category.
     :param covariates: the covariates of the phenotype.
+    :param processes: number of processes working in parallel.
 
     :return: dataframe with genes and their p_values
     """
@@ -135,65 +137,6 @@ def find_pvalue(
         p_values_df[adj_pval + '_adj_pval'] = list(adjusted)[1]
     p_values_df.to_csv(output_file, sep='\t', index=False)
     return p_values_df
-
-
-def run_linear(gene_col, X, Y):
-    """
-    Helper function to run linear regression association.
-
-    :param gene_col: a tuple from df.iteritems()
-    :param X: the covariates.
-    :param Y: the target.
-
-    :return: a list with gene name, pvalues, coefs and std err.
-    """
-    X[gene_col[0]] = gene_col[1]
-    X = sm.add_constant(X)
-    linear_model = sm.OLS(Y, X)
-    result = linear_model.fit()
-    pval = list(result.pvalues)
-    beta_coef = list(result.params)[-1]
-    std_err = result.bse[-1]
-    return [gene_col[0]] + pval + [beta_coef, std_err]
-
-
-def run_glm(gene_col, X, Y):
-    """
-    Helper function to run Generalize linear model regression association.
-
-    :param gene_col: a tuple from df.iteritems()
-    :param X: the covariates.
-    :param Y: the target.
-
-    :return: a list with gene name, pvalues, coefs and std err.
-    """
-    X[gene_col.name] = gene_col
-    X = sm.add_constant(X)
-    glm_model = sm.GLM(Y, X)
-    result = glm_model.fit()
-    pval = list(result.pvalues)
-    beta_coef = list(result.params)[-1]
-    std_err = result.bse[-1]
-    return [gene_col.name] + pval + [beta_coef, std_err]
-
-
-def run_logit(gene_col, X, Y):
-    """
-    Helper function to run logistic regression association.
-
-    :param gene_col: a tuple from df.iteritems()
-    :param X: the covariates.
-    :param Y: the target.
-
-    :return: a list with gene name, pvalues, and std err.
-    """
-    X[gene_col.name] = gene_col
-    X = sm.add_constant(X)
-    logit_model = sm.Logit(Y, X)
-    result = logit_model.fit()
-    pval = list(result.pvalues)
-    std_err = result.bse[-1]
-    return [gene_col.name] + pval + [std_err]
 
 
 def betareg_pvalues(
