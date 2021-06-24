@@ -22,16 +22,16 @@ def main():
 @click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
 @click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
 @click.option('-o', '--output-file', required=True, help="the final output scores matrix.")
-@click.option('--beta-param', default=(1.0, 25.0), nargs=2, type=float,
+@click.option('-p', '--beta-param', default=(1.0, 25.0), nargs=2, type=float,
               help="the parameters from beta weight function.")
-@click.option('--weight-func', default='beta', type=click.Choice(['beta', 'log10']),
+@click.option('-w', '--weight-func', default='beta', type=click.Choice(['beta', 'log10']),
               help="the weighting function used in score calculation.")
-@click.option('--variant-col', default='SNP', help="the column containing the variant IDs.")
-@click.option('--gene-col', default='Gene.refGene', help="the column containing gene names.")
-@click.option('--af-col', default='MAF', help="the column containing allele frequency.")
-@click.option('--del-col', default='CADD_raw', help="the column containing the deleteriousness score.")
-@click.option('--alt-col', default='Alt', help="the column containing the alternate base.")
-@click.option('--maf-threshold', default=0.01, help="the threshold for minor allele frequency.")
+@click.option('-v', '--variant-col', default='SNP', help="the column containing the variant IDs.")
+@click.option('-g', '--gene-col', default='Gene.refGene', help="the column containing gene names.")
+@click.option('-f', '--af-col', default='MAF', help="the column containing allele frequency.")
+@click.option('-d', '--del-col', default='CADD_raw', help="the column containing the deleteriousness score.")
+@click.option('-l', '--alt-col', default='Alt', help="the column containing the alternate base.")
+@click.option('-m', '--maf-threshold', default=0.01, help="the threshold for minor allele frequency.")
 def score_genes(
     *,
     annotated_vcf,
@@ -50,6 +50,7 @@ def score_genes(
 ):
     """
     Calculate the gene-based scores for a given dataset.
+    \f
 
     :param annotated_vcf: an annotated containing variant IDs, alt, info and samples genotypes.
     :param plink: the directory of plink, if not set in environment
@@ -102,10 +103,10 @@ def score_genes(
 @click.option('-c', '--cases-column', required=True,
               help="the name of the column that contains the case/control or quantitative vals.")
 @click.option('-m', '--samples-column', required=True, help="the name of the column that contains the samples.")
-@click.option('--adj-pval', type=click.Choice(
+@click.option('-a', '--adj-pval', type=click.Choice(
     ['bonferroni', 'sidak', 'holm-sidak', 'holm',
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
-@click.option('--covariates', default='PC1,PC2', help="the covariates used for calculation")
+@click.option('-v', '--covariates', default='PC1,PC2', help="the covariates used for calculation")
 @click.option('-p', '--processes', type=int, default=1, help='number of processes for parallelization')
 def find_association(
     *,
@@ -122,6 +123,7 @@ def find_association(
 ):
     """
     Calculate the P-value between two given groups.
+    \f
 
     :param scores_file: the file containing gene scores.
     :param info_file: file containing the phenotype.
@@ -187,6 +189,7 @@ def visualize(
 ):
     """
     Visualize manhatten plot and qqplot for the data.
+    \f
 
     :param pvals_file: the file containing p-values.
     :param info_file: file containing variant/gene info.
@@ -251,6 +254,7 @@ def create_model(
 ):
     """
     Create a machine learning model with given dataset.
+    \f
 
     :param samples_col: the name of the column with samples identifiers.
     :param data_file: file containing features and target.
@@ -307,6 +311,7 @@ def test_model(
 ):
     """
     Evaluate a machine learning model with a given dataset.
+    \f
 
     :param model_path: the path to the ML model.
     :param input_file: the testing dataset.
@@ -314,7 +319,7 @@ def test_model(
     :param label_col: the labels/target column.
     :param samples_col: the sample ids column.
 
-    :return:
+    :return: a dataframe with predicted values.
     """
     testing_df = model_testing(
         model_path=model_path,
@@ -336,6 +341,7 @@ def get_prs(
     """
     This command gets a pgs file (provided by the user or downloaded) then calculates the PRS scores for dataset.
     This command is interactive.
+    \f
 
     :param plink: provide plink path if not default in environment.
 

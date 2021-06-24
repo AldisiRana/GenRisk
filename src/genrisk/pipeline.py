@@ -40,6 +40,7 @@ def find_pvalue(
 ):
     """
     Calculate the significance of a gene in a population using Mann-Whitney-U test.
+    \f
 
     :param test: the type of statistical test to use, choices are: t-test, mannwhitenyu, GLM, logit.
     :param scores_file: dataframe containing the scores of genes across samples.
@@ -151,6 +152,7 @@ def betareg_pvalues(
 ):
     """
     Calculate association significance between two groups using betareg.
+    \f
 
     :param scores_file: the path to the scores file.
     :param pheno_file:  the path to the phenotypes and covariates file.
@@ -189,6 +191,7 @@ def create_prediction_model(
 ):
     """
     Create a prediction model (classifier or regressor) using the provided dataset.
+    \f
 
     :param model_name: the name of the prediction model.
     :param model_type: type of model (reg or classifier).
@@ -266,6 +269,18 @@ def model_testing(
     label_col,
     model_type
 ):
+    """
+    Load a prediction model and use it to predict label values in a dataset.
+    \f
+
+    :param model_path: the path to saved model.
+    :param input_file: the file with features and label.
+    :param samples_col: the name of samples column.
+    :param label_col: the name of the target column.
+    :param model_type: regressor or classifier
+
+    :return: a dataframe with prediction values.
+    """
     model = joblib.load(model_path)
     testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col)
     x_set = testing_df.drop(columns=label_col)
