@@ -177,6 +177,7 @@ def find_association(
 @click.option('-c', '--chr-col', default='Chr', help='the name of the chromosomes column')
 @click.option('-s', '--pos-col', default='Start', help='the name of the position/start of the gene column')
 def visualize(
+    *,
     pvals_file,
     info_file,
     genescol_1,
@@ -339,7 +340,8 @@ def get_prs(
     plink,
 ):
     """
-    This command gets a pgs file (provided by the user or downloaded) then calculates the PRS scores for dataset.
+    Calculate PRS.
+    This command gets a pgs file (provided by the user or downloaded) then calculates the PRS for dataset.
     This command is interactive.
     \f
 
