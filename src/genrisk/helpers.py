@@ -129,7 +129,7 @@ def get_pvals_logit(*, df, genes, cases_column, **kwargs):
 
 
 def get_pvals_linear(*, df, genes, cases_column, **kwargs):
-    covariates = kwargs['covariates']
+    covariates = kwargs.get('covariates')
     y_set = df[[cases_column]]
     x_set = df[covariates]
     genes_df = df[genes]
