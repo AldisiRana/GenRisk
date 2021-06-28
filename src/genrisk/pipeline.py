@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-import multiprocessing
 import os
 import random
 import subprocess
-from functools import partial
 
 import joblib
 import matplotlib.pyplot as plt
@@ -11,16 +9,20 @@ import numpy as np
 import pandas as pd
 import pycaret.classification as cl
 import pycaret.regression as pyreg
-import scipy.stats as stats
 import sklearn.metrics as metrics
 from pycaret.utils import check_metric
 from statsmodels.stats.multitest import multipletests
-from tqdm import tqdm
 
-from .helpers import run_logit, run_linear, run_glm
+from .helpers import run_mannwhitneyu, run_ttest, get_pvals_logit, get_pvals_linear
 
 PATH = os.path.abspath(os.path.join((__file__), os.pardir, os.pardir, os.pardir))
 BETAREG_SHELL = os.path.join(PATH, 'scripts', 'betareg_shell.R')
+association_functions = {
+    'mannwhitneyu': run_mannwhitneyu,
+    'ttest_ind': run_ttest,
+    'logit': get_pvals_logit,
+    'linear': get_pvals_linear,
+}
 
 
 def find_pvalue(
@@ -57,10 +59,10 @@ def find_pvalue(
 
     :return: dataframe with genes and their p_values
     """
-    scores_df = pd.read_csv(scores_file, sep='\t')
+    scores_df = pd.read_csv(scores_file, sep='\t', index_col=samples_column)
     scores_df.replace([np.inf, -np.inf], 0, inplace=True)
     scores_df.fillna(0, inplace=True)
-    scores_df = scores_df.loc[:, scores_df.var() != 0.0]
+    scores_df = scores_df.loc[:, scores_df.var() != 0.0].reset_index()
     genotype_df = pd.read_csv(info_file, sep='\t')
     genotype_df.dropna(subset=[cases_column], inplace=True)
     merged_df = genotype_df.merge(scores_df, how='inner', on=samples_column)
@@ -69,70 +71,13 @@ def find_pvalue(
     if genes is None:
         genes = scores_df.columns.tolist()[1:]
     del scores_df
-    df_by_cases = merged_df.groupby(cases_column)
     if covariates:
         covariates = covariates.split(',')
-    if cases and controls:
-        cc = [cases, controls]
-    else:
-        cc = list(df_by_cases.groups.keys())
-    p_values = []
-    if test == 'mannwhitneyu':
-        if len(cc) > 2:
-            Warning('There are more than two categories here. We will only consider the first two categories.')
-        for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            case_0 = df_by_cases.get_group(cc[0])[gene].tolist()
-            case_1 = df_by_cases.get_group(cc[1])[gene].tolist()
-            try:
-                u_statistic, p_val = stats.mannwhitneyu(case_0, case_1, alternative='greater')
-            except:
-                continue
-            p_values.append([gene, u_statistic, p_val])
-        p_values_df = pd.DataFrame(p_values, columns=['genes', 'statistic', 'p_value']).sort_values(by=['p_value'])
-    elif test == 'ttest_ind':
-        if len(cc) > 2:
-            Warning('There are more than two categories here. We will only consider the first two categories.')
-        for gene in tqdm(genes, desc='Calculating p_values for genes'):
-            case_0 = df_by_cases.get_group(cc[0])[gene].tolist()
-            case_1 = df_by_cases.get_group(cc[1])[gene].tolist()
-            try:
-                statistic, p_val = stats.ttest_ind(case_0, case_1)
-            except:
-                continue
-            p_values.append([gene, statistic, p_val])
-        p_values_df = pd.DataFrame(p_values, columns=['genes', 'statistic', 'p_value']).sort_values(by=['p_value'])
-    elif test == 'logit':
-        Y = merged_df[[cases_column]]
-        X = merged_df[covariates]
-        genes_df = merged_df[genes]
-        del merged_df
-        pool = multiprocessing.Pool(processes=processes)
-        partial_func = partial(run_logit, X=X, Y=Y)
-        p_values = list(pool.imap(partial_func, genes_df.iteritems()))
-        cols = ['genes', 'const_pval'] + covariates + ['p_value' + 'std_err']
-        p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
-    elif test == 'linear':
-        Y = merged_df[[cases_column]]
-        X = merged_df[covariates]
-        genes_df = merged_df[genes]
-        del merged_df
-        pool = multiprocessing.Pool(processes=processes)
-        partial_func = partial(run_linear, X=X, Y=Y)
-        p_values = list(pool.imap(partial_func, genes_df.iteritems()))
-        cols = ['genes', 'const_pval'] + covariates + ['p_value', 'beta_coef', 'std_err']
-        p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
-    elif test == 'glm':
-        Y = merged_df[[cases_column]]
-        X = merged_df[covariates]
-        genes_df = merged_df[genes]
-        del merged_df
-        pool = multiprocessing.Pool(processes=processes)
-        partial_func = partial(run_glm, X=X, Y=Y)
-        p_values = list(pool.imap(partial_func, genes_df.iteritems()))
-        cols = ['genes', 'const_pval'] + covariates + ['p_value', 'beta_coef', 'std_err']
-        p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
-    else:
-        raise Exception("The test you selected is not available.")
+    args = {
+        'genes': genes, 'df': merged_df, 'processes': processes, 'cases': cases, 'controls': controls,
+        'covariates': covariates, 'cases_column': cases_column
+    }
+    p_values_df = association_functions.get(test)(**args)
     if adj_pval:
         adjusted = multipletests(list(p_values_df['p_value']), method=adj_pval)
         p_values_df[adj_pval + '_adj_pval'] = list(adjusted)[1]
@@ -205,7 +150,6 @@ def create_prediction_model(
     :param metric: the metric to evaluate the best model.
     :return: the metrics.
     """
-    metrics = None
     if model_type == 'regressor':
         if not metric:
             metric = 'RMSE'
