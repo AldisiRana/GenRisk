@@ -3,8 +3,10 @@ import multiprocessing
 import re
 from functools import partial
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import sklearn.metrics as metrics
 import statsmodels.api as sm
 import scipy.stats as stats
 from tqdm import tqdm
@@ -138,3 +140,27 @@ def get_pvals_linear(*, df, genes, cases_column, **kwargs):
     p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
     return p_values_df
 
+
+def generate_scatterplot(*, x_axis, y_axis, output):
+    plt.scatter(x_axis, y_axis, alpha=0.5)
+    m, b = np.polyfit(x_axis, y_axis, 1)
+    plt.plot(x_axis, m * x_axis + b, 'r')
+    plt.title('Actual vs predicted scatterplot')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.savefig(output + '_regressor_scatterplot.png')
+    return plt.show()
+
+
+def generate_confusion_matrix(x_set, y_set, output):
+    confusion = metrics.plot_confusion_matrix(x_set, y_set)
+    confusion.ax_.set_title('Classifier confusion matrix')
+    plt.savefig(output + '_classifier_confusion_matrix.png')
+    return plt.show()
+
+
+def write_output(*, input_list, output):
+    textfile = open(output, "w")
+    for line in input_list:
+        textfile.write(line)
+    textfile.close()

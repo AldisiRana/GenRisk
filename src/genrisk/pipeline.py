@@ -4,7 +4,6 @@ import random
 import subprocess
 
 import joblib
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pycaret.classification as cl
@@ -13,7 +12,8 @@ import sklearn.metrics as metrics
 from pycaret.utils import check_metric
 from statsmodels.stats.multitest import multipletests
 
-from .helpers import run_mannwhitneyu, run_ttest, get_pvals_logit, get_pvals_linear
+from .helpers import run_mannwhitneyu, run_ttest, get_pvals_logit, get_pvals_linear, generate_scatterplot, \
+    generate_confusion_matrix, write_output
 
 PATH = os.path.abspath(os.path.join((__file__), os.pardir, os.pardir, os.pardir))
 BETAREG_SHELL = os.path.join(PATH, 'scripts', 'betareg_shell.R')
@@ -232,31 +232,18 @@ def model_testing(
         report = metrics.classification_report(testing_df[label_col], unseen_predictions.Label)
         acc = metrics.accuracy_score(testing_df[label_col], unseen_predictions.Label)
         auc = metrics.auc(testing_df[label_col], unseen_predictions.Label)
-        confusion = metrics.plot_confusion_matrix(x_set, testing_df[label_col])
-        confusion.ax_.set_title('Classifier confusion matrix')
-        plt.show()
-        plt.savefig(input_file.split('.')[0] + '_classifier_confusion_matrix.png')
-        textfile = open(input_file.split('.')[0] + "_report.txt", "w")
-        textfile.write('Testing model report: \n')
-        textfile.write(report + '\n')
-        textfile.write('AUC = ' + str(auc) + '\n')
-        textfile.write('Accuracy = ' + str(acc) + '\n')
-        textfile.close()
+        plot = generate_confusion_matrix(x_set=x_set, y_set=testing_df[label_col], output=input_file.split('.')[0])
+        input_list = [
+            'Testing model report: \n', report + '\n', 'AUC = ' + str(auc) + '\n', 'Accuracy = ' + str(acc) + '\n'
+        ]
+        write_output(input_list=input_list, output=input_file.split('.')[0] + "_report.txt")
     else:
         unseen_predictions = pyreg.predict_model(model, data=x_set)
         r2 = metrics.r2_score(testing_df[label_col], unseen_predictions.Label)
         rmse = metrics.mean_squared_error(testing_df[label_col], unseen_predictions.Label, squared=False)
-        plt.scatter(unseen_predictions.Label, testing_df[label_col], alpha=0.5)
-        m, b = np.polyfit(unseen_predictions.Label, testing_df[label_col], 1)
-        plt.plot(unseen_predictions.Label, m * unseen_predictions.Label + b, 'r')
-        plt.title('Actual vs predicted scatterplot')
-        plt.xlabel('Predicted')
-        plt.ylabel('Actual')
-        plt.savefig(input_file.split('.')[0] + '_regressor_scatterplot.png')
-        textfile = open(input_file.split('.')[0] + "_report.txt", "w")
-        textfile.write('Testing model report: \n')
-        textfile.write('R^2 = ' + str(r2) + '\n')
-        textfile.write('RMSE = ' + str(rmse) + '\n')
-        textfile.close()
+        plot = generate_scatterplot(
+            x_axis=unseen_predictions.Label, y_axis=testing_df[label_col], output=input_file.split('.')[0])
+        input_list = ['Testing model report: \n', 'R^2 = ' + str(r2) + '\n', 'RMSE = ' + str(rmse) + '\n']
+        write_output(input_list=input_list, output=input_file.split('.')[0] + "_report.txt")
     prediction_df = unseen_predictions[['Label']]
     return prediction_df
