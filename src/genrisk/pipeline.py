@@ -74,10 +74,9 @@ def find_pvalue(
     if covariates:
         covariates = covariates.split(',')
     args = {
-        'genes': genes, 'df': merged_df, 'processes': processes, 'cases': cases, 'controls': controls,
-        'covariates': covariates, 'cases_column': cases_column
+        'processes': processes, 'cases': cases, 'controls': controls, 'covariates': covariates,
     }
-    p_values_df = association_functions.get(test)(**args)
+    p_values_df = association_functions.get(test)(df=merged_df, genes=genes, cases_column=cases_column, **args)
     if adj_pval:
         adjusted = multipletests(list(p_values_df['p_value']), method=adj_pval)
         p_values_df[adj_pval + '_adj_pval'] = list(adjusted)[1]

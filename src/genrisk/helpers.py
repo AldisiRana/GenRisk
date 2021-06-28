@@ -66,16 +66,16 @@ def uni_profiles(df, f):
     return df
 
 
-def run_mannwhitneyu(**kwargs):
+def run_mannwhitneyu(*, df, genes, cases_column, **kwargs):
     p_values = []
-    df_by_cases = kwargs['df'].groupby(kwargs['cases_column'])
+    df_by_cases = df.groupby(cases_column)
     if kwargs['cases'] and kwargs['controls']:
         cc = [kwargs['cases'], kwargs['controls']]
     else:
         cc = list(df_by_cases.groups.keys())
     if len(cc) > 2:
         Warning('There are more than two categories here. We will only consider the first two categories.')
-    for gene in tqdm(kwargs['genes'], desc='Calculating p_values for genes'):
+    for gene in tqdm(genes, desc='Calculating p_values for genes'):
         case_0 = df_by_cases.get_group(cc[0])[gene].tolist()
         case_1 = df_by_cases.get_group(cc[1])[gene].tolist()
         try:
@@ -88,9 +88,9 @@ def run_mannwhitneyu(**kwargs):
     return p_values_df
 
 
-def run_ttest(**kwargs):
+def run_ttest(*, df, genes, cases_column, **kwargs):
     p_values = []
-    df_by_cases = kwargs['df'].groupby(kwargs['cases_column'])
+    df_by_cases = df.groupby(cases_column)
     if kwargs['cases'] and kwargs['controls']:
         cc = [kwargs['cases'], kwargs['controls']]
     else:
@@ -98,7 +98,7 @@ def run_ttest(**kwargs):
     if len(cc) > 2:
         Warning('There are more than two categories here. We will only consider the first two categories.')
 
-    for gene in tqdm(kwargs['genes'], desc='Calculating p_values for genes'):
+    for gene in tqdm(genes, desc='Calculating p_values for genes'):
         case_0 = df_by_cases.get_group(cc[0])[gene].tolist()
         case_1 = df_by_cases.get_group(cc[1])[gene].tolist()
         try:
@@ -111,15 +111,13 @@ def run_ttest(**kwargs):
     return p_values_df
 
 
-def get_pvals_logit(**kwargs):
-    cases_column = kwargs['cases_column']
-    genes = kwargs['genes']
+def get_pvals_logit(*, df, genes, cases_column, **kwargs):
     covariates = kwargs['covariates']
-    kwargs['df'][cases_column] = np.interp(
-        kwargs['df'][cases_column], (kwargs['df'][cases_column].min(), kwargs['df'][cases_column].max()), (0, 1))
-    y_set = kwargs['df'][[cases_column]]
-    x_set = kwargs['df'][covariates]
-    genes_df = kwargs['df'][genes]
+    df[cases_column] = np.interp(
+        df[cases_column], (df[cases_column].min(), df[cases_column].max()), (0, 1))
+    y_set = df[[cases_column]]
+    x_set = df[covariates]
+    genes_df = df[genes]
     pool = multiprocessing.Pool(processes=kwargs['processes'])
     partial_func = partial(run_logit, x_set=x_set, y_set=y_set)
     p_values = list(pool.imap(partial_func, genes_df.iteritems()))
@@ -128,13 +126,11 @@ def get_pvals_logit(**kwargs):
     return p_values_df
 
 
-def get_pvals_linear(**kwargs):
-    cases_column = kwargs['cases_column']
-    genes = kwargs['genes']
+def get_pvals_linear(*, df, genes, cases_column, **kwargs):
     covariates = kwargs['covariates']
-    y_set = kwargs['df'][[cases_column]]
-    x_set = kwargs['df'][covariates]
-    genes_df = kwargs['df'][genes]
+    y_set = df[[cases_column]]
+    x_set = df[covariates]
+    genes_df = df[genes]
     pool = multiprocessing.Pool(processes=kwargs['processes'])
     partial_func = partial(run_linear, x_set=x_set, y_set=y_set)
     p_values = list(pool.imap(partial_func, genes_df.iteritems()))
