@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import multiprocessing
 import re
 from functools import partial
 
+import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -164,3 +166,26 @@ def write_output(*, input_list, output):
     for line in input_list:
         textfile.write(line)
     textfile.close()
+
+
+def create_logger(*, name, filename=None):
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.DEBUG)
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    if filename:
+        now = datetime.now()
+        log_file = filename + now.strftime("_%d%m%Y_%H%M") + '.log'
+        # create file handler which logs even debug messages
+        fh = logging.FileHandler(log_file)
+        fh.setLevel(logging.DEBUG)
+        # create console handler with a higher log level
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.ERROR)
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        ch.setFormatter(formatter)
+        fh.setFormatter(formatter)
+        # add the handlers to the logger
+        logger.addHandler(fh)
+        logger.addHandler(ch)
+    return logger

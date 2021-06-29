@@ -7,8 +7,12 @@ import click
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from .helpers import create_logger
 from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, model_testing
 from .utils import get_gene_info, plink_process, combine_scores, download_pgs, draw_qqplot, draw_manhattan
+
+
+log = click.option('--log', is_flag=True, help="create a log file for the command")
 
 
 @click.group()
@@ -32,6 +36,7 @@ def main():
 @click.option('-d', '--del-col', default='CADD_raw', help="the column containing the deleteriousness score.")
 @click.option('-l', '--alt-col', default='Alt', help="the column containing the alternate base.")
 @click.option('-m', '--maf-threshold', default=0.01, help="the threshold for minor allele frequency.")
+@log
 def score_genes(
     *,
     annotated_vcf,
@@ -47,6 +52,7 @@ def score_genes(
     del_col,
     alt_col,
     maf_threshold,
+    log,
 ):
     """
     Calculate the gene-based scores for a given dataset.
@@ -67,27 +73,46 @@ def score_genes(
 
     :return: the final dataframe information.
     """
+    if log:
+        filename = output_file.split('.')[0]
+    else:
+        filename = None
+    logger = create_logger(name='Score Genes', filename=filename)
+    logger.info('Score genes process is starting now...')
+    logger.info(locals())
     confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
-    click.echo('getting information from vcf files')
-    genes_folder = get_gene_info(
-        annotated_vcf=annotated_vcf,
-        output_dir=temp_dir,
-        beta_param=beta_param,
-        weight_func=weight_func,
-        del_col=del_col,
-        maf_threshold=maf_threshold,
-        genes_col=gene_col,
-        variant_col=variant_col,
-        af_col=af_col,
-        alt_col=alt_col,
-    )
-    click.echo('calculating gene scores ...')
-    plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=annotated_vcf, bfiles=bfiles)
-    click.echo('combining score files ...')
-    df = combine_scores(input_path=temp_dir, output_path=output_file)
+    logger.info('getting information from vcf files')
+    try:
+        genes_folder = get_gene_info(
+            annotated_vcf=annotated_vcf,
+            output_dir=temp_dir,
+            beta_param=beta_param,
+            weight_func=weight_func,
+            del_col=del_col,
+            maf_threshold=maf_threshold,
+            genes_col=gene_col,
+            variant_col=variant_col,
+            af_col=af_col,
+            alt_col=alt_col,
+        )
+    except Exception as arg:
+        logger.exception(arg)
+        raise
+    logger.info('calculating gene scores ...')
+    try:
+        plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=annotated_vcf, bfiles=bfiles)
+    except Exception as arg:
+        logger.exception(arg)
+        raise
+    logger.info('combining score files ...')
+    try:
+        df = combine_scores(input_path=temp_dir, output_path=output_file)
+    except Exception as arg:
+        logger.exception(arg)
+        raise
     if confirm:
         shutil.rmtree(temp_dir)
-    click.echo('process is complete.')
+    logger.info('process is complete.')
     return df.info()
 
 
@@ -357,34 +382,30 @@ def get_prs(
         if p.returncode != 0:
             click.echo('The PGS file could not be viewed using cmd, please view it manually.')
         click.echo('Please check the PGS file viewed and provide us with the needed columns.')
-        id_col = click.prompt('Please provide the ID column number')
-        allele = click.prompt('Please provide the effect allele column number')
-        weight = click.prompt('Please provide the effect weight column number')
     else:
         pgs_file = click.prompt('Please provide path to PGS file', type=str)
-        id_col = click.prompt('Please provide the ID column number')
-        allele = click.prompt('Please provide the effect allele column number')
-        weight = click.prompt('Please provide the effect weight column number')
+    id_col = click.prompt('Please provide the ID column number')
+    allele = click.prompt('Please provide the effect allele column number')
+    weight = click.prompt('Please provide the effect weight column number')
     cols = ' '.join([str(id_col), str(allele), str(weight)])
     file_type = click.prompt('Do you have a VCF file or binary files?', type=click.Choice(['vcf', 'bfile']))
     input_file = click.prompt('Please provide the path to input file', type=str)
     confirm = click.confirm('Please be aware that variant ID in both input file and pgs file need to match.'
                             'Do you want to continue?')
-    if confirm:
-        output_file = click.prompt('Please provide an output file path', type=str)
-        if file_type == 'vcf':
-            p = subprocess.call(
-                plink + " --vcf " + input_file + " --score " + pgs_file + " " + cols + " sum --out " + output_file,
-                shell=True
-            )
-        else:
-            p = subprocess.call(
-                plink + " --bfile " + input_file + " --score " + pgs_file + " " + cols + " sum --out " + output_file,
-                shell=True
-            )
+    if not confirm:
+        return 'Ok. You still have the PGS file (if downloaded) but the scores were not calculated.'
+    output_file = click.prompt('Please provide an output file path', type=str)
+    if file_type == 'vcf':
+        p = subprocess.call(
+            plink + " --vcf " + input_file + " --score " + pgs_file + " " + cols + " sum --out " + output_file,
+            shell=True
+        )
     else:
-        click.echo('Ok. You still have the PGS file (if downloaded) but the scores were not calculated.')
-    click.echo('Process is complete. Have a nice day!')
+        p = subprocess.call(
+            plink + " --bfile " + input_file + " --score " + pgs_file + " " + cols + " sum --out " + output_file,
+            shell=True
+        )
+    return 'Process is complete. Have a nice day!'
 
 
 if __name__ == '__main__':
