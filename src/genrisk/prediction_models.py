@@ -2,7 +2,6 @@ import random
 
 import pycaret.classification as pycl
 import pycaret.regression as pyreg
-from pycaret.utils import check_metric
 import sklearn.metrics as metrics
 
 from genrisk.helpers import write_output, generate_confusion_matrix, generate_scatterplot
@@ -34,13 +33,9 @@ def regression_model(
     pyreg.plot_model(final_model, plot='feature', save=True)
     pyreg.plot_model(final_model, plot='error', save=True)
     if len(testing_set.index) != 0:
-        unseen_predictions = pyreg.predict_model(final_model, data=testing_set)
-        r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
-        rmse = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'RMSE')
-        input_list = [
-            model_name, '\nTesting model report: \n', 'R^2 = ' + str(r2) + '\n', 'RMSE = ' + str(rmse) + '\n'
-        ]
-        write_output(output=model_name + "_report.txt", input_list=input_list)
+        unseen_predictions = test_regressor(
+            model=final_model, x_set=testing_set, y_col=testing_set[y_col], output=model_name
+        )
         unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=False)
     pyreg.save_model(final_model, model_name)
     return final_model
@@ -72,13 +67,9 @@ def classification_model(
     pycl.plot_model(final_model, plot='confusion_matrix', save=True)
     pycl.plot_model(final_model, plot='feature', save=True)
     if len(testing_set.index) != 0:
-        unseen_predictions = pycl.predict_model(final_model, data=testing_set)
-        auc = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'AUC')
-        accuracy = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'Accuracy')
-        input_list = [
-            model_name, '\nTesting model report: \n', 'AUC: ' + str(auc) + '\n', 'Accuracy: ' + str(accuracy) + '\n'
-        ]
-        write_output(output=model_name + "_report.txt", input_list=input_list)
+        unseen_predictions = test_classifier(
+            model=final_model, x_set=testing_set, y_col=testing_set[y_col], output=model_name
+        )
         unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=False)
     pycl.save_model(final_model, model_name)
     return final_model
