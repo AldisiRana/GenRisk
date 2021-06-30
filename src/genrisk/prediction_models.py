@@ -18,9 +18,12 @@ def regression_model(
     metric,
     model_name,
     testing_set,
+    imbalanced
 ):
-    setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1 - test_size, fold=folds,
-                        silent=True, session_id=random.randint(1, 2147483647))
+    if not metric:
+        metric = 'RMSE'
+    setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1 - test_size,
+                        fold=folds, silent=True, session_id=random.randint(1, 2147483647))
     best_model = pyreg.compare_models(sort=metric)
     pyreg.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)
     reg_model = pyreg.create_model(best_model)
@@ -53,8 +56,10 @@ def classification_model(
     metric,
     model_name,
     testing_set,
-    imbalanced,
+    imbalanced
 ):
+    if not metric:
+        metric = 'AUC'
     setup = pycl.setup(target=y_col, fix_imbalance=imbalanced, normalize=normalize, data=training_set,
                        train_size=1 - test_size, silent=True, fold=folds, session_id=random.randint(1, 2147483647))
     best_model = pycl.compare_models(sort=metric)

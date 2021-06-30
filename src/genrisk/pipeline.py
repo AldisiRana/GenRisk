@@ -212,23 +212,9 @@ def create_prediction_model(
     :param metric: the metric to evaluate the best model.
     :return: the metrics.
     """
-    if model_type == 'regressor':
-        if not metric:
-            metric = 'RMSE'
-        final_model = regression_model(
-            y_col=y_col,
-            training_set=training_set,
-            normalize=normalize,
-            test_size=test_size,
-            folds=folds,
-            metric=metric,
-            model_name=model_name,
-            testing_set=testing_set
-        )
-    elif model_type == 'classifier':
-        if not metric:
-            metric = 'AUC'
-        final_model = classification_model(
+    try:
+        model_func = {'classifier': classification_model, 'regressor': regression_model}
+        final_model = model_func.get(model_type)(
             y_col=y_col,
             training_set=training_set,
             normalize=normalize,
@@ -237,10 +223,10 @@ def create_prediction_model(
             metric=metric,
             model_name=model_name,
             testing_set=testing_set,
-            imbalanced=imbalanced
+            imbalanced=imbalanced,
         )
-    else:
-        return Exception('Model requested is not available. Please choose regressor or classifier.')
+    except Exception:
+        raise Exception('Model requested is not available. Please choose regressor or classifier.')
     return final_model
 
 
@@ -267,19 +253,12 @@ def model_testing(
     model = joblib.load(model_path)
     testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col)
     x_set = testing_df.drop(columns=label_col)
-    if model_type == 'classifier':
-        unseen_predictions = test_classifier(
-            y_col=testing_df[label_col],
-            output=input_file.split('.')[0],
-            model=model,
-            x_set=x_set,
-        )
-    else:
-        unseen_predictions = test_regressor(
-            y_col=testing_df[label_col],
-            output=input_file.split('.')[0],
-            model=model,
-            x_set=x_set,
-        )
+    model_func = {'classifier': test_classifier, 'regressor': test_regressor}
+    unseen_predictions = model_func.get(model_type)(
+        y_col=testing_df[label_col],
+        output=input_file.split('.')[0],
+        model=model,
+        x_set=x_set
+    )
     prediction_df = unseen_predictions[['Label']]
     return prediction_df
