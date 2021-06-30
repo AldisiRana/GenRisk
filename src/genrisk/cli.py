@@ -7,9 +7,10 @@ import click
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from .helpers import create_logger
-from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, model_testing
-from .utils import get_gene_info, plink_process, combine_scores, download_pgs, draw_qqplot, draw_manhattan
+from genrisk.gene_scoring import download_pgs
+from genrisk.helpers import create_logger
+from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, model_testing, scoring_process
+from .utils import draw_qqplot, draw_manhattan
 
 
 log = click.option('--log', is_flag=True, help="create a log file for the command")
@@ -21,7 +22,7 @@ def main():
 
 
 @main.command()
-@click.option('-a', '--annotated-vcf', required=True, help='the annotated vcf')
+@click.option('-a', '--annotated-vcf', required=True, type=click.Path(exists=True), help='the annotated vcf')
 @click.option('-b', '--bfiles', default=None)
 @click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
 @click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
@@ -73,6 +74,7 @@ def score_genes(
 
     :return: the final dataframe information.
     """
+    confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
     if log:
         filename = output_file.split('.')[0]
     else:
@@ -80,45 +82,34 @@ def score_genes(
     logger = create_logger(name='Score Genes', filename=filename)
     logger.info('Score genes process is starting now...')
     logger.info(locals())
-    confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
     logger.info('getting information from vcf files')
-    try:
-        genes_folder = get_gene_info(
-            annotated_vcf=annotated_vcf,
-            output_dir=temp_dir,
-            beta_param=beta_param,
-            weight_func=weight_func,
-            del_col=del_col,
-            maf_threshold=maf_threshold,
-            genes_col=gene_col,
-            variant_col=variant_col,
-            af_col=af_col,
-            alt_col=alt_col,
-        )
-    except Exception as arg:
-        logger.exception(arg)
-        raise
-    logger.info('calculating gene scores ...')
-    try:
-        plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=annotated_vcf, bfiles=bfiles)
-    except Exception as arg:
-        logger.exception(arg)
-        raise
-    logger.info('combining score files ...')
-    try:
-        df = combine_scores(input_path=temp_dir, output_path=output_file)
-    except Exception as arg:
-        logger.exception(arg)
-        raise
+    df = scoring_process(
+        logger=logger,
+        annotated_vcf=annotated_vcf,
+        bfiles=bfiles,
+        plink=plink,
+        beta_param=beta_param,
+        temp_dir=temp_dir,
+        output_file=output_file,
+        weight_func=weight_func,
+        variant_col=variant_col,
+        gene_col=gene_col,
+        af_col=af_col,
+        del_col=del_col,
+        alt_col=alt_col,
+        maf_threshold=maf_threshold,
+    )
     if confirm:
+        logger.info('The temporary files will be removed now.')
         shutil.rmtree(temp_dir)
-    logger.info('process is complete.')
     return df.info()
 
 
 @main.command()
-@click.option('-s', '--scores-file', required=True, help="The scoring file of genes across a population.")
-@click.option('-i', '--info-file', required=True, help="File containing information about the cohort.")
+@click.option('-s', '--scores-file', required=True, type=click.Path(exists=True),
+              help="The scoring file of genes across a population.")
+@click.option('-i', '--info-file', required=True, type=click.Path(exists=True),
+              help="File containing information about the cohort.")
 @click.option('-o', '--output-path', required=True, help='the path for the output file.')
 @click.option('-g', '--genes',
               help="a list containing the genes to calculate. if not provided all genes will be used.")
@@ -133,6 +124,7 @@ def score_genes(
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
 @click.option('-v', '--covariates', default='PC1,PC2', help="the covariates used for calculation")
 @click.option('-p', '--processes', type=int, default=1, help='number of processes for parallelization')
+@log
 def find_association(
     *,
     scores_file,
@@ -145,6 +137,7 @@ def find_association(
     adj_pval,
     covariates,
     processes,
+    log
 ):
     """
     Calculate the P-value between two given groups.
@@ -163,6 +156,13 @@ def find_association(
 
     :return:
     """
+    if log:
+        filename = output_path.split('.')[0]
+    else:
+        filename = None
+    logger = create_logger(name='Find association', filename=filename)
+    logger.info(locals())
+    logger.info("The process for calculating the p_values will start now.")
     if test == 'betareg':
         betareg_pvalues(
             scores_file=scores_file,
@@ -172,9 +172,9 @@ def find_association(
             output_path=output_path,
             covariates=covariates,
             processes=processes,
+            logger=logger,
         )
     else:
-        click.echo("The process for calculating the p_values will start now.")
         df = find_pvalue(
             scores_file=scores_file,
             output_file=output_path,
@@ -186,14 +186,14 @@ def find_association(
             adj_pval=adj_pval,
             covariates=covariates,
             processes=processes,
+            logger=logger
         )
-        click.echo('Process is complete.')
-        click.echo(df.info())
+        return df.info()
 
 
 @main.command()
-@click.option('-p', '--pvals-file', required=True, help="the file containing p-values.")
-@click.option('-i', '--info-file', help="file containing variant/gene info.")
+@click.option('-p', '--pvals-file', required=True, type=click.Path(exists=True), help="the file containing p-values.")
+@click.option('-i', '--info-file', type=click.Path(exists=True), help="file containing variant/gene info.")
 @click.option('--genescol-1', default='gene', help="the name of the genes column in pvals file.")
 @click.option('--genescol-2', default='Gene.refGene', help="the name of the genes column in info file.")
 @click.option('-q', '--qq-output', default=None, help="the name of the qq plot file.")
@@ -230,26 +230,44 @@ def visualize(
     :return:
 
     """
+    if log:
+        filename = pvals_file.split('.')[0]
+    else:
+        filename = None
+    logger = create_logger(name='Visualization', filename=filename)
+    logger.info(locals())
+    logger.info('Reading p_values file...')
     pvals_df = pd.read_csv(pvals_file, sep='\t', index_col=False)
     if qq_output:
-        draw_qqplot(pvals=pvals_df[pval_col], qq_output=qq_output)
+        logger.info('Creating QQ-plot...')
+        try:
+            draw_qqplot(pvals=pvals_df[pval_col], qq_output=qq_output)
+        except Exception as arg:
+            logger.exception(arg)
+            raise
     if manhattan_output:
+        logger.info('Creating Manhattan plot...')
         if not info_file:
-            raise Exception('Please provide a file with gene information to generate manhattan plot.')
+            logger.exception('Please provide a file with gene information to generate manhattan plot.')
         info_df = pd.read_csv(info_file, sep="\t", index_col=False)
         merged = pd.merge(pvals_df, info_df, left_on=genescol_1, right_on=genescol_2, how='inner')
-        draw_manhattan(
-            data=merged,
-            chr_col=chr_col,
-            pos_col=pos_col,
-            pvals_col=pval_col,
-            genes_col=genescol_1,
-            manhattan_output=manhattan_output
-        )
+        try:
+            draw_manhattan(
+                data=merged,
+                chr_col=chr_col,
+                pos_col=pos_col,
+                pvals_col=pval_col,
+                genes_col=genescol_1,
+                manhattan_output=manhattan_output
+            )
+        except Exception as arg:
+            logger.exception(arg)
+            raise
 
 
 @main.command()
-@click.option('-d', '--data-file', required=True, help='file with all features and target for training model.')
+@click.option('-d', '--data-file', type=click.Path(exists=True), required=True,
+              help='file with all features and target for training model.')
 @click.option('-o', '--output-folder', required=True, help='path of folder that will contain all outputs.')
 @click.option('-i', '--test-size', default=0.25, help='test size for cross validation and evaluation.')
 @click.option('-t', '--test', is_flag=True,
@@ -321,9 +339,9 @@ def create_model(
 @main.command()
 @click.option('-t', '--model-type', required=True, type=click.Choice(['regressor', 'classifier']),
               help='type of prediction model.')
-@click.option('-i', '--input-file', required=True, help='testing dataset')
+@click.option('-i', '--input-file', required=True, type=click.Path(exists=True), help='testing dataset')
 @click.option('-l', '--label-col', required=True, help='the target/phenotype/label column')
-@click.option('-m', '--model-path', required=True, help='path to the trained model.')
+@click.option('-m', '--model-path', required=True, type=click.Path(exists=True), help='path to the trained model.')
 @click.option('-s', '--samples-col', default='IID', help='the samples column.')
 @click.option('-o', '--output-file', default=None, help='the path to output file.')
 def test_model(

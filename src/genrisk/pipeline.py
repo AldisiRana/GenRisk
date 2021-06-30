@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
 import os
-import random
 import subprocess
 
 import joblib
 import numpy as np
 import pandas as pd
-import pycaret.classification as cl
-import pycaret.regression as pyreg
-import sklearn.metrics as metrics
-from pycaret.utils import check_metric
 from statsmodels.stats.multitest import multipletests
 
-from .helpers import run_mannwhitneyu, run_ttest, get_pvals_logit, get_pvals_linear, generate_scatterplot, \
-    generate_confusion_matrix, write_output
+from .prediction_models import regression_model, classification_model, test_classifier, test_regressor
+from .association_analysis import run_mannwhitneyu, run_ttest, get_pvals_logit, get_pvals_linear
+from .gene_scoring import get_gene_info, plink_process, combine_scores
 
 PATH = os.path.abspath(os.path.join((__file__), os.pardir, os.pardir, os.pardir))
 BETAREG_SHELL = os.path.join(PATH, 'scripts', 'betareg_shell.R')
@@ -23,6 +19,55 @@ association_functions = {
     'logit': get_pvals_logit,
     'linear': get_pvals_linear,
 }
+
+
+def scoring_process(
+    *,
+    logger,
+    annotated_vcf,
+    temp_dir,
+    beta_param,
+    weight_func,
+    del_col,
+    maf_threshold,
+    gene_col,
+    variant_col,
+    af_col,
+    alt_col,
+    bfiles,
+    plink,
+    output_file
+):
+    try:
+        genes_folder = get_gene_info(
+            annotated_vcf=annotated_vcf,
+            output_dir=temp_dir,
+            beta_param=beta_param,
+            weight_func=weight_func,
+            del_col=del_col,
+            maf_threshold=maf_threshold,
+            genes_col=gene_col,
+            variant_col=variant_col,
+            af_col=af_col,
+            alt_col=alt_col,
+        )
+    except Exception as arg:
+        logger.exception(arg)
+        raise
+    logger.info('calculating gene scores ...')
+    try:
+        plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=annotated_vcf, bfiles=bfiles)
+    except Exception as arg:
+        logger.exception(arg)
+        raise
+    logger.info('combining score files ...')
+    try:
+        df = combine_scores(input_path=temp_dir, output_path=output_file)
+    except Exception as arg:
+        logger.exception(arg)
+        raise
+    logger.info('process is complete.')
+    return df
 
 
 def find_pvalue(
@@ -39,6 +84,7 @@ def find_pvalue(
     cases=None,
     controls=None,
     processes=1,
+    logger
 ):
     """
     Calculate the significance of a gene in a population using Mann-Whitney-U test.
@@ -59,12 +105,15 @@ def find_pvalue(
 
     :return: dataframe with genes and their p_values
     """
+    logger.info("Reading scores file...")
     scores_df = pd.read_csv(scores_file, sep=r'\s+', index_col=samples_column)
     scores_df.replace([np.inf, -np.inf], 0, inplace=True)
     scores_df.fillna(0, inplace=True)
     scores_df = scores_df.loc[:, scores_df.var() != 0.0].reset_index()
+    logger.info("Reading info file...")
     genotype_df = pd.read_csv(info_file, sep='\t')
     genotype_df.dropna(subset=[cases_column], inplace=True)
+    logger.info("Processing files...")
     merged_df = genotype_df.merge(scores_df, how='inner', on=samples_column)
     merged_df.replace([np.inf, -np.inf], 0, inplace=True)
     merged_df.fillna(0, inplace=True)
@@ -76,11 +125,18 @@ def find_pvalue(
     args = {
         'processes': processes, 'cases': cases, 'controls': controls, 'covariates': covariates,
     }
-    p_values_df = association_functions.get(test)(df=merged_df, genes=genes, cases_column=cases_column, **args)
+    logger.info("Calculating p_values using the following test: " + test)
+    try:
+        p_values_df = association_functions.get(test)(df=merged_df, genes=genes, cases_column=cases_column, **args)
+    except Exception as arg:
+        logger.exception(arg)
+        raise
     if adj_pval:
+        logger.info("Calculating the adjusted p_values...")
         adjusted = multipletests(list(p_values_df['p_value']), method=adj_pval)
         p_values_df[adj_pval + '_adj_pval'] = list(adjusted)[1]
     p_values_df.to_csv(output_file, sep='\t', index=False)
+    logger.info("Process is complete. The association analysis results have been saved.")
     return p_values_df
 
 
@@ -92,7 +148,8 @@ def betareg_pvalues(
     cases_col,
     output_path,
     covariates,
-    processes
+    processes,
+    logger,
 ):
     """
     Calculate association significance between two groups using betareg.
@@ -108,16 +165,22 @@ def betareg_pvalues(
 
     :return:
     """
-    p = subprocess.call(
-        ["Rscript", BETAREG_SHELL,
-         "-s", scores_file,
-         "--phenofile", pheno_file,
-         "--samplescol", samples_col,
-         "--casescol", cases_col,
-         "-o", output_path,
-         "--covariates", covariates,
-         "--processes", str(processes)]
-    )
+    logger.info("The p_values will be calculated using beta regression.")
+    try:
+        p = subprocess.call(
+            ["Rscript", BETAREG_SHELL,
+             "-s", scores_file,
+             "--phenofile", pheno_file,
+             "--samplescol", samples_col,
+             "--casescol", cases_col,
+             "-o", output_path,
+             "--covariates", covariates,
+             "--processes", str(processes)]
+        )
+    except Exception as arg:
+        logger.exception(arg)
+        raise
+    logger.info("Process is complete. The association analysis results have been saved.")
 
 
 def create_prediction_model(
@@ -152,53 +215,30 @@ def create_prediction_model(
     if model_type == 'regressor':
         if not metric:
             metric = 'RMSE'
-        setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1 - test_size, fold=folds,
-                            silent=True, session_id=random.randint(1, 2147483647))
-        best_model = pyreg.compare_models(sort=metric)
-        pyreg.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)
-        reg_model = pyreg.create_model(best_model)
-        reg_tuned_model = pyreg.tune_model(reg_model, optimize=metric)
-        pyreg.pull().to_csv(model_name + '_tuned_model.tsv', sep='\t', index=False)
-        final_model = pyreg.finalize_model(reg_tuned_model)
-        pyreg.plot_model(final_model, save=True)
-        pyreg.plot_model(final_model, plot='feature', save=True)
-        pyreg.plot_model(final_model, plot='error', save=True)
-        if len(testing_set.index) != 0:
-            unseen_predictions = pyreg.predict_model(final_model, data=testing_set)
-            r2 = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'R2')
-            rmse = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'RMSE')
-            textfile = open(model_name + "_report.txt", "w")
-            textfile.write('Testing model report: \n')
-            textfile.write('R^2 = ' + str(r2) + '\n')
-            textfile.write('RMSE = ' + str(rmse) + '\n')
-            textfile.close()
-            unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=False)
-        pyreg.save_model(final_model, model_name)
+        final_model = regression_model(
+            y_col=y_col,
+            training_set=training_set,
+            normalize=normalize,
+            test_size=test_size,
+            folds=folds,
+            metric=metric,
+            model_name=model_name,
+            testing_set=testing_set
+        )
     elif model_type == 'classifier':
         if not metric:
             metric = 'AUC'
-        setup = cl.setup(target=y_col, fix_imbalance=imbalanced, data=training_set, train_size=1 - test_size,
-                         silent=True, fold=folds, session_id=random.randint(1, 2147483647))
-        best_model = cl.compare_models(sort=metric)
-        cl.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)
-        cl_model = cl.create_model(best_model)
-        cl_tuned_model = cl.tune_model(cl_model, optimize=metric)
-        cl.pull().to_csv(model_name + '_tuned_model.tsv', sep='\t', index=False)
-        final_model = cl.finalize_model(cl_tuned_model)
-        cl.plot_model(final_model, plot='pr', save=True)
-        cl.plot_model(final_model, plot='confusion_matrix', save=True)
-        cl.plot_model(final_model, plot='feature', save=True)
-        if len(testing_set.index) != 0:
-            unseen_predictions = cl.predict_model(final_model, data=testing_set)
-            auc = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'AUC')
-            accuracy = check_metric(unseen_predictions[y_col], unseen_predictions.Label, 'Accuracy')
-            textfile = open(model_name + "_report.txt", "w")
-            textfile.write('Testing model report: \n')
-            textfile.write('AUC: ' + str(auc) + '\n')
-            textfile.write('Accuracy: ' + str(accuracy) + '\n')
-            textfile.close()
-            unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=False)
-        cl.save_model(final_model, model_name)
+        final_model = classification_model(
+            y_col=y_col,
+            training_set=training_set,
+            normalize=normalize,
+            test_size=test_size,
+            folds=folds,
+            metric=metric,
+            model_name=model_name,
+            testing_set=testing_set,
+            imbalanced=imbalanced
+        )
     else:
         return Exception('Model requested is not available. Please choose regressor or classifier.')
     return final_model
@@ -228,22 +268,18 @@ def model_testing(
     testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col)
     x_set = testing_df.drop(columns=label_col)
     if model_type == 'classifier':
-        unseen_predictions = cl.predict_model(model, data=x_set)
-        report = metrics.classification_report(testing_df[label_col], unseen_predictions.Label)
-        acc = metrics.accuracy_score(testing_df[label_col], unseen_predictions.Label)
-        auc = metrics.auc(testing_df[label_col], unseen_predictions.Label)
-        plot = generate_confusion_matrix(x_set=x_set, y_set=testing_df[label_col], output=input_file.split('.')[0])
-        input_list = [
-            'Testing model report: \n', report + '\n', 'AUC = ' + str(auc) + '\n', 'Accuracy = ' + str(acc) + '\n'
-        ]
-        write_output(input_list=input_list, output=input_file.split('.')[0] + "_report.txt")
+        unseen_predictions = test_classifier(
+            y_col=testing_df[label_col],
+            output=input_file.split('.')[0],
+            model=model,
+            x_set=x_set,
+        )
     else:
-        unseen_predictions = pyreg.predict_model(model, data=x_set)
-        r2 = metrics.r2_score(testing_df[label_col], unseen_predictions.Label)
-        rmse = metrics.mean_squared_error(testing_df[label_col], unseen_predictions.Label, squared=False)
-        plot = generate_scatterplot(
-            x_axis=unseen_predictions.Label, y_axis=testing_df[label_col], output=input_file.split('.')[0])
-        input_list = ['Testing model report: \n', 'R^2 = ' + str(r2) + '\n', 'RMSE = ' + str(rmse) + '\n']
-        write_output(input_list=input_list, output=input_file.split('.')[0] + "_report.txt")
+        unseen_predictions = test_regressor(
+            y_col=testing_df[label_col],
+            output=input_file.split('.')[0],
+            model=model,
+            x_set=x_set,
+        )
     prediction_df = unseen_predictions[['Label']]
     return prediction_df
