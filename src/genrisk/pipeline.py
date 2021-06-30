@@ -38,6 +38,27 @@ def scoring_process(
     plink,
     output_file
 ):
+    """
+    Calculate gene-based scores.
+    \f
+
+    :param bfiles: the binary files for plink process.
+    :param logger: an object that logs function outputs.
+    :param annotated_vcf: an annotated containing variant IDs, alt, info and samples genotypes.
+    :param plink: the directory of plink, if not set in environment
+    :param beta_param: the parameters from beta weight function.
+    :param temp_dir: a temporary directory to save temporary files before merging.
+    :param output_file: the final output scores matrix.
+    :param weight_func: the weighting function used in score calculation.
+    :param variant_col: the column containing the variant IDs.
+    :param gene_col: the column containing gene names.
+    :param af_col: the column containing allele frequency.
+    :param del_col: the column containing deleteriousness score.
+    :param alt_col: the column containing alternate base.
+    :param maf_threshold: the threshold for minor allele frequency.
+
+    :return: gene-based scores dataframe.
+    """
     try:
         genes_folder = get_gene_info(
             annotated_vcf=annotated_vcf,
@@ -102,6 +123,7 @@ def find_pvalue(
     :param cases:  the name of the cases category.
     :param covariates: the covariates of the phenotype.
     :param processes: number of processes working in parallel.
+    :param logger: an object that logs function outputs.
 
     :return: dataframe with genes and their p_values
     """
@@ -162,6 +184,7 @@ def betareg_pvalues(
     :param output_path: the path to the output file.
     :param covariates: the covariates used in calculations, written with no space and comma in between (e.g PC1,PC2)
     :param processes: number of processes to parallelize.
+    :param logger: an object that logs function outputs.
 
     :return:
     """

@@ -59,6 +59,7 @@ def score_genes(
     Calculate the gene-based scores for a given dataset.
     \f
 
+    :param bfiles: the binary files for plink process.
     :param annotated_vcf: an annotated containing variant IDs, alt, info and samples genotypes.
     :param plink: the directory of plink, if not set in environment
     :param beta_param: the parameters from beta weight function.
