@@ -87,7 +87,7 @@ def run_logit(gene_col, x_set, y_set):
         pval = list(result.pvalues)
         std_err = result.bse[-1]
     except:
-        return ['NA', 'NA', 'NA']
+        return
     return [gene_col[0]] + pval + [std_err]
 
 
