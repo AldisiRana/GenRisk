@@ -43,7 +43,11 @@ x <- scan(genes, what="", sep="\n")
 
 genes = strsplit(x, "[[:space:]]+")
 
-mydata= fread(opt$scoresfile, header=TRUE, select=genes)
+header <- fread(opt$scoresfile, nrows = 1, header = FALSE)
+all_in_header <- all(genes %chin% unlist(header))
+stopifnot(all_in_header)
+
+mydata= fread(opt$scoresfile, header=TRUE, select=genes, verbose=TRUE)
 
 mydata[is.na(mydata)] = 0
 
