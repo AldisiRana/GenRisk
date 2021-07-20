@@ -43,9 +43,9 @@ x <- scan(opt$genes, what="", sep="\n")
 
 genes = strsplit(x, "[[:space:]]+")
 
-header <- fread(opt$scoresfile, nrows = 1, header = FALSE)
-all_in_header <- all(genes %chin% unlist(header))
-stopifnot(all_in_header)
+header <- colnames(fread(opt$scoresfile, nrows = 0, header = TRUE))
+
+genes <- intersect(genes, header)
 
 mydata= fread(opt$scoresfile, header=TRUE, select=genes, verbose=TRUE)
 
