@@ -164,6 +164,10 @@ def find_association(
     logger = create_logger(name='Find association', filename=filename)
     logger.info(locals())
     logger.info("The process for calculating the p_values will start now.")
+    if genes:
+        with open(genes) as f:
+            content = f.readlines()
+        genes = [x.strip() for x in content]
     if test == 'betareg':
         betareg_pvalues(
             scores_file=scores_file,
