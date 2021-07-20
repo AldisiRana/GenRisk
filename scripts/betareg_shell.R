@@ -38,7 +38,7 @@ opt = parse_args(opt_parser);
 
 message("Reading files...")
 
-x <- scan(genes, what="", sep="\n")
+x <- scan(opt$genes, what="", sep="\n")
 # Separate elements by one or more whitepace
 
 genes = strsplit(x, "[[:space:]]+")
