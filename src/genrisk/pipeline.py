@@ -128,11 +128,10 @@ def find_pvalue(
     :return: dataframe with genes and their p_values
     """
     logger.info("Reading scores file...")
-    if genes:
-        scores_df = pd.read_csv(scores_file, sep=r'\s+', index_col=samples_column, usecols=genes)
-    else:
-        scores_df = pd.read_csv(scores_file, sep=r'\s+', index_col=samples_column)
+    scores_df = pd.read_csv(scores_file, sep=r'\s+', index_col=samples_column)
+    if genes is None:
         genes = scores_df.columns.tolist()
+    genes = list(set(genes) & set(scores_df.columns.tolist()))
     scores_df.replace([np.inf, -np.inf], 0, inplace=True)
     scores_df.fillna(0, inplace=True)
     scores_df = scores_df.loc[:, scores_df.var() != 0.0].reset_index()
