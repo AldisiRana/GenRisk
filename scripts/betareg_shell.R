@@ -47,7 +47,7 @@ header <- colnames(fread(opt$scoresfile, nrows = 0))
 
 genes <- intersect(genes, header)
 
-mydata= fread(opt$scoresfile, select=c(genes, opt$casescol), verbose=TRUE)
+mydata= fread(opt$scoresfile, select=c(genes, opt$samplescol), verbose=TRUE)
 
 mydata[is.na(mydata)] = 0
 
