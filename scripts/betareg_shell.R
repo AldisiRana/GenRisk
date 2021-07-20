@@ -29,17 +29,21 @@ option_list = list(
   make_option(c("--samplescol"), type='character', help="name of samples column", default="IID"),
   make_option(c("--casescol"), type='character', help="name of cases column", default="cases"),
   make_option(c("--processes"), type='integer', help="number of processes", default=1),
+  make_option(c("--genes"), type='character', help='file with a list of genes', default= NA),
   make_option(c("--covariates"), type='character', help="all covariates for calculation, seperated by comma", default="PC1,PC2,age")
 );
 
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 
-if (any(is.na(opt))) stop("Please make sure to include all required args.")
-
 message("Reading files...")
 
-mydata=read.table(opt$scoresfile, header=TRUE)
+x <- scan(genes, what="", sep="\n")
+# Separate elements by one or more whitepace
+
+genes = strsplit(x, "[[:space:]]+")
+
+mydata= fread(opt$scoresfile, header=TRUE, select=genes)
 
 mydata[is.na(mydata)] = 0
 

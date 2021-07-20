@@ -175,6 +175,7 @@ def betareg_pvalues(
     output_path,
     covariates,
     processes,
+    genes,
     logger,
 ):
     """
@@ -202,7 +203,8 @@ def betareg_pvalues(
              "--casescol", cases_col,
              "-o", output_path,
              "--covariates", covariates,
-             "--processes", str(processes)]
+             "--processes", str(processes),
+             "--genes", genes]
         )
     except Exception as arg:
         logger.exception(arg)
