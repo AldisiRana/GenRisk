@@ -43,11 +43,11 @@ x <- scan(opt$genes, what="", sep="\n")
 
 genes = strsplit(x, "[[:space:]]+")
 
-header <- colnames(fread(opt$scoresfile, nrows = 0, header = TRUE))
+header <- colnames(fread(opt$scoresfile, nrows = 0))
 
 genes <- intersect(genes, header)
 
-mydata= fread(opt$scoresfile, header=TRUE, select=genes, verbose=TRUE)
+mydata= fread(opt$scoresfile, select=c(genes, opt$casescol), verbose=TRUE)
 
 mydata[is.na(mydata)] = 0
 
