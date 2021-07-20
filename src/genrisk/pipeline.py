@@ -129,7 +129,8 @@ def find_pvalue(
     """
     logger.info("Reading scores file...")
     if genes:
-        scores_df = pd.read_csv(scores_file, sep=r'\s+', index_col=samples_column, usecols=lambda x: x in genes)
+        scores_df = pd.read_csv(scores_file, sep=r'\s+', index_col=samples_column,
+                                usecols=lambda x: x in genes+[samples_column])
     else:
         scores_df = pd.read_csv(scores_file, sep=r'\s+', index_col=samples_column)
         genes = scores_df.columns.tolist()
