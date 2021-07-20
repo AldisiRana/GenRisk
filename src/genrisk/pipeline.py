@@ -139,7 +139,11 @@ def find_pvalue(
     merged_df = genotype_df.merge(scores_df, how='inner', on=samples_column)
     merged_df.replace([np.inf, -np.inf], 0, inplace=True)
     merged_df.fillna(0, inplace=True)
-    if genes is None:
+    if genes:
+        with open(genes) as f:
+            content = f.readlines()
+        genes = [x.strip() for x in content]
+    else:
         genes = scores_df.columns.tolist()[1:]
     del scores_df
     if covariates:

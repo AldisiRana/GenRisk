@@ -113,7 +113,7 @@ def score_genes(
               help="File containing information about the cohort.")
 @click.option('-o', '--output-path', required=True, help='the path for the output file.')
 @click.option('-g', '--genes',
-              help="a list containing the genes to calculate. if not provided all genes will be used.")
+              help="a file containing the genes to calculate. if not provided all genes will be used.")
 @click.option('-t', '--test', required=True,
               type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'betareg', 'linear']),
               help='statistical test for calculating P value.')
