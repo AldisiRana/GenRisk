@@ -256,7 +256,7 @@ def visualize(
         if not info_file:
             logger.exception('Please provide a file with gene information to generate manhattan plot.')
         info_df = pd.read_csv(info_file, sep="\t", index_col=False)
-        merged = pd.merge(pvals_df, info_df, left_on=genescol_1, right_on=genescol_2, how='inner')
+        merged = pd.merge(pvals_df, info_df, left_on=genescol_1, right_on=genescol_2, how='left')
         try:
             draw_manhattan(
                 data=merged,

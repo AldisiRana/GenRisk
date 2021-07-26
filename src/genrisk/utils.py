@@ -71,7 +71,6 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
     data.drop_duplicates(subset=[genes_col], inplace=True)
     data.dropna(subset=[pvals_col], inplace=True)
     data['-logp'] = - np.log10(data[pvals_col])
-    data = data.dropna(how="any", axis=0)
     data[chr_col].replace('X', 23, inplace=True)
     data[chr_col] = data[chr_col].astype('int64')
     data = data.sort_values([chr_col, pos_col])
@@ -86,7 +85,7 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
     plot = sns.relplot(data=data, x='i', y='-logp', aspect=3.7,
                        hue=chr_col, palette=custom_palette, kind='scatter', legend=None)
     plot.fig.suptitle(manhattan_output.split('.')[0])
-    # plot.ax.set_ylim(0.0, max(data["-logp"]) + 1)
+    plot.ax.set_ylim(0.0, max(data["-logp"]) + 1)
 
     anno = []
     for ind in data.nlargest(10, ['-logp']).index:
