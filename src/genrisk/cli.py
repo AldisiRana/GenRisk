@@ -326,7 +326,7 @@ def create_model(
     training_set = pd.read_csv(data_file, sep='\t', index_col=samples_col)
     testing_set = pd.DataFrame()
     if test:
-        training_set, testing_set = train_test_split(training_set, test_size=test_size, random_state=seed)
+        training_set, testing_set = train_test_split(training_set, test_size=test_size, random_state=int(seed))
     os.mkdir(output_folder)
     os.chdir(output_folder)
     model = create_prediction_model(
