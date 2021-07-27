@@ -287,6 +287,7 @@ def visualize(
 @click.option('-f', '--folds', default=10, type=int, help='number of cross-validation folds in training.')
 @click.option('--metric', help='the metric used to choose best model after training.')
 @click.option('-s', '--samples-col', default='IID')
+@click.option('--seed', default=None, help='add number to create reproduciple train_test splitting.')
 def create_model(
     *,
     data_file,
@@ -301,6 +302,7 @@ def create_model(
     folds,
     metric,
     samples_col,
+    seed
 ):
     """
     Create a machine learning model with given dataset.
@@ -324,7 +326,7 @@ def create_model(
     training_set = pd.read_csv(data_file, sep='\t', index_col=samples_col)
     testing_set = pd.DataFrame()
     if test:
-        training_set, testing_set = train_test_split(training_set, test_size=test_size)
+        training_set, testing_set = train_test_split(training_set, test_size=test_size, random_state=seed)
     os.mkdir(output_folder)
     os.chdir(output_folder)
     model = create_prediction_model(
