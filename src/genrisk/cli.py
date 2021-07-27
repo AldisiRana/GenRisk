@@ -324,6 +324,7 @@ def create_model(
     :return: the final model
     """
     training_set = pd.read_csv(data_file, sep='\t', index_col=samples_col)
+    training_set.dropna(subset=[target_col], inplace=True)
     testing_set = pd.DataFrame()
     if test:
         training_set, testing_set = train_test_split(training_set, test_size=test_size, random_state=int(seed))
