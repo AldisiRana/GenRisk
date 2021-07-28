@@ -153,6 +153,7 @@ def find_pvalue(
     logger.info("Calculating p_values using the following test: " + test)
     try:
         p_values_df = association_functions.get(test)(df=merged_df, genes=genes, cases_column=cases_column, **args)
+        p_values_df.dropna(subset=['p_value'], inplace=True)
     except Exception as arg:
         logger.exception(arg)
         raise
