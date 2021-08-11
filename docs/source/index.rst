@@ -15,6 +15,7 @@ Welcome to GenRisk's documentation!
    pipeline
    utils
    use_example
+   ldl_results
 
 Indices and tables
 ==================
