@@ -104,7 +104,7 @@ def run_mannwhitneyu(*, df, genes, cases_column, **kwargs):
         case_0 = df_by_cases.get_group(cc[0])[gene].tolist()
         case_1 = df_by_cases.get_group(cc[1])[gene].tolist()
         try:
-            u_statistic, p_val = stats.mannwhitneyu(case_0, case_1, alternative='greater')
+            u_statistic, p_val = stats.mannwhitneyu(case_0, case_1)
         except:
             continue
         p_values.append([gene, u_statistic, p_val])
