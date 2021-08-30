@@ -148,7 +148,7 @@ def find_pvalue(
     if covariates:
         covariates = covariates.split(',')
     args = {
-        'processes': processes, 'cases': cases, 'controls': controls, 'covariates': covariates,
+        'processes': processes, 'cases': cases, 'controls': controls, 'covariates': covariates, 'logger': logger,
     }
     logger.info("Calculating p_values using the following test: " + test)
     try:

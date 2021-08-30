@@ -94,6 +94,7 @@ def run_logit(gene_col, x_set, y_set):
 def run_mannwhitneyu(*, df, genes, cases_column, **kwargs):
     p_values = []
     df_by_cases = df.groupby(cases_column)
+    kwargs['logger'].info(df_by_cases.size())
     if kwargs['cases'] and kwargs['controls']:
         cc = [kwargs['cases'], kwargs['controls']]
     else:
@@ -116,6 +117,7 @@ def run_mannwhitneyu(*, df, genes, cases_column, **kwargs):
 def run_ttest(*, df, genes, cases_column, **kwargs):
     p_values = []
     df_by_cases = df.groupby(cases_column)
+    kwargs['logger'].info(df_by_cases.size())
     if kwargs['cases'] and kwargs['controls']:
         cc = [kwargs['cases'], kwargs['controls']]
     else:
@@ -140,6 +142,7 @@ def get_pvals_logit(*, df, genes, cases_column, **kwargs):
     covariates = kwargs['covariates']
     df[cases_column] = np.interp(
         df[cases_column], (df[cases_column].min(), df[cases_column].max()), (0, 1))
+    kwargs['logger'].info(df.groupby(cases_column).size())
     y_set = df[[cases_column]]
     x_set = df[covariates]
     genes_df = df[genes]
