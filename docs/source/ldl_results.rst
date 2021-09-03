@@ -24,6 +24,11 @@ The Manhattan plot:
 
 Regression model
 *****************
+For the prediction model, we used LDL direct measurements are target. For features, we used the scores of 477 selected genes (https://doi.org/10.1038/nrg2779) + BMI + age + sex + PC1-4.
+We also used PRS (PGS000065), to avoid colinearty, we excluded variants that were included in the gene scores from the PRS calculation.
+We then ran the pipeline using 25% of the dataset as external testing set and 75% were used in training with 10-fold cross-validation.
+The final prediction model was generated using gradiant boosting regression (CatBooster) which had an Rˆ2 of  0.1412 and an RMSE of 0.8035.
+
 Feature importance plot:
 
 .. image:: ../../ldl_example/Feature_Importance.png
@@ -32,7 +37,7 @@ Feature importance plot:
 
 Actual vs Predicted:
 
-.. image:: ../../ldl_example/ldl_testing_regressor_scatterplot.png
+.. image:: ../../ldl_example/regressor_scatterplot.png
     :width: 400
     :align: center
 
