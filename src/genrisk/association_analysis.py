@@ -143,6 +143,8 @@ def get_pvals_logit(*, df, genes, cases_column, **kwargs):
     df[cases_column] = np.interp(
         df[cases_column], (df[cases_column].min(), df[cases_column].max()), (0, 1))
     kwargs['logger'].info(df.groupby(cases_column).size())
+    df.fillna(0, inplace=True)
+    df.replace([np.inf, -np.inf], 0, inplace=True)
     y_set = df[[cases_column]]
     x_set = df[covariates]
     genes_df = df[genes]
