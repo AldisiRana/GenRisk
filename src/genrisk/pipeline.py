@@ -140,9 +140,9 @@ def find_pvalue(
     genotype_df = pd.read_csv(info_file, sep='\t')
     genotype_df.dropna(subset=[cases_column], inplace=True)
     logger.info("Processing files...")
-    merged_df = genotype_df.merge(scores_df, how='inner', on=samples_column)
-    merged_df.replace([np.inf, -np.inf], 0, inplace=True)
-    merged_df.fillna(0, inplace=True)
+    merged_df = pd.merge(scores_df, genotype_df, how='inner', on=samples_column)
+    merged_df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    merged_df.apply(lambda x: x.fillna(x.mean()), axis=1)
     genes = scores_df.columns.tolist()[1:]
     del scores_df
     if covariates:

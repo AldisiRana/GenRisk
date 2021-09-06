@@ -143,8 +143,6 @@ def get_pvals_logit(*, df, genes, cases_column, **kwargs):
     df[cases_column] = np.interp(
         df[cases_column], (df[cases_column].min(), df[cases_column].max()), (0, 1))
     kwargs['logger'].info(df.groupby(cases_column).size())
-    df.fillna(0, inplace=True)
-    df.replace([np.inf, -np.inf], 0, inplace=True)
     y_set = df[[cases_column]]
     x_set = df[covariates]
     genes_df = df[genes]
@@ -152,7 +150,7 @@ def get_pvals_logit(*, df, genes, cases_column, **kwargs):
     partial_func = partial(run_logit, x_set=x_set, y_set=y_set)
     p_values = list(pool.imap(partial_func, genes_df.iteritems()))
     cols = ['genes', 'const_pval'] + covariates + ['p_value', 'std_err']
-    p_values_df = pd.DataFrame(p_values, columns=cols).sort_values(by=['p_value'])
+    p_values_df = pd.DataFrame(list(filter(None, p_values)), columns=cols).sort_values(by=['p_value'])
     return p_values_df
 
 
