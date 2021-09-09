@@ -139,7 +139,7 @@ def find_pvalue(
     logger.info("Reading info file...")
     if covariates:
         covariates = covariates.split(',')
-        genotype_df = pd.read_csv(info_file, sep='\t', usecols=covariates+[cases_column])
+        genotype_df = pd.read_csv(info_file, sep='\t', usecols=covariates+[cases_column, samples_column])
         genotype_df.dropna(inplace=True)
     else:
         genotype_df = pd.read_csv(info_file, sep='\t')
