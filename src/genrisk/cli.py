@@ -342,6 +342,7 @@ def create_model(
         training_set=training_set,
         testing_set=testing_set,
         test_size=test_size,
+        seed=int(seed)
     )
     return model
 
