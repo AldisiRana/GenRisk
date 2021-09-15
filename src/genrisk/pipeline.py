@@ -228,6 +228,7 @@ def create_prediction_model(
     testing_set=pd.DataFrame(),
     test_size=0.25,
     metric=None,
+    seed,
 ):
     """
     Create a prediction model (classifier or regressor) using the provided dataset.
@@ -257,6 +258,7 @@ def create_prediction_model(
             model_name=model_name,
             testing_set=testing_set,
             imbalanced=imbalanced,
+            seed=seed,
         )
     except Exception:
         raise Exception('Model requested is not available. Please choose regressor or classifier.')

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import random
 import shutil
 import subprocess
 
@@ -287,7 +288,7 @@ def visualize(
 @click.option('-f', '--folds', default=10, type=int, help='number of cross-validation folds in training.')
 @click.option('--metric', help='the metric used to choose best model after training.')
 @click.option('-s', '--samples-col', default='IID')
-@click.option('--seed', default=None, help='add number to create reproduciple train_test splitting.')
+@click.option('--seed', default=random.randint(1, 2147483647), help='add number to create reproduciple train_test splitting.')
 def create_model(
     *,
     data_file,
