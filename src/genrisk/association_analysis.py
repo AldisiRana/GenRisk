@@ -4,8 +4,8 @@ from functools import partial
 
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
 import scipy.stats as stats
+import statsmodels.api as sm
 from scipy.stats import pearsonr
 from tqdm import tqdm
 

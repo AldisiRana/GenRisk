@@ -123,3 +123,22 @@ def draw_qqplot(*, pvals, qq_output):
            figname=qq_output,
            ax=ax)
 
+
+def merge_files(*, files_lst, sep, by, cols=None):
+    """
+    Merge a list of files into one dataframe.
+
+    :param files_lst: a list with files to merge.
+    :param sep: the column seperator.
+    :param by:  the common column between all files.
+    :param cols: selected columns to remain in dataframe.
+    :return: merged dataframe
+    """
+    df = pd.read_csv(files_lst[0], sep=sep)
+    for file in files_lst[1:]:
+        df2 = pd.read_csv(file, sep=sep)
+        df = pd.merge(df, df2, by=by)
+    if cols:
+        df = df[[cols]]
+    return df
+

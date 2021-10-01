@@ -2,17 +2,15 @@
 import os
 import random
 import shutil
-import subprocess
 
 import click
 import pandas as pd
+from genrisk.helpers import create_logger
 from sklearn.model_selection import train_test_split
 
-from genrisk.gene_scoring import download_pgs
-from genrisk.helpers import create_logger
 from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, model_testing, scoring_process
-from .utils import draw_qqplot, draw_manhattan
-
+from .prs_scoring import prs_prompt
+from .utils import draw_qqplot, draw_manhattan, merge_files
 
 log = click.option('--log', is_flag=True, help="create a log file for the command")
 
@@ -394,9 +392,8 @@ def get_prs(
     plink,
 ):
     """
-    Calculate PRS.
+    Calculate PRS. This command is interactive.
     This command gets a pgs file (provided by the user or downloaded) then calculates the PRS for dataset.
-    This command is interactive.
     \f
 
     :param plink: provide plink path if not default in environment.
@@ -404,31 +401,36 @@ def get_prs(
     :return:
     """
     download = click.confirm('Do you want to download PGS file?')
-    if download:
-        pgs_id = click.prompt('Please input PGS ID', type=str)
-        pgs_file = download_pgs(prs_id=pgs_id)
-        p = subprocess.run(["zcat", pgs_file, "|", 'head', '-n', "15"], shell=True)
-        if p.returncode != 0:
-            click.echo('The PGS file could not be viewed using cmd, please view it manually.')
-        click.echo('Please check the PGS file viewed and provide us with the needed columns.')
-    else:
-        pgs_file = click.prompt('Please provide path to PGS file', type=str)
-    id_col = click.prompt('Please provide the ID column number')
-    allele = click.prompt('Please provide the effect allele column number')
-    weight = click.prompt('Please provide the effect weight column number')
-    cols = ' '.join([str(id_col), str(allele), str(weight)])
-    file_type = click.prompt('Do you have a VCF file or binary files?', type=click.Choice(['vcf', 'bfile']))
-    input_file = click.prompt('Please provide the path to input file', type=str)
-    confirm = click.confirm('Please be aware that variant ID in both input file and pgs file need to match.'
-                            'Do you want to continue?')
-    if not confirm:
-        return 'Ok. You still have the PGS file (if downloaded) but the scores were not calculated.'
-    output_file = click.prompt('Please provide an output file path', type=str)
-    if file_type == 'vcf':
-        p = subprocess.call(
-            plink + " --vcf " + input_file + " --score " + pgs_file + " " + cols + " sum --out " + output_file,
-            shell=True
-        )
+    return prs_prompt(plink=plink, download=download)
+
+
+@main.command()
+@click.option('-f', '--files', required=True,
+              help='input all files to merge with a comma in between. E.g: file1,file2,file3')
+@click.option('-s', '--sep', default='\t', help='the column seperator in files.')
+@click.option('-b', '--by', default='IID', help='the common column between all files to merge.')
+@click.option('-c', '--cols', default=None,
+              help='if desired, a list of columns can be chosen to save final file, e.g: col1,col2,col5')
+@click.option('-o', '--outputfile', required=True, help='the name and path to save final dataframe')
+def merge(
+    *,
+    files,
+    sep,
+    by,
+    cols,
+    output_file
+):
+
+    files_lst = files.split(',')
+    df = merge_files(
+        files_lst=files_lst,
+        sep=sep,
+        by=by
+    )
+    df.to_csv(output_file, sep=sep)
+    return df
+
+
     else:
         p = subprocess.call(
             plink + " --bfile " + input_file + " --score " + pgs_file + " " + cols + " sum --out " + output_file,

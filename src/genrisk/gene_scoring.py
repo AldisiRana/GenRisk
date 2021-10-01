@@ -3,11 +3,9 @@ import gzip
 import os
 import re
 import subprocess
-import urllib.request as urllib
 
 import numpy as np
 import pandas as pd
-import requests
 from scipy.stats import beta
 from tqdm import tqdm
 
@@ -140,23 +138,5 @@ def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None):
         )
 
 
-def download_pgs(
     *,
-    prs_id,
 ):
-    """
-    Get PGS from pgscatalog
-
-    :param prs_id: the PRS ID in the pgscatalog.
-
-    :return:
-    """
-    # make sure that the columns are present and matching
-    resp = requests.get('https://www.pgscatalog.org/rest/score/%s' % prs_id)
-    prs_info = resp.json()
-    if resp.status_code != 200 or not prs_info:
-        raise Exception('The PRS score might be wrong!')
-    url = prs_info['ftp_scoring_file']
-    prs_file = prs_id + '.gz'
-    urllib.urlretrieve(url, prs_file)
-    return prs_file

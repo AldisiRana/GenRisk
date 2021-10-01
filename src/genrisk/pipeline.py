@@ -7,9 +7,9 @@ import numpy as np
 import pandas as pd
 from statsmodels.stats.multitest import multipletests
 
-from .prediction_models import regression_model, classification_model, test_classifier, test_regressor
 from .association_analysis import run_mannwhitneyu, run_ttest, get_pvals_logit, get_pvals_linear
 from .gene_scoring import get_gene_info, plink_process, combine_scores
+from .prediction_models import regression_model, classification_model, test_classifier, test_regressor
 
 PATH = os.path.abspath(os.path.join((__file__), os.pardir, os.pardir, os.pardir))
 BETAREG_SHELL = os.path.join(PATH, 'scripts', 'betareg_shell.R')
@@ -297,3 +297,4 @@ def model_testing(
     )
     prediction_df = unseen_predictions[['Label']]
     return prediction_df
+
