@@ -138,5 +138,19 @@ def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None):
         )
 
 
+def calculate_gbrs(
     *,
+    scores_df,
+    weights_df,
+    weights_col,
+    genes_col,
+    sum
 ):
+    genes = set(weights_df[genes_col]).intersection(set(scores_df.columns))
+    df = scores_df[genes]
+    df = df.reindex(sorted(df.columns), axis=1)
+    df *= list(weights_df.sort_values(by=genes_col)[weights_col].values)
+    if sum:
+        df['gbrs'] = df.sum(axis=1)
+        df = df[['gbrs']]
+    return df

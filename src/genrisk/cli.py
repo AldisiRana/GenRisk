@@ -431,12 +431,77 @@ def merge(
     return df
 
 
+@main.command()
+@click.option('-s', '--scores-file', required=True)
+@click.option('-w', '--weights-file', default=None)
+@click.option('-p', '--pheno-file', default=None)
+@click.option('-c', '--pheno-col', default=None)
+@click.option('-v', '--covariates', default='sex,age,bmi,PC1,PC2,PC3,PC4')
+@click.option('-g', '--genes-col', default='genes')
+@click.option('-i', '--samples-col', default='IID')
+@click.option('-e', '--weights-col', default='zscore')
+@click.option('-o', '--output-file', required=True)
+@click.option('--split-size', default=0.25)
+@click.option('--sum', is_flag=True)
+def get_gbrs(
+    *,
+    sum,
+    scores_file,
+    weights_file,
+    pheno_file,
+    pheno_col,
+    covariates,
+    genes_col,
+    samples_col,
+    weights_col,
+    output_file,
+    split_size
+):
+    """
+    calcuation gene-based risk scores for individuals.
+
+    :param scores_file: the gene-based scores file
+    :param weights_file: the weights for each gene.
+    :param pheno_file: if no weights are given, pheno file is used to calculate them
+    :param pheno_col:
+    :param covariates:
+    :param genes_col:
+    :param samples_col:
+    :param weights_col:
+    :param output_file:
+    :param sum:
+    :return:
+    """
+    scores_df = pd.read_csv(scores_file, sep='\t')
+    if weights_file:
+        weights_df = pd.read_csv(weights_file, sep='\t')
     else:
-        p = subprocess.call(
-            plink + " --bfile " + input_file + " --score " + pgs_file + " " + cols + " sum --out " + output_file,
-            shell=True
+        _, pheno_temp = train_test_split(training_set, test_size=split_size, random_state=0)
+        sample_ids = list(pheno_temp[samples_col].values)
+        scores_temp = scores_df[scores_df[samples_col].isin(sample_ids)]
+        weights_df = find_pvalue(
+            scores_file=scores_temp,
+            info_file=pheno_file,
+            output_file='weights_'+output_file,
+            cases_column=pheno_col,
+            samples_column=samples_col,
+            test='linear',
+            covariates=covariates,
         )
-    return 'Process is complete. Have a nice day!'
+        scores_df = scores_df[~scores_df[samples_col].isin(sample_ids)]
+        del scores_temp
+        del pheno_temp
+        weights_df['zscore'] = weights_df['beta_coef']/weights_df['std_err']
+    df = calculate_gbrs(
+        scores_df=scores_df,
+        weights_df=weights_df,
+        weights_col=weights_col,
+        genes_col=genes_col,
+        sum=sum,
+    )
+    df[samples_col] = scores_file[samples_col]
+    df.to_csv(output_file, sep='\t', index=False)
+    return df
 
 
 if __name__ == '__main__':
