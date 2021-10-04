@@ -420,7 +420,17 @@ def merge(
     cols,
     output_file
 ):
+    """
+    Merge all files given into one dataframe.
+    /f
 
+    :param files: all files to merge with a comma in between. E.g: file1,file2,file3
+    :param sep: the column seperator in files.
+    :param by: the common column between all files to merge.
+    :param cols: a list of columns can be chosen to save final file, e.g: col1,col2,col5
+    :param output_file: the name and path to save final dataframe
+    :return: merged dataframe
+    """
     files_lst = files.split(',')
     df = merge_files(
         files_lst=files_lst,
@@ -432,17 +442,18 @@ def merge(
 
 
 @main.command()
-@click.option('-s', '--scores-file', required=True)
-@click.option('-w', '--weights-file', default=None)
-@click.option('-p', '--pheno-file', default=None)
-@click.option('-c', '--pheno-col', default=None)
-@click.option('-v', '--covariates', default='sex,age,bmi,PC1,PC2,PC3,PC4')
-@click.option('-g', '--genes-col', default='genes')
-@click.option('-i', '--samples-col', default='IID')
-@click.option('-e', '--weights-col', default='zscore')
-@click.option('-o', '--output-file', required=True)
-@click.option('--split-size', default=0.25)
-@click.option('--sum', is_flag=True)
+@click.option('-s', '--scores-file', required=True, help='the gene-based scores file.')
+@click.option('-w', '--weights-file', default=None, help='a file containg the weights for each gene.')
+@click.option('-p', '--pheno-file', default=None, help='if no weights are given, pheno file is used to calculate them.')
+@click.option('-c', '--pheno-col', default=None, help='the column containing the phenotype.')
+@click.option('-v', '--covariates', default='sex,age,bmi,PC1,PC2,PC3,PC4',
+              help='the covariates to use in the linear model.')
+@click.option('-g', '--genes-col', default='genes', help='the column containing gene names.')
+@click.option('-i', '--samples-col', default='IID', help='the column contatining sample ids.')
+@click.option('-e', '--weights-col', default='zscore', help='the name and path to output results.')
+@click.option('-o', '--output-file', required=True, help='the name and path to output results.')
+@click.option('--split-size', default=0.25, help='the size ratio to split dataset for weight calculation.')
+@click.option('--sum', is_flag=True, help='if True the genes will be summed into one gbrs.')
 def get_gbrs(
     *,
     sum,
@@ -458,19 +469,20 @@ def get_gbrs(
     split_size
 ):
     """
-    calcuation gene-based risk scores for individuals.
+    Calculate gene-based risk scores for individuals.
+    \f
 
     :param scores_file: the gene-based scores file
     :param weights_file: the weights for each gene.
     :param pheno_file: if no weights are given, pheno file is used to calculate them
-    :param pheno_col:
-    :param covariates:
-    :param genes_col:
-    :param samples_col:
-    :param weights_col:
-    :param output_file:
-    :param sum:
-    :return:
+    :param pheno_col: the column containing the phenotype.
+    :param covariates: the covariates to use in the linear model.
+    :param genes_col: the column containing gene names.
+    :param samples_col: the column contatining sample ids.
+    :param weights_col: the column containing effect weight.
+    :param output_file: the name and path to output results.
+    :param sum: if True the genes will be summed into one gbrs
+    :return: gbrs dataframe
     """
     scores_df = pd.read_csv(scores_file, sep='\t')
     if weights_file:
