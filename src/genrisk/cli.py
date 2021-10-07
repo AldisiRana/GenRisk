@@ -5,9 +5,11 @@ import shutil
 
 import click
 import pandas as pd
-from genrisk.helpers import create_logger
+
 from sklearn.model_selection import train_test_split
 
+from .gene_scoring import calculate_gbrs
+from .helpers import create_logger
 from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, model_testing, scoring_process
 from .prs_scoring import prs_prompt
 from .utils import draw_qqplot, draw_manhattan, merge_files
