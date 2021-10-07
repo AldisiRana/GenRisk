@@ -514,6 +514,7 @@ def get_gbrs(
             samples_column=samples_col,
             test='linear',
             covariates=covariates,
+            logger=logger,
         )
         logger.info("Exluding samples used in weights calculation.")
         scores_df = scores_df[~scores_df[samples_col].isin(sample_ids)]
