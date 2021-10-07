@@ -15,6 +15,9 @@ from .prs_scoring import prs_prompt
 from .utils import draw_qqplot, draw_manhattan, merge_files
 
 log = click.option('--log', is_flag=True, help="create a log file for the command")
+samples_col = click.option('-m', '--samples-col', default='IID',
+                           help="the name of the column that contains the samples.")
+output_file = click.option('-o', '--output-file', required=True, help="the final output path")
 
 
 @click.group()
@@ -27,7 +30,7 @@ def main():
 @click.option('-b', '--bfiles', default=None)
 @click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
 @click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
-@click.option('-o', '--output-file', required=True, help="the final output scores matrix.")
+@output_file
 @click.option('-p', '--beta-param', default=(1.0, 25.0), nargs=2, type=float,
               help="the parameters from beta weight function.")
 @click.option('-w', '--weight-func', default='beta', type=click.Choice(['beta', 'log10']),
@@ -118,9 +121,9 @@ def score_genes(
 @click.option('-t', '--test', required=True,
               type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'betareg', 'linear']),
               help='statistical test for calculating P value.')
-@click.option('-c', '--cases-column', required=True,
+@click.option('-c', '--cases-col', required=True,
               help="the name of the column that contains the case/control or quantitative vals.")
-@click.option('-m', '--samples-column', required=True, help="the name of the column that contains the samples.")
+@samples_col
 @click.option('-a', '--adj-pval', type=click.Choice(
     ['bonferroni', 'sidak', 'holm-sidak', 'holm',
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
@@ -133,8 +136,8 @@ def find_association(
     info_file,
     output_path,
     genes,
-    cases_column,
-    samples_column,
+    cases_col,
+    samples_col,
     test,
     adj_pval,
     covariates,
@@ -149,8 +152,8 @@ def find_association(
     :param info_file: file containing the phenotype.
     :param output_path: the path for final output.
     :param genes: a list of genes to calculate. if not, all genes in scoring file will be used.
-    :param cases_column: the name of the column with phenotypes.
-    :param samples_column: the name of the column with sample IDs. All files need to have the same format.
+    :param cases_col: the name of the column with phenotypes.
+    :param samples_col: the name of the column with sample IDs. All files need to have the same format.
     :param test: the test used to calculate pvalue.
     :param adj_pval: the adjustment method used (if any).
     :param covariates: the column names of covariates to use, with comma in between. (e.g: PC1,PC2,age)
@@ -169,8 +172,8 @@ def find_association(
         betareg_pvalues(
             scores_file=scores_file,
             pheno_file=info_file,
-            cases_col=cases_column,
-            samples_col=samples_column,
+            cases_col=cases_col,
+            samples_col=samples_col,
             output_path=output_path,
             covariates=covariates,
             processes=processes,
@@ -187,8 +190,8 @@ def find_association(
             output_file=output_path,
             info_file=info_file,
             genes=genes,
-            cases_column=cases_column,
-            samples_column=samples_column,
+            cases_column=cases_col,
+            samples_column=samples_col,
             test=test,
             adj_pval=adj_pval,
             covariates=covariates,
@@ -289,7 +292,7 @@ def visualize(
 @click.option('--normalize', is_flag=True, help='if flagged the data will be normalized before training.')
 @click.option('-f', '--folds', default=10, type=int, help='number of cross-validation folds in training.')
 @click.option('--metric', help='the metric used to choose best model after training.')
-@click.option('-s', '--samples-col', default='IID')
+@samples_col
 @click.option('--seed', default=random.randint(1, 2147483647), help='add number to create reproduciple train_test splitting.')
 def create_model(
     *,
@@ -454,11 +457,11 @@ def merge(
 @click.option('-v', '--covariates', default='sex,age,bmi,PC1,PC2,PC3,PC4',
               help='the covariates to use in the linear model.')
 @click.option('-g', '--genes-col', default='genes', help='the column containing gene names.')
-@click.option('-i', '--samples-col', default='IID', help='the column contatining sample ids.')
 @click.option('-e', '--weights-col', default='zscore', help='the name and path to output results.')
 @click.option('-o', '--output-file', required=True, help='the name and path to output results.')
 @click.option('--split-size', default=0.25, help='the size ratio to split dataset for weight calculation.')
 @click.option('--sum', is_flag=True, help='if True the genes will be summed into one gbrs.')
+@samples_col
 @log
 def get_gbrs(
     *,
@@ -531,7 +534,7 @@ def get_gbrs(
         genes_col=genes_col,
         sum=sum,
     )
-    df[samples_col] = scores_file[samples_col]
+    df[samples_col] = list(scores_file[samples_col].values)
     logger.info("GBRS dataframe is being saved ...")
     df.to_csv(output_file, sep='\t', index=False)
     logger.info("Process is complete.")
