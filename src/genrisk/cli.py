@@ -208,6 +208,7 @@ def find_association(
 @click.option('-v', '--pval-col', default='p_value', help="the name of the pvalues column.")
 @click.option('-c', '--chr-col', default='Chr', help='the name of the chromosomes column')
 @click.option('-s', '--pos-col', default='Start', help='the name of the position/start of the gene column')
+@log
 def visualize(
     *,
     pvals_file,
@@ -219,6 +220,7 @@ def visualize(
     pval_col,
     chr_col,
     pos_col,
+    log,
 ):
     """
     Visualize manhatten plot and qqplot for the data.
@@ -457,6 +459,7 @@ def merge(
 @click.option('-o', '--output-file', required=True, help='the name and path to output results.')
 @click.option('--split-size', default=0.25, help='the size ratio to split dataset for weight calculation.')
 @click.option('--sum', is_flag=True, help='if True the genes will be summed into one gbrs.')
+@log
 def get_gbrs(
     *,
     sum,
@@ -469,7 +472,8 @@ def get_gbrs(
     samples_col,
     weights_col,
     output_file,
-    split_size
+    split_size,
+    log,
 ):
     """
     Calculate gene-based risk scores for individuals.
@@ -487,15 +491,21 @@ def get_gbrs(
     :param sum: if True the genes will be summed into one gbrs
     :return: gbrs dataframe
     """
+    logger = create_logger(name='Calculate GBRS', filename=output_file.split('.')[0])
+    logger.info(locals())
+    logger.info("Reading files...")
     scores_df = pd.read_csv(scores_file, sep=r'\s+', index_col=False)
     pheno_df = pd.read_csv(pheno_file, sep='\t', index_col=False)
     if weights_file:
         weights_df = pd.read_csv(weights_file, sep='\t')
     else:
+        logger.info("No weights available, weights will be caluclated now.")
+        logger.info("Creating temporary files...")
         _, pheno_temp = train_test_split(pheno_df, test_size=split_size, random_state=0)
         sample_ids = list(pheno_temp[samples_col].values)
         scores_temp = scores_df[scores_df[samples_col].isin(sample_ids)]
         scores_temp.to_csv('scores_temp.tsv', sep='\t', index=False)
+        logger.info("The process for calculating the p_values will start now.")
         weights_df = find_pvalue(
             scores_file='scores_temp.tsv',
             info_file=pheno_file,
@@ -505,11 +515,14 @@ def get_gbrs(
             test='linear',
             covariates=covariates,
         )
+        logger.info("Exluding samples used in weights calculation.")
         scores_df = scores_df[~scores_df[samples_col].isin(sample_ids)]
+        logger.info("Remove temporary files.")
         del scores_temp
         del pheno_temp
         os.remove('scores_temp.tsv')
         weights_df['zscore'] = weights_df['beta_coef']/weights_df['std_err']
+    logger.info("Calculating GBRS now ...")
     df = calculate_gbrs(
         scores_df=scores_df,
         weights_df=weights_df,
@@ -518,7 +531,9 @@ def get_gbrs(
         sum=sum,
     )
     df[samples_col] = scores_file[samples_col]
+    logger.info("GBRS dataframe is being saved ...")
     df.to_csv(output_file, sep='\t', index=False)
+    logger.info("Process is complete.")
     return df
 
 

@@ -100,7 +100,7 @@ def find_pvalue(
     cases_column,
     samples_column,
     test='mannwhitneyu',
-    adj_pval,
+    adj_pval=None,
     covariates=None,
     cases=None,
     controls=None,
