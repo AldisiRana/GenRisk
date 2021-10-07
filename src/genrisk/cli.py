@@ -437,7 +437,8 @@ def merge(
     df = merge_files(
         files_lst=files_lst,
         sep=sep,
-        by=by
+        by=by,
+        cols=cols
     )
     df.to_csv(output_file, sep=sep)
     return df
@@ -487,14 +488,16 @@ def get_gbrs(
     :return: gbrs dataframe
     """
     scores_df = pd.read_csv(scores_file, sep='\t')
+    pheno_df = pd.read_csv(pheno_file, sep='\t')
     if weights_file:
         weights_df = pd.read_csv(weights_file, sep='\t')
     else:
-        _, pheno_temp = train_test_split(training_set, test_size=split_size, random_state=0)
+        _, pheno_temp = train_test_split(pheno_df, test_size=split_size, random_state=0)
         sample_ids = list(pheno_temp[samples_col].values)
         scores_temp = scores_df[scores_df[samples_col].isin(sample_ids)]
+        scores_temp.to_csv('scores_temp.tsv', sep='\t', index=False)
         weights_df = find_pvalue(
-            scores_file=scores_temp,
+            scores_file='scores_temp.tsv',
             info_file=pheno_file,
             output_file='weights_'+output_file,
             cases_column=pheno_col,
@@ -505,6 +508,7 @@ def get_gbrs(
         scores_df = scores_df[~scores_df[samples_col].isin(sample_ids)]
         del scores_temp
         del pheno_temp
+        os.remove('scores_temp.tsv')
         weights_df['zscore'] = weights_df['beta_coef']/weights_df['std_err']
     df = calculate_gbrs(
         scores_df=scores_df,
