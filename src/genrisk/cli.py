@@ -487,7 +487,7 @@ def get_gbrs(
     :param sum: if True the genes will be summed into one gbrs
     :return: gbrs dataframe
     """
-    scores_df = pd.read_csv(scores_file, sep='\t', index_col=False)
+    scores_df = pd.read_csv(scores_file, sep=r'\s+', index_col=False)
     pheno_df = pd.read_csv(pheno_file, sep='\t', index_col=False)
     if weights_file:
         weights_df = pd.read_csv(weights_file, sep='\t')
