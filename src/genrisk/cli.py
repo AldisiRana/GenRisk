@@ -504,9 +504,7 @@ def get_gbrs(
     else:
         logger.info("No weights available, weights will be caluclated now.")
         logger.info("Creating temporary files...")
-        _, pheno_temp = train_test_split(pheno_df, test_size=split_size, random_state=0)
-        sample_ids = list(pheno_temp[samples_col].values)
-        scores_temp = scores_df[scores_df[samples_col].isin(sample_ids)]
+        scores_df, scores_temp = train_test_split(scores_df, test_size=split_size, random_state=0)
         scores_temp.to_csv('scores_temp.tsv', sep='\t', index=False)
         logger.info("The process for calculating the p_values will start now.")
         weights_df = find_pvalue(
@@ -520,10 +518,9 @@ def get_gbrs(
             logger=logger,
         )
         logger.info("Exluding samples used in weights calculation.")
-        scores_df = scores_df[~scores_df[samples_col].isin(sample_ids)]
+        scores_df.reset_index(drop=True, inplace=True)
         logger.info("Remove temporary files.")
         del scores_temp
-        del pheno_temp
         os.remove('scores_temp.tsv')
         weights_df['zscore'] = weights_df['beta_coef']/weights_df['std_err']
     logger.info("Calculating GBRS now ...")
