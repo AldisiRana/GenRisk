@@ -498,7 +498,6 @@ def get_gbrs(
     logger.info(locals())
     logger.info("Reading files...")
     scores_df = pd.read_csv(scores_file, sep=r'\s+', index_col=False)
-    pheno_df = pd.read_csv(pheno_file, sep='\t', index_col=False)
     if weights_file:
         weights_df = pd.read_csv(weights_file, sep='\t')
     else:
