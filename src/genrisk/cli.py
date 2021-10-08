@@ -531,7 +531,7 @@ def get_gbrs(
         genes_col=genes_col,
         sum=sum,
     )
-    df[samples_col] = list(scores_file[samples_col].values)
+    df[samples_col] = scores_df[samples_col]
     logger.info("GBRS dataframe is being saved ...")
     df.to_csv(output_file, sep='\t', index=False)
     logger.info("Process is complete.")
