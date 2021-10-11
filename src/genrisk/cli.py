@@ -14,10 +14,10 @@ from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, mod
 from .prs_scoring import prs_prompt
 from .utils import draw_qqplot, draw_manhattan, merge_files
 
-log = click.option('--log', is_flag=True, help="create a log file for the command")
 samples_col = click.option('-m', '--samples-col', default='IID',
                            help="the name of the column that contains the samples.")
 output_file = click.option('-o', '--output-file', required=True, help="the final output path")
+logger = create_logger()
 
 
 @click.group()
@@ -27,7 +27,8 @@ def main():
 
 @main.command()
 @click.option('-a', '--annotated-vcf', required=True, type=click.Path(exists=True), help='the annotated vcf')
-@click.option('-b', '--bfiles', default=None)
+@click.option('-b', '--bfiles', default=None,
+              help='provide binary files if annotated vcf does not contain the samples info')
 @click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
 @click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
 @output_file
@@ -41,7 +42,6 @@ def main():
 @click.option('-d', '--del-col', default='CADD_raw', help="the column containing the deleteriousness score.")
 @click.option('-l', '--alt-col', default='Alt', help="the column containing the alternate base.")
 @click.option('-m', '--maf-threshold', default=0.01, help="the threshold for minor allele frequency.")
-@log
 def score_genes(
     *,
     annotated_vcf,
@@ -57,7 +57,6 @@ def score_genes(
     del_col,
     alt_col,
     maf_threshold,
-    log,
 ):
     """
     Calculate the gene-based scores for a given dataset.
@@ -80,11 +79,7 @@ def score_genes(
     :return: the final dataframe information.
     """
     confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
-    if log:
-        filename = output_file.split('.')[0]
-    else:
-        filename = None
-    logger = create_logger(name='Score Genes', filename=filename)
+    logger.info('GenRisk - Gene-based scoring')
     logger.info('Score genes process is starting now...')
     logger.info(locals())
     logger.info('getting information from vcf files')
@@ -115,7 +110,7 @@ def score_genes(
               help="The scoring file of genes across a population.")
 @click.option('-i', '--info-file', required=True, type=click.Path(exists=True),
               help="File containing information about the cohort.")
-@click.option('-o', '--output-path', required=True, help='the path for the output file.')
+@output_file
 @click.option('-g', '--genes',
               help="a file containing the genes to calculate. if not provided all genes will be used.")
 @click.option('-t', '--test', required=True,
@@ -129,12 +124,11 @@ def score_genes(
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
 @click.option('-v', '--covariates', default='PC1,PC2', help="the covariates used for calculation")
 @click.option('-p', '--processes', type=int, default=1, help='number of processes for parallelization')
-@log
 def find_association(
     *,
     scores_file,
     info_file,
-    output_path,
+    output_file,
     genes,
     cases_col,
     samples_col,
@@ -142,7 +136,6 @@ def find_association(
     adj_pval,
     covariates,
     processes,
-    log
 ):
     """
     Calculate the P-value between two given groups.
@@ -150,7 +143,7 @@ def find_association(
 
     :param scores_file: the file containing gene scores.
     :param info_file: file containing the phenotype.
-    :param output_path: the path for final output.
+    :param output_file: the path for final output.
     :param genes: a list of genes to calculate. if not, all genes in scoring file will be used.
     :param cases_col: the name of the column with phenotypes.
     :param samples_col: the name of the column with sample IDs. All files need to have the same format.
@@ -161,11 +154,7 @@ def find_association(
 
     :return:
     """
-    if log:
-        filename = output_path.split('.')[0]
-    else:
-        filename = None
-    logger = create_logger(name='Find association', filename=filename)
+    logger.info('GenRisk - Finding associations')
     logger.info(locals())
     logger.info("The process for calculating the p_values will start now.")
     if test == 'betareg':
@@ -174,7 +163,7 @@ def find_association(
             pheno_file=info_file,
             cases_col=cases_col,
             samples_col=samples_col,
-            output_path=output_path,
+            output_path=output_file,
             covariates=covariates,
             processes=processes,
             genes=genes,
@@ -187,7 +176,7 @@ def find_association(
             genes = [x.strip() for x in content]
         df = find_pvalue(
             scores_file=scores_file,
-            output_file=output_path,
+            output_file=output_file,
             info_file=info_file,
             genes=genes,
             cases_column=cases_col,
@@ -211,7 +200,6 @@ def find_association(
 @click.option('-v', '--pval-col', default='p_value', help="the name of the pvalues column.")
 @click.option('-c', '--chr-col', default='Chr', help='the name of the chromosomes column')
 @click.option('-s', '--pos-col', default='Start', help='the name of the position/start of the gene column')
-@log
 def visualize(
     *,
     pvals_file,
@@ -223,7 +211,6 @@ def visualize(
     pval_col,
     chr_col,
     pos_col,
-    log,
 ):
     """
     Visualize manhatten plot and qqplot for the data.
@@ -242,11 +229,7 @@ def visualize(
     :return:
 
     """
-    if log:
-        filename = pvals_file.split('.')[0]
-    else:
-        filename = None
-    logger = create_logger(name='Visualization', filename=filename)
+    logger.info('GenRisk - creating plots for data')
     logger.info(locals())
     logger.info('Reading p_values file...')
     pvals_df = pd.read_csv(pvals_file, sep='\t', index_col=False)
@@ -293,7 +276,8 @@ def visualize(
 @click.option('-f', '--folds', default=10, type=int, help='number of cross-validation folds in training.')
 @click.option('--metric', help='the metric used to choose best model after training.')
 @samples_col
-@click.option('--seed', default=random.randint(1, 2147483647), help='add number to create reproduciple train_test splitting.')
+@click.option('--seed', default=random.randint(1, 2147483647),
+              help='add number to create reproduciple train_test splitting.')
 def create_model(
     *,
     data_file,
@@ -329,6 +313,9 @@ def create_model(
 
     :return: the final model
     """
+    logger.info('GenRisk - Create prediction model')
+    logger.info(locals())
+    logger.info('Reading and preparing data ...')
     training_set = pd.read_csv(data_file, sep='\t', index_col=samples_col)
     training_set.dropna(subset=[target_col], inplace=True)
     testing_set = pd.DataFrame()
@@ -336,6 +323,7 @@ def create_model(
         training_set, testing_set = train_test_split(training_set, test_size=test_size, random_state=int(seed))
     os.mkdir(output_folder)
     os.chdir(output_folder)
+    logger.info('Model generation starting ...')
     model = create_prediction_model(
         model_name=model_name,
         model_type=model_type,
@@ -349,6 +337,7 @@ def create_model(
         test_size=test_size,
         seed=int(seed)
     )
+    logger.info('Model is generated.')
     return model
 
 
@@ -359,7 +348,7 @@ def create_model(
 @click.option('-l', '--label-col', required=True, help='the target/phenotype/label column')
 @click.option('-m', '--model-path', required=True, type=click.Path(exists=True), help='path to the trained model.')
 @click.option('-s', '--samples-col', default='IID', help='the samples column.')
-@click.option('-o', '--output-file', default=None, help='the path to output file.')
+@output_file
 def test_model(
     *,
     model_path,
@@ -381,6 +370,8 @@ def test_model(
 
     :return: a dataframe with predicted values.
     """
+    logger.info('GenRisk - testing prediction model')
+    logger.info(locals())
     testing_df = model_testing(
         model_path=model_path,
         input_file=input_file,
@@ -388,6 +379,7 @@ def test_model(
         samples_col=samples_col,
         model_type=model_type,
     )
+    logger.info('saving test predictions')
     testing_df.to_csv(output_file, sep='\t')
     return testing_df
 
@@ -418,7 +410,7 @@ def get_prs(
 @click.option('-b', '--by', default='IID', help='the common column between all files to merge.')
 @click.option('-c', '--cols', default=None,
               help='if desired, a list of columns can be chosen to save final file, e.g: col1,col2,col5')
-@click.option('-o', '--outputfile', required=True, help='the name and path to save final dataframe')
+@output_file
 def merge(
     *,
     files,
@@ -438,6 +430,8 @@ def merge(
     :param output_file: the name and path to save final dataframe
     :return: merged dataframe
     """
+    logger.info('GenRisk - merging dataframes')
+    logger.info(locals())
     files_lst = files.split(',')
     df = merge_files(
         files_lst=files_lst,
@@ -445,6 +439,7 @@ def merge(
         by=by,
         cols=cols
     )
+    logger.info('saving merged dataframe.')
     df.to_csv(output_file, sep=sep)
     return df
 
@@ -458,11 +453,10 @@ def merge(
               help='the covariates to use in the linear model.')
 @click.option('-g', '--genes-col', default='genes', help='the column containing gene names.')
 @click.option('-e', '--weights-col', default='zscore', help='the name and path to output results.')
-@click.option('-o', '--output-file', required=True, help='the name and path to output results.')
+@output_file
 @click.option('--split-size', default=0.25, help='the size ratio to split dataset for weight calculation.')
 @click.option('--sum', is_flag=True, help='if True the genes will be summed into one gbrs.')
 @samples_col
-@log
 def get_gbrs(
     *,
     sum,
@@ -476,12 +470,12 @@ def get_gbrs(
     weights_col,
     output_file,
     split_size,
-    log,
 ):
     """
     Calculate gene-based risk scores for individuals.
     \f
 
+    :param split_size: the test size for weight calculations.
     :param scores_file: the gene-based scores file
     :param weights_file: the weights for each gene.
     :param pheno_file: if no weights are given, pheno file is used to calculate them
@@ -494,7 +488,7 @@ def get_gbrs(
     :param sum: if True the genes will be summed into one gbrs
     :return: gbrs dataframe
     """
-    logger = create_logger(name='Calculate GBRS', filename=output_file.split('.')[0])
+    logger.info('GenRisk - Calculating gene-based risk scores')
     logger.info(locals())
     logger.info("Reading files...")
     scores_df = pd.read_csv(scores_file, sep=r'\s+', index_col=False)
