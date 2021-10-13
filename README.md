@@ -15,8 +15,9 @@ within a phenotype in a population
 ## Usage
 
 ### Score genes
-Calculate the gene-based scores for a given dataset.
-requires an annotated vcf (should contain variant ID, ALT, Gene, and deleterious score, for more information check out the example in toy_example)
+This command calculate the gene-based scores for a given dataset.
+
+It requires an annotated vcf (i.e: annotated with variant ID , ALT, Gene, and deleterious score, for more information check out the example in toy_example)
 
     $ genrisk score-genes --annotated-vcf toy_example/annotated_toy_dataset.vcf --temp-dir toy_example/toy_dataset/ 
     --output-file toy_example/toy_dataset_scores --weight-func beta --maf-threshold 0.01
@@ -53,7 +54,7 @@ Evaluate a machine learning model with a given dataset.
 * For further CLI options and parameters use --help
 
 ### Get PRS scores
-Gets a PGS file (provided by the user or downloaded from pgscatalog) then calculates the PRS scores for dataset.
+This command aquires a PGS file (provided by the user or downloaded from pgscatalog) then calculates the PRS scores for dataset.
 Note: This command is interactive.
 
     $ genrisk get-prs
@@ -61,7 +62,7 @@ Note: This command is interactive.
 
 ### Get GBRS
 Calculate gene-based risk scores for individuals. 
-If the user does not have weights for calculation, they can provide a file with the phenotype and weights will be calculated.
+If users do not have weights for calculation, they can provide a file with the phenotype and weights will be calculated.
 
     $genrisk get-gbrs --scores-file scores_file.tsv --weights-file weights_file.tsv --weights-col zscore --sum
 * For further CLI options and parameters use --help
