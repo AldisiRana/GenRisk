@@ -77,10 +77,10 @@ def get_gene_info(
     genes = list(set(df[genes_col]))
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
-    #gene_file = output_dir + '.genes'
-    #f = open(os.path.join(output_dir, gene_file), 'w')
-    #f.writelines("%s\n" % gene for gene in genes)
-    #f.close()
+    gene_file = output_dir + '.genes'
+    f = open(os.path.join(output_dir, gene_file), 'w')
+    f.writelines("%s\n" % gene for gene in genes)
+    f.close()
     [df[df[genes_col] == gene][[variant_col, alt_col, 'score', genes_col]].to_csv(os.path.join(output_dir, (
         str(gene) + '.w')), index=False, sep='\t') for gene in tqdm(genes, desc="writing w gene files")]
     [df[df[genes_col] == gene][[variant_col, alt_col]].to_csv(os.path.join(output_dir, (str(gene) + '.v')),
