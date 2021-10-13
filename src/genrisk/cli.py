@@ -295,7 +295,7 @@ def create_model(
     seed
 ):
     """
-    Create a machine learning model with given dataset.
+    Create a prediction model with given dataset.
     \f
 
     :param samples_col: the name of the column with samples identifiers.
@@ -359,7 +359,7 @@ def test_model(
     output_file,
 ):
     """
-    Evaluate a machine learning model with a given dataset.
+    Evaluate a prediction model with a given dataset.
     \f
 
     :param model_path: the path to the ML model.

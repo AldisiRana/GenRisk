@@ -39,14 +39,14 @@ Visualize manhatten plot and qqplot for the data.
 * For further CLI options and parameters use --help
 
 ### Create model
-Create a machine learning model (classifier or regressor) with given dataset
+Create a prediction model (classifier or regressor) with given dataset
 
     $ genrisk create-model --data-file toy_example_regressor_features.tsv --model-type regressor --output-folder toy_regressor 
     --test-size 0.25 --test --model-name toy_regressor --target-col trait1 --imbalanced --normalize
 * For further CLI options and parameters use --help
 
 ### Test model
-Evaluate a machine learning model with a given dataset.
+Evaluate a prediction model with a given dataset.
 
     $ genrisk test-model --model-path regressor_model.pkl --input-file testing_dataset.tsv --model-type regressor 
     --labels-col target --samples-col IID
