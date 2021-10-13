@@ -4,14 +4,16 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from adjustText import adjust_text
-from pybiomart import Dataset
 from qmplot import qqplot
 from tqdm import tqdm
 
 
 def normalize_gene_len(
     *,
-    genes_lengths_file=None,
+    genes_lengths_file,
+    genes_col='Gene name',
+    start_col='Gene end (bp)',
+    end_col='Gene start (bp)',
     matrix_file,
     samples_col,
     output_path
@@ -19,6 +21,9 @@ def normalize_gene_len(
     """
     Normalize matrix by gene length.
 
+    :param end_col:
+    :param start_col:
+    :param genes_col:
     :param genes_lengths_file: a file containing genes, and their start and end bps.
     :param matrix_file: a tsv file containing a matrix of samples and their scores across genes.
     :param samples_col: column containing the samples IDs.
@@ -26,16 +31,9 @@ def normalize_gene_len(
 
     :return: a normalized dataframe.
     """
-    if genes_lengths_file:
-        genes_df = pd.read_csv(genes_lengths_file, sep='\t')
-    else:
-        gene_dataset = Dataset(name='hsapiens_gene_ensembl', host='http://www.ensembl.org')
-        genes_df = gene_dataset.query(
-            attributes=['external_gene_name', 'start_position', 'end_position'],
-            only_unique=False,
-        )
+    genes_df = pd.read_csv(genes_lengths_file, sep='\t')
     genes_lengths = {
-        row['Gene name']: round((row['Gene end (bp)'] - row['Gene start (bp)']) / 1000, 3)
+        row[genes_col]: round((row[start_col] - row[end_col]) / 1000, 3)
         for _, row in genes_df.iterrows()
     }
     scores_df = pd.read_csv(matrix_file, sep=r'\s+')

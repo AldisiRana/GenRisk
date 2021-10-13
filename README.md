@@ -67,5 +67,5 @@ If the user does not have weights for calculation, they can provide a file with 
 * For further CLI options and parameters use --help
 
 ## Contact
-If you have any questions or problems with the tool please feel free to create an issue in the repository or contact me via email:
+If you have any questions or problems with the tool or its installation please feel free to create an issue in the repository or contact me via email:
 aldisi.rana@gmail.com
