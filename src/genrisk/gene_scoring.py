@@ -77,9 +77,10 @@ def get_gene_info(
     genes = list(set(df[genes_col]))
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
-    gene_file = output_dir + '.genes'
-    with open(os.path.join(output_dir, gene_file), 'w') as f:
-        f.writelines("%s\n" % gene for gene in genes)
+    #gene_file = output_dir + '.genes'
+    #f = open(os.path.join(output_dir, gene_file), 'w')
+    #f.writelines("%s\n" % gene for gene in genes)
+    #f.close()
     [df[df[genes_col] == gene][[variant_col, alt_col, 'score', genes_col]].to_csv(os.path.join(output_dir, (
         str(gene) + '.w')), index=False, sep='\t') for gene in tqdm(genes, desc="writing w gene files")]
     [df[df[genes_col] == gene][[variant_col, alt_col]].to_csv(os.path.join(output_dir, (str(gene) + '.v')),
@@ -144,8 +145,19 @@ def calculate_gbrs(
     weights_df,
     weights_col,
     genes_col,
-    sum
+    sum=True
 ):
+    """
+    Calculate a gene-based risk score for each individual in a given dataset.
+
+    :param scores_df: the matrix with gene-based scores.
+    :param weights_df: the matrix with weights for each gene.
+    :param weights_col: the name of the column with the weights.
+    :param genes_col: the name of the column with the genes.
+    :param sum: if True it will sum the gene-based risk scores into one value.
+
+    :return: a dataframe with the gene-based risk scores.
+    """
     genes = set(weights_df[genes_col]).intersection(set(scores_df.columns))
     df = scores_df[genes]
     df = df.reindex(sorted(df.columns), axis=1)
