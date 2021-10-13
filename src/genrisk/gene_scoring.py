@@ -173,10 +173,13 @@ def pathway_scoring(
     genes,
     scores_file,
     samples_col,
+    logger
 ):
+    logger.info('reading scores file ...')
     scores_df = pd.read_csv(scores_file, sep=r'\s+', usecols=[samples_col] + genes)
     pathway_scores = pd.DataFrame(columns=[samples_col] + list(pathways))
     pathway_scores[samples_col] = scores_df[samples_col]
+    logger.info('calculating pathway scores ...')
     for path, path_genes in pathways.items():
         selected_genes = list(set(genes) & (set(path_genes)))
         if len(selected_genes) == 0:

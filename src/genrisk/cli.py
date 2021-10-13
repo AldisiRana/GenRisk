@@ -553,12 +553,15 @@ def calculate_pathways(
     :param samples_col: column containing samples ids.
     :return: the pathway scores df
     """
+    logger.info('GenRisk - calculating pathway scores')
+    logger.info(locals())
     pathways = {line.strip().split('\t')[0]: line.strip().split('\t')[2:] for line in open(pathway_file, 'r')}
     all_genes = [item for sublist in list(pathways.values()) for item in sublist]
     fline = open(scores_file).readline().rstrip().split('\t')
     genes = list(set(all_genes) & set(fline))
-    df = pathway_scoring(pathways=pathways, genes=genes, scores_file=scores_file, samples_col=samples_col)
+    df = pathway_scoring(pathways=pathways, genes=genes, scores_file=scores_file, samples_col=samples_col, logger=logger)
     df.to_csv(output_file, sep='\t', index=False)
+    logger.info('Process is done.')
     return df
 
 
