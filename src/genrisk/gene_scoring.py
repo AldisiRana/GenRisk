@@ -169,16 +169,17 @@ def calculate_gbrs(
 
 def pathway_scoring(
     *,
-    pathway_file,
-    output_file,
+    pathways,
+    genes,
     scores_file,
+    samples_col,
 ):
-    ## code under progress
-    pathways = {}
-    with open(pathway_file, "r") as file:
-        for line in file:
-            line = line.strip().split("\t")
-            pathways[line[0]] = line[2:]
-    all_genes = [item for sublist in list(pathways.values()) for item in sublist]
-    scores_df = pd.read_csv(scores_file, sep='\t', usecols=['IID']+all_genes)
-
+    scores_df = pd.read_csv(scores_file, sep='\t', usecols=[samples_col] + genes)
+    pathway_scores = pd.DataFrame(columns=[samples_col] + list(pathways))
+    pathway_scores[samples_col] = scores_df[samples_col]
+    for path, path_genes in pathways.items():
+        selected_genes = list(set(genes) & (set(path_genes)))
+        if len(selected_genes) == 0:
+            pathway_scores.drop(columns=[path], inplace=True)
+        pathway_scores[path] = scores_df[selected_genes].sum(axis=1)
+    return pathway_scores

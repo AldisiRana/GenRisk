@@ -8,15 +8,15 @@ import pandas as pd
 
 from sklearn.model_selection import train_test_split
 
-from .gene_scoring import calculate_gbrs
+from .gene_scoring import calculate_gbrs, pathway_scoring
 from .helpers import create_logger
 from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, model_testing, scoring_process
 from .prs_scoring import prs_prompt
 from .utils import draw_qqplot, draw_manhattan, merge_files
 
-samples_col = click.option('-m', '--samples-col', default='IID',
+SAMPLES_COL = click.option('-m', '--samples-col', default='IID',
                            help="the name of the column that contains the samples.")
-output_file = click.option('-o', '--output-file', required=True, help="the final output path")
+OUTPUT_FILE = click.option('-o', '--output-file', required=True, help="the final output path")
 logger = create_logger()
 
 
@@ -31,7 +31,7 @@ def main():
               help='provide binary files if annotated vcf does not contain the samples info')
 @click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
 @click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
-@output_file
+@OUTPUT_FILE
 @click.option('-p', '--beta-param', default=(1.0, 25.0), nargs=2, type=float,
               help="the parameters from beta weight function.")
 @click.option('-w', '--weight-func', default='beta', type=click.Choice(['beta', 'log10']),
@@ -110,7 +110,7 @@ def score_genes(
               help="The scoring file of genes across a population.")
 @click.option('-i', '--info-file', required=True, type=click.Path(exists=True),
               help="File containing information about the cohort.")
-@output_file
+@OUTPUT_FILE
 @click.option('-g', '--genes',
               help="a file containing the genes to calculate. if not provided all genes will be used.")
 @click.option('-t', '--test', required=True,
@@ -118,7 +118,7 @@ def score_genes(
               help='statistical test for calculating P value.')
 @click.option('-c', '--cases-col', required=True,
               help="the name of the column that contains the case/control or quantitative vals.")
-@samples_col
+@SAMPLES_COL
 @click.option('-a', '--adj-pval', type=click.Choice(
     ['bonferroni', 'sidak', 'holm-sidak', 'holm',
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
@@ -275,7 +275,7 @@ def visualize(
 @click.option('--normalize', is_flag=True, help='if flagged the data will be normalized before training.')
 @click.option('-f', '--folds', default=10, type=int, help='number of cross-validation folds in training.')
 @click.option('--metric', help='the metric used to choose best model after training.')
-@samples_col
+@SAMPLES_COL
 @click.option('--seed', default=random.randint(1, 2147483647),
               help='add number to create reproduciple train_test splitting.')
 def create_model(
@@ -348,7 +348,7 @@ def create_model(
 @click.option('-l', '--label-col', required=True, help='the target/phenotype/label column')
 @click.option('-m', '--model-path', required=True, type=click.Path(exists=True), help='path to the trained model.')
 @click.option('-s', '--samples-col', default='IID', help='the samples column.')
-@output_file
+@OUTPUT_FILE
 def test_model(
     *,
     model_path,
@@ -410,7 +410,7 @@ def get_prs(
 @click.option('-b', '--by', default='IID', help='the common column between all files to merge.')
 @click.option('-c', '--cols', default=None,
               help='if desired, a list of columns can be chosen to save final file, e.g: col1,col2,col5')
-@output_file
+@OUTPUT_FILE
 def merge(
     *,
     files,
@@ -453,10 +453,10 @@ def merge(
               help='the covariates to use in the linear model.')
 @click.option('-g', '--genes-col', default='genes', help='the column containing gene names.')
 @click.option('-e', '--weights-col', default='zscore', help='the name and path to output results.')
-@output_file
+@OUTPUT_FILE
 @click.option('--split-size', default=0.25, help='the size ratio to split dataset for weight calculation.')
 @click.option('--sum', is_flag=True, help='if True the genes will be summed into one gbrs.')
-@samples_col
+@SAMPLES_COL
 def get_gbrs(
     *,
     sum,
@@ -528,6 +528,37 @@ def get_gbrs(
     logger.info("GBRS dataframe is being saved ...")
     df.to_csv(output_file, sep='\t', index=False)
     logger.info("Process is complete.")
+    return df
+
+
+@main.command()
+@OUTPUT_FILE
+@SAMPLES_COL
+@click.option('-p', '--pathway-file', required=True, help='.gmt file containing the pathway and its genes.')
+@click.option('-s', '--scores-file', required=True, help='genes scores file to calculate pathway scores.')
+def calculate_pathways(
+    *,
+    output_file,
+    pathway_file,
+    scores_file,
+    samples_col
+):
+    """
+    Calculate pathway scores using gene-based scores and gmt pathway file.
+    /f
+
+    :param output_file: the final output
+    :param pathway_file: .gmt file containing the pathway and its genes.
+    :param scores_file: genes scores file to calculate pathway scores.
+    :param samples_col: column containing samples ids.
+    :return: the pathway scores df
+    """
+    pathways = {line.strip().split('\t')[0]: line.strip().split('\t')[2:] for line in open(pathway_file, 'r')}
+    all_genes = [item for sublist in list(pathways.values()) for item in sublist]
+    fline = open(scores_file).readline().rstrip().split('\t')
+    genes = list(set(all_genes) & set(fline))
+    df = pathway_scoring(pathways=pathways, genes=genes, scores_file=scores_file, samples_col=samples_col)
+    df.to_csv(output_file, sep='\t', index=False)
     return df
 
 
