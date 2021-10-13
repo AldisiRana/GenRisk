@@ -154,3 +154,19 @@ def calculate_gbrs(
         df['gbrs'] = df.sum(axis=1)
         df = df[['gbrs']]
     return df
+
+
+def pathway_scoring(
+    *,
+    pathway_file,
+    output_file,
+    scores_file,
+):
+    pathways = {}
+    with open(pathway_file, "r") as file:
+        for line in file:
+            line = line.strip().split("\t")
+            pathways[line[0]] = line[2:]
+    all_genes = [item for sublist in list(pathways.values()) for item in sublist]
+    scores_df = pd.read_csv(scores_file, sep='\t', usecols=['IID']+all_genes)
+

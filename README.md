@@ -19,8 +19,7 @@ This command calculate the gene-based scores for a given dataset.
 
 It requires an annotated vcf (i.e: annotated with variant ID , ALT, Gene, and deleterious score, for more information check out the example in toy_example)
 
-    $ genrisk score-genes --annotated-vcf toy_example/annotated_toy_dataset.vcf --temp-dir toy_example/toy_dataset/ 
-    --output-file toy_example/toy_dataset_scores --weight-func beta --maf-threshold 0.01
+    $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/ --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT --variant-col ID --af-col AF --del-col CADD --gene-col Gene
 
 * For further CLI options and parameters use --help
 
