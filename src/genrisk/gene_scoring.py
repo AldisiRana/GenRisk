@@ -124,7 +124,7 @@ def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None):
 
     :return:
     """
-    genes = [line.strip() for line in open(os.path.join(genes_folder, (genes_folder + '.genes')), 'r')]
+    genes = [line.strip() for line in open(genes_folder + '.genes', 'r')]
     if bfiles:
         input_files = " --bfile " + bfiles
     else:
