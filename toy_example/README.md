@@ -9,7 +9,7 @@ The signals and phenotypes were simulated using [SIMU](https://github.com/precim
 ### Annotated vcf
 The annotated vcf contains information about the SNPS, gene, deleteriousness score and allele frequency.
 It should also contain samples genotypes. This information is important for the calculation of the gene-based scores.
-The toy annotated vcf used in the examples can be downloaded from [here](https://uni-bonn.sciebo.de/s/WQroVFBQ8NXNnF1).
+The toy annotated vcf used in the examples can be downloaded from [here](https://uni-bonn.sciebo.de/s/WQroVFBQ8NXNnF1/download).
 
 ### snps_list
 This file contains the toy significant variants that were used to create the toy phenotypes.
