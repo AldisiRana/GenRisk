@@ -83,7 +83,7 @@ def create_logger():
     logger.setLevel(logging.DEBUG)
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     now = datetime.now()
-    log_file = 'genrisk_' + now.strftime("_%d%m%Y_%H%M") + '.log'
+    log_file = 'genrisk_' + now.strftime("%d%m%Y_%H%M") + '.log'
     # create file handler which logs even debug messages
     fh = logging.FileHandler(log_file)
     fh.setLevel(logging.DEBUG)
