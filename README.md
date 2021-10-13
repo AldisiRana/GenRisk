@@ -4,10 +4,8 @@ GenRisk is a package that implements different gene-based scoring schemes to ana
 within a phenotype in a population
 
 ## Requirements
-* annotated vcf (should contain variant ID, ALT, Gene, and deleterious score, for more information check out the example in toy_example)
 * plink >= 1.9 https://www.cog-genomics.org/plink/
 * R version >= 3.6.3
-
 
 ## Installation
 ``GenRisk`` can be installed on python3+ from the latest code on [GitHub](https://github.com/AldisiRana/GenRisk) with:
@@ -18,6 +16,7 @@ within a phenotype in a population
 
 ### Score genes
 Calculate the gene-based scores for a given dataset.
+requires an annotated vcf (should contain variant ID, ALT, Gene, and deleterious score, for more information check out the example in toy_example)
 
     $ genrisk score-genes --annotated-vcf toy_example/annotated_toy_dataset.vcf --temp-dir toy_example/toy_dataset/ 
     --output-file toy_example/toy_dataset_scores --weight-func beta --maf-threshold 0.01
@@ -66,3 +65,7 @@ If the user does not have weights for calculation, they can provide a file with 
 
     $genrisk get-gbrs --scores-file scores_file.tsv --weights-file weights_file.tsv --weights-col zscore --sum
 * For further CLI options and parameters use --help
+
+## Contact
+If you have any questions or problems with the tool please feel free to create an issue in the repository or contact me via email:
+aldisi.rana@gmail.com
