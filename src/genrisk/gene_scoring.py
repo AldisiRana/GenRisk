@@ -174,7 +174,7 @@ def pathway_scoring(
     scores_file,
     samples_col,
 ):
-    scores_df = pd.read_csv(scores_file, sep='\t', usecols=[samples_col] + genes)
+    scores_df = pd.read_csv(scores_file, sep=r'\s+', usecols=[samples_col] + genes)
     pathway_scores = pd.DataFrame(columns=[samples_col] + list(pathways))
     pathway_scores[samples_col] = scores_df[samples_col]
     for path, path_genes in pathways.items():

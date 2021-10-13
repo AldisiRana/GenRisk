@@ -545,7 +545,7 @@ def calculate_pathways(
 ):
     """
     Calculate pathway scores using gene-based scores and gmt pathway file.
-    /f
+    \f
 
     :param output_file: the final output
     :param pathway_file: .gmt file containing the pathway and its genes.
