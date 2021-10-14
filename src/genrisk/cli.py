@@ -79,7 +79,7 @@ def score_genes(
     :return: the final dataframe information.
     """
     confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
-    logger.info('GenRisk - Gene-based scoring')
+    logger.info('Gene-based scoring')
     logger.info('Score genes process is starting now...')
     logger.info(locals())
     logger.info('getting information from vcf files')
@@ -154,7 +154,7 @@ def find_association(
 
     :return:
     """
-    logger.info('GenRisk - Finding associations')
+    logger.info('Finding associations')
     logger.info(locals())
     logger.info("The process for calculating the p_values will start now.")
     if test == 'betareg':
@@ -229,7 +229,7 @@ def visualize(
     :return:
 
     """
-    logger.info('GenRisk - creating plots for data')
+    logger.info('Creating plots for data')
     logger.info(locals())
     logger.info('Reading p_values file...')
     pvals_df = pd.read_csv(pvals_file, sep='\t', index_col=False)
@@ -313,7 +313,7 @@ def create_model(
 
     :return: the final model
     """
-    logger.info('GenRisk - Create prediction model')
+    logger.info('Create prediction model')
     logger.info(locals())
     logger.info('Reading and preparing data ...')
     training_set = pd.read_csv(data_file, sep='\t', index_col=samples_col)
@@ -370,7 +370,7 @@ def test_model(
 
     :return: a dataframe with predicted values.
     """
-    logger.info('GenRisk - testing prediction model')
+    logger.info('Testing prediction model')
     logger.info(locals())
     testing_df = model_testing(
         model_path=model_path,
@@ -557,9 +557,9 @@ def calculate_pathways(
     logger.info(locals())
     pathways = {line.strip().split('\t')[0]: line.strip().split('\t')[2:] for line in open(pathway_file, 'r')}
     all_genes = [item for sublist in list(pathways.values()) for item in sublist]
-    fline = open(scores_file).readline().rstrip().split()
-    genes = list(set(all_genes) & set(fline))
-    df = pathway_scoring(pathways=pathways, genes=genes, scores_file=scores_file, samples_col=samples_col, logger=logger)
+    scored_genes = open(scores_file).readline().rstrip().split()
+    combined_genes = list(set(all_genes) & set(scored_genes))
+    df = pathway_scoring(pathways=pathways, genes=combined_genes, scores_file=scores_file, samples_col=samples_col, logger=logger)
     df.to_csv(output_file, sep='\t', index=False)
     logger.info('Process is done.')
     return df
