@@ -180,7 +180,7 @@ def pathway_scoring(
     pathway_scores = pd.DataFrame(columns=[samples_col] + list(pathways))
     pathway_scores[samples_col] = scores_df[samples_col]
     logger.info('calculating pathway scores ...')
-    for path, path_genes in pathways.items():
+    for path, path_genes in tqdm(pathways.items(), desc='calculating pathway scores'):
         selected_genes = list(set(genes) & (set(path_genes)))
         if len(selected_genes) == 0:
             pathway_scores.drop(columns=[path], inplace=True)
