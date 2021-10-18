@@ -9,6 +9,17 @@ Welcome to GenRisk's documentation!
 GenRisk is a package that implements different gene-based scoring schemes to analyze and find significant genes
 within a phenotype in a population
 
+
+.. toctree::
+   :maxdepth: 2
+
+   cli
+   pipeline
+   utils
+   use_example
+   ldl_results
+
+
 Installation
 ##############
 
@@ -28,14 +39,6 @@ ____________________
 
 ###############################
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Content
-   cli
-   pipeline
-   utils
-   use_example
-   ldl_results
 
 Indices and tables
 ==================
