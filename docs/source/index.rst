@@ -31,11 +31,11 @@ ____________________
 .. toctree::
    :maxdepth: 2
    :caption: Content
-    cli
-    pipeline
-    utils
-    use_example
-    ldl_results
+   cli
+   pipeline
+   utils
+   use_example
+   ldl_results
 
 Indices and tables
 ==================
