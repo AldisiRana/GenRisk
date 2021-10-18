@@ -5,7 +5,6 @@ contain the root `toctree` directive.
 
 Welcome to GenRisk's documentation!
 ########################################
-.. automodule:: genrisk
 
 .. toctree::
    :maxdepth: 2
