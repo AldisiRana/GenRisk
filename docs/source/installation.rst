@@ -13,6 +13,6 @@ ____________________
 
 .. code-block:: bash
 
-    pip install git+https://github.com/AldisiRana/GenRisk.git
+    pip install genrisk
 
 
