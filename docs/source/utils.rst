@@ -1,3 +1,4 @@
+.. _utils:
 Utilities
 ##########
 .. autofunction:: genrisk.utils.get_prs

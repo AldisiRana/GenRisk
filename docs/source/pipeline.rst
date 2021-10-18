@@ -1,3 +1,4 @@
+.. _pipeline:
 Pipeline
 #########
 .. autofunction:: genrisk.pipeline.find_pvalue

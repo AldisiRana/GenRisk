@@ -1,3 +1,4 @@
+.. _ldl_results:
 Real use case
 ###############
 We ran the pipeline using about 200K samples from UKBiobank.

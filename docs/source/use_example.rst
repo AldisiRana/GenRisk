@@ -1,3 +1,4 @@
+.. _use_example:
 Example use case
 ##################
 This toy dataset is not real data. It contains about 10,000 SNP and 20 genes,
