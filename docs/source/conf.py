@@ -49,6 +49,16 @@ extensions = [
     'sphinx_click',
 ]
 
+html_sidebars = {
+    '**': [
+        'about.html',
+        'navigation.html',
+        'relations.html',
+        'searchbox.html',
+        'donate.html',
+    ]
+}
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
