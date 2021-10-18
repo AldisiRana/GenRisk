@@ -184,5 +184,5 @@ def pathway_scoring(
         selected_genes = list(set(genes) & (set(path_genes)))
         if len(selected_genes) == 0:
             pathway_scores.drop(columns=[path], inplace=True)
-        pathway_scores[path] = scores_df[selected_genes].abs().sum(axis=1)
+        pathway_scores[path] = scores_df[selected_genes].sum(axis=1)
     return pathway_scores
