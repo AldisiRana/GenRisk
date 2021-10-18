@@ -28,13 +28,14 @@ ____________________
 
 ###############################
 
-Functions and cases:
-=====================
-* :ref:`cli`
-* :ref:`pipeline`
-* :ref:`utils`
-* :ref:`use_example`
-* :ref:`ldl_results`
+.. toctree::
+   :maxdepth: 2
+   :caption: Content
+    cli
+    pipeline
+    utils
+    use_example
+    ldl_results
 
 Indices and tables
 ==================
