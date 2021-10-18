@@ -5,16 +5,32 @@
 
 Welcome to GenRisk's documentation!
 ########################################
-.. automodule:: genrisk
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-   cli
-   pipeline
-   utils
-   use_example
-   ldl_results
+GenRisk is a package that implements different gene-based scoring schemes to analyze and find significant genes
+within a phenotype in a population
+
+Installation
+##############
+
+Requirements
+_____________
+* `plink <https://www.cog-genomics.org/plink>`_ >= 1.9
+* R version >= 3.6.3
+* python >= 3.
+
+Package installation
+____________________
+``GenRisk`` can be installed on python3+ from the latest code on `GitHub <https://github.com/AldisiRana/GenRisk>`_ with:
+
+.. code-block:: bash
+
+    pip install genrisk
+
+* :ref:`cli`
+* :ref:`pipeline`
+* :ref:`utils`
+* :ref:`use_example`
+* :ref:`ldl_results`
 
 Indices and tables
 ==================
