@@ -10,7 +10,7 @@ within a phenotype in a population
 ## Installation
 ``GenRisk`` can be installed on python3+ from the latest code on [GitHub](https://github.com/AldisiRana/GenRisk) with:
 
-    $ pip install git+https://github.com/AldisiRana/GenRisk.git
+    $ pip install genrisk
 
 ## Usage
 
