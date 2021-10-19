@@ -455,11 +455,13 @@ def merge(
 @click.option('-e', '--weights-col', default='zscore', help='the name and path to output results.')
 @OUTPUT_FILE
 @click.option('--split-size', default=0.25, help='the size ratio to split dataset for weight calculation.')
-@click.option('--sum', is_flag=True, help='if True the genes will be summed into one gbrs.')
+@click.option('--method', type=click.Choice(['sum', 'pathways', 'gene']),
+              help='method for presenting the risk scores.')
 @SAMPLES_COL
+@click.option('-p', '--pathway-file', required=True, help='.gmt file containing the pathway and its genes.')
 def get_gbrs(
     *,
-    sum,
+    method,
     scores_file,
     weights_file,
     pheno_file,
@@ -470,6 +472,7 @@ def get_gbrs(
     weights_col,
     output_file,
     split_size,
+    pathway_file
 ):
     """
     Calculate gene-based risk scores for individuals.
@@ -485,7 +488,7 @@ def get_gbrs(
     :param samples_col: the column contatining sample ids.
     :param weights_col: the column containing effect weight.
     :param output_file: the name and path to output results.
-    :param sum: if True the genes will be summed into one gbrs
+    :param method: for presenting the risk scores.
     :return: gbrs dataframe
     """
     logger.info('GenRisk - Calculating gene-based risk scores')
@@ -522,7 +525,9 @@ def get_gbrs(
         weights_df=weights_df,
         weights_col=weights_col,
         genes_col=genes_col,
-        sum=sum,
+        method=method,
+        pathway_file=pathway_file,
+        samples_col=samples_col,
     )
     df[samples_col] = scores_df[samples_col]
     logger.info("GBRS dataframe is being saved ...")

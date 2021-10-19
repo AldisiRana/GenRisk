@@ -144,7 +144,10 @@ def calculate_gbrs(
     weights_df,
     weights_col,
     genes_col,
-    sum=True
+    pathway_file=None,
+    samples_col,
+    method,
+    logger
 ):
     """
     Calculate a gene-based risk score for each individual in a given dataset.
@@ -161,9 +164,19 @@ def calculate_gbrs(
     df = scores_df[genes]
     df = df.reindex(sorted(df.columns), axis=1)
     df *= list(weights_df.sort_values(by=genes_col)[weights_col].values)
-    if sum:
+    if method == 'sum':
         df['gbrs'] = df.sum(axis=1)
         df = df[['gbrs']]
+    elif method == 'pathways':
+        pathways = {line.strip().split('\t')[0]: line.strip().split('\t')[2:] for line in open(pathway_file, 'r')}
+        pathway_scores = pd.DataFrame(columns=[samples_col] + list(pathways))
+        logger.info('calculating pathway scores ...')
+        for path, path_genes in tqdm(pathways.items(), desc='calculating pathway scores'):
+            selected_genes = list(set(genes) & (set(path_genes)))
+            if len(selected_genes) == 0:
+                pathway_scores.drop(columns=[path], inplace=True)
+            pathway_scores[path] = df[selected_genes].sum(axis=1)
+        df = pathway_scores
     return df
 
 
