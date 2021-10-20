@@ -44,7 +44,7 @@ def calc_corr(
         gene_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
         corr, pval = pearsonr(gene_df[gene + '_x'], gene_df[gene + '_y'])
         corr_info.append([gene, corr, pval])
-    corr_df = pd.DataFrame(corr_info, columns=['genes', 'corr', 'p_value']).sort_values(by=['p_value'])
+    corr_df = pd.DataFrame(corr_info, columns=['target', 'corr', 'p_value']).sort_values(by=['p_value'])
     corr_df.to_csv(output_file, sep='\t', index=False)
     return corr_df
 

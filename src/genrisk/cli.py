@@ -506,7 +506,7 @@ def get_gbrs(
         weights_df = find_pvalue(
             scores_file='scores_temp.tsv',
             info_file=pheno_file,
-            output_file='weights_'+output_file,
+            output_file='association_'+output_file,
             cases_column=pheno_col,
             samples_column=samples_col,
             test='linear',
