@@ -458,7 +458,7 @@ def merge(
 @click.option('--method', type=click.Choice(['sum', 'pathways', 'gene']),
               help='method for presenting the risk scores.')
 @SAMPLES_COL
-@click.option('-p', '--pathway-file', required=True, help='.gmt file containing the pathway and its genes.')
+@click.option('--pathway-file', required=True, help='.gmt file containing the pathway and its genes.')
 def get_gbrs(
     *,
     method,
@@ -528,6 +528,7 @@ def get_gbrs(
         method=method,
         pathway_file=pathway_file,
         samples_col=samples_col,
+        logger=logger,
     )
     df[samples_col] = scores_df[samples_col]
     logger.info("GBRS dataframe is being saved ...")
