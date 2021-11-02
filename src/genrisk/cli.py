@@ -268,7 +268,7 @@ def visualize(
 @click.option('-t', '--test', is_flag=True,
               help='if flagged, a test set will be created for evaluating the final model.')
 @click.option('-n', '--model-name', required=True, help='name of model file.')
-@click.option('-m', '--model-type', required=True, type=click.Choice(['regressor', 'classifier']),
+@click.option('--model-type', required=True, type=click.Choice(['regressor', 'classifier']),
               help='type of prediction model.')
 @click.option('-l', '--target-col', required=True, help='name of target column in data_file.')
 @click.option('-b', '--imbalanced', is_flag=True, help='if flagged methods will be used to account for the imbalance.')
@@ -520,6 +520,7 @@ def get_gbrs(
         os.remove('scores_temp.tsv')
         weights_df['zscore'] = weights_df['beta_coef']/weights_df['std_err']
     logger.info("Calculating GBRS now ...")
+    weights_df.dropna(subset=[weights_col], inplace=True)
     df = calculate_gbrs(
         scores_df=scores_df,
         weights_df=weights_df,
