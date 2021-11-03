@@ -31,11 +31,16 @@ _____________
 
 Package installation
 ____________________
-``GenRisk`` can be installed on python3+ from the latest code on `GitHub <https://github.com/AldisiRana/GenRisk>`_ with:
+Option 1: The latest release of ``GenRisk`` can be installed on python3+ with:
 
 .. code-block:: bash
 
     pip install genrisk
+
+Option2: you can also install the package with the latest updates directly from `GitHub <https://github.com/AldisiRana/GenRisk>`_ with:
+.. code-block:: bash
+
+    pip install git+https://github.com/AldisiRana/GenRisk.git
 
 ###############################
 
