@@ -520,7 +520,7 @@ def get_gbrs(
         os.remove('scores_temp.tsv')
         weights_df['zscore'] = weights_df['beta_coef']/weights_df['std_err']
     logger.info("Calculating GBRS now ...")
-    weights_df.dropna(subset=[weights_col], inplace=True)
+    weights_df[weights_col] = weights_df[weights_df[weights_col].apply(lambda x: x.isnumeric())]
     weights_df[weights_col] = pd.to_numeric(weights_df[weights_col])
     df = calculate_gbrs(
         scores_df=scores_df,
