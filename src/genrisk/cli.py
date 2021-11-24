@@ -2,6 +2,7 @@
 import os
 import random
 import shutil
+import time
 
 import click
 import pandas as pd
@@ -83,6 +84,7 @@ def score_genes(
     logger.info('Score genes process is starting now...')
     logger.info(locals())
     logger.info('getting information from vcf files')
+    start_time = time.time()
     df = scoring_process(
         logger=logger,
         annotated_vcf=annotated_vcf,
@@ -102,6 +104,9 @@ def score_genes(
     if confirm:
         logger.info('The temporary files will be removed now.')
         shutil.rmtree(temp_dir)
+    time.sleep(1)
+    end_time = time.time()
+    logger.info(f"Runtime of the program is {end_time - start_time} Sec")
     return df.info()
 
 
@@ -157,6 +162,7 @@ def find_association(
     logger.info('Finding associations')
     logger.info(locals())
     logger.info("The process for calculating the p_values will start now.")
+    start_time = time.time()
     if test == 'betareg':
         betareg_pvalues(
             scores_file=scores_file,
@@ -169,6 +175,8 @@ def find_association(
             genes=genes,
             logger=logger,
         )
+        end_time = time.time()
+        logger.info(f"Runtime of the program is {end_time - start_time}")
     else:
         if genes:
             with open(genes) as f:
@@ -187,6 +195,8 @@ def find_association(
             processes=processes,
             logger=logger
         )
+        end_time = time.time()
+        logger.info(f"Runtime of the program is {end_time - start_time}")
         return df.info()
 
 
@@ -316,6 +326,7 @@ def create_model(
     logger.info('Create prediction model')
     logger.info(locals())
     logger.info('Reading and preparing data ...')
+    start_time = time.time()
     training_set = pd.read_csv(data_file, sep='\t', index_col=samples_col)
     training_set.dropna(subset=[target_col], inplace=True)
     testing_set = pd.DataFrame()
@@ -338,6 +349,8 @@ def create_model(
         seed=int(seed)
     )
     logger.info('Model is generated.')
+    end_time = time.time()
+    logger.info(f"Runtime of the program is {end_time - start_time}")
     return model
 
 
