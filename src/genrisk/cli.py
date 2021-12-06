@@ -61,45 +61,23 @@ def score_genes(
 ):
     """
     Calculate the gene-based scores for a given dataset.
+    \f
 
-    Parameters
-    ----------
-    annotated_vcf : str
-        an annotated containing variant IDs, alt, info and samples genotypes.
-    bfiles : str, default=None
-        the binary files for plink process.
-    plink : str, optional
-        the directory of plink, if not set in environment
-    beta_param : int int, default=1 25
-        the parameters from beta weight function. Should be two parameters.
-    temp_dir : str
-        a temporary directory to save temporary files before merging.
-    output_file : str
-        the final output scores matrix.
-    weight_func : str, default=beta
-        the weighting function used in score calculation.
-    variant_col : str, default=SNP
-        the column containing the variant IDs.
-    gene_col : str, default=Gene.refGene
-        the column containing gene names.
-    af_col : str, default=MAF
-        the column containing allele frequency.
-    del_col : str, default=CADD_raw
-        the column containing deleteriousness score.
-    alt_col : str, default=Alt
-        the column containing alternate base.
-    maf_threshold : float, default=0.01
-        the threshold for minor allele frequency.
+    :param bfiles: the binary files for plink process.
+    :param annotated_vcf: an annotated containing variant IDs, alt, info and samples genotypes.
+    :param plink: the directory of plink, if not set in environment
+    :param beta_param: the parameters from beta weight function.
+    :param temp_dir: a temporary directory to save temporary files before merging.
+    :param output_file: the final output scores matrix.
+    :param weight_func: the weighting function used in score calculation.
+    :param variant_col: the column containing the variant IDs.
+    :param gene_col: the column containing gene names.
+    :param af_col: the column containing allele frequency.
+    :param del_col: the column containing deleteriousness score.
+    :param alt_col: the column containing alternate base.
+    :param maf_threshold: the threshold for minor allele frequency.
 
-    Returns
-    -------
-        pd.DataFrame
-            the final dataframe information.
-
-    Examples
-    --------
-        $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/ --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT --variant-col ID --af-col AF --del-col CADD --gene-col Gene
-
+    :return: the final dataframe information.
     """
     confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
     logger.info('Gene-based scoring')
