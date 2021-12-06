@@ -134,7 +134,7 @@ def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None):
         w_file = os.path.join(genes_folder, (gene + '.w'))
         p = subprocess.call(
             plink + input_files + " --double-id" + " --extract " + v_file + " --score " + w_file +
-            " 1 2 3 sum --out " + os.path.join(genes_folder, gene), shell=True
+            " 1 2 3 --out " + os.path.join(genes_folder, gene), shell=True
         )
 
 
