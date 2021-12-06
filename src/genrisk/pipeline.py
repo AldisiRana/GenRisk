@@ -229,6 +229,7 @@ def create_prediction_model(
     test_size=0.25,
     metric=None,
     seed,
+    include_models,
 ):
     """
     Create a prediction model (classifier or regressor) using the provided dataset.
@@ -259,6 +260,7 @@ def create_prediction_model(
             testing_set=testing_set,
             imbalanced=imbalanced,
             seed=seed,
+            include_models=include_models,
         )
     except Exception:
         raise Exception('Model requested is not available. Please choose regressor or classifier.')

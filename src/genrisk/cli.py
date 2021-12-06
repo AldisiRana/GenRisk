@@ -59,9 +59,7 @@ def score_genes(
     alt_col,
     maf_threshold,
 ):
-    """
-    Calculate the gene-based scores for a given dataset.
-    \f
+    """Calculate the gene-based scores for a given dataset.
 
     :param bfiles: the binary files for plink process.
     :param annotated_vcf: an annotated containing variant IDs, alt, info and samples genotypes.
@@ -78,6 +76,9 @@ def score_genes(
     :param maf_threshold: the threshold for minor allele frequency.
 
     :return: the final dataframe information.
+
+    :example:
+
     """
     confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
     logger.info('Gene-based scoring')
@@ -142,9 +143,7 @@ def find_association(
     covariates,
     processes,
 ):
-    """
-    Calculate the P-value between two given groups.
-    \f
+    """Calculate the P-value between two given groups.
 
     :param scores_file: the file containing gene scores.
     :param info_file: file containing the phenotype.
@@ -222,9 +221,7 @@ def visualize(
     chr_col,
     pos_col,
 ):
-    """
-    Visualize manhatten plot and qqplot for the data.
-    \f
+    """Visualize manhatten plot and qqplot for the data.
 
     :param pvals_file: the file containing p-values.
     :param info_file: file containing variant/gene info.
@@ -288,6 +285,8 @@ def visualize(
 @SAMPLES_COL
 @click.option('--seed', default=random.randint(1, 2147483647),
               help='add number to create reproduciple train_test splitting.')
+@click.option('--include-models', default=None,
+              help='choose specific models to compare with comma in between. e.g lr,gbr,dt')
 def create_model(
     *,
     data_file,
@@ -302,11 +301,10 @@ def create_model(
     folds,
     metric,
     samples_col,
-    seed
+    seed,
+    include_models
 ):
-    """
-    Create a prediction model with given dataset.
-    \f
+    """Create a prediction model with given dataset.
 
     :param samples_col: the name of the column with samples identifiers.
     :param data_file: file containing features and target.
@@ -320,6 +318,8 @@ def create_model(
     :param normalize:  if true the data will be normalized before training
     :param folds: the number of folds used for cross validation
     :param metric: the metric used to choose best model after training.
+    :param include_models: list of specific models to compare. more information in the documentations
+    :param seed:
 
     :return: the final model
     """
@@ -335,6 +335,8 @@ def create_model(
     os.mkdir(output_folder)
     os.chdir(output_folder)
     logger.info('Model generation starting ...')
+    if include_models:
+        include_models = include_models.split(',')
     model = create_prediction_model(
         model_name=model_name,
         model_type=model_type,
@@ -346,7 +348,8 @@ def create_model(
         training_set=training_set,
         testing_set=testing_set,
         test_size=test_size,
-        seed=int(seed)
+        seed=int(seed),
+        include_models=include_models,
     )
     logger.info('Model is generated.')
     end_time = time.time()
@@ -371,9 +374,7 @@ def test_model(
     samples_col,
     output_file,
 ):
-    """
-    Evaluate a prediction model with a given dataset.
-    \f
+    """Evaluate a prediction model with a given dataset.
 
     :param model_path: the path to the ML model.
     :param input_file: the testing dataset.
@@ -403,10 +404,8 @@ def get_prs(
     *,
     plink,
 ):
-    """
-    Calculate PRS. This command is interactive.
+    """Calculate PRS. This command is interactive.
     This command gets a pgs file (provided by the user or downloaded) then calculates the PRS for dataset.
-    \f
 
     :param plink: provide plink path if not default in environment.
 
@@ -432,15 +431,14 @@ def merge(
     cols,
     output_file
 ):
-    """
-    Merge all files given into one dataframe.
-    /f
+    """Merge all files given into one dataframe.
 
     :param files: all files to merge with a comma in between. E.g: file1,file2,file3
     :param sep: the column seperator in files.
     :param by: the common column between all files to merge.
     :param cols: a list of columns can be chosen to save final file, e.g: col1,col2,col5
     :param output_file: the name and path to save final dataframe
+
     :return: merged dataframe
     """
     logger.info('GenRisk - merging dataframes')
@@ -487,9 +485,7 @@ def get_gbrs(
     split_size,
     pathway_file
 ):
-    """
-    Calculate gene-based risk scores for individuals.
-    \f
+    """Calculate gene-based risk scores for individuals.
 
     :param split_size: the test size for weight calculations.
     :param scores_file: the gene-based scores file
@@ -502,6 +498,7 @@ def get_gbrs(
     :param weights_col: the column containing effect weight.
     :param output_file: the name and path to output results.
     :param method: for presenting the risk scores.
+
     :return: gbrs dataframe
     """
     logger.info('GenRisk - Calculating gene-based risk scores')
@@ -564,14 +561,13 @@ def calculate_pathways(
     scores_file,
     samples_col
 ):
-    """
-    Calculate pathway scores using gene-based scores and gmt pathway file.
-    \f
+    """Calculate pathway scores using gene-based scores and gmt pathway file.
 
     :param output_file: the final output
     :param pathway_file: .gmt file containing the pathway and its genes.
     :param scores_file: genes scores file to calculate pathway scores.
     :param samples_col: column containing samples ids.
+
     :return: the pathway scores df
     """
     logger.info('GenRisk - calculating pathway scores')

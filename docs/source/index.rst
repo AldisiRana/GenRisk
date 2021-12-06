@@ -16,6 +16,7 @@ within a phenotype in a population
    cli
    pipeline
    utils
+   model_types
    use_example
    ldl_results
 
