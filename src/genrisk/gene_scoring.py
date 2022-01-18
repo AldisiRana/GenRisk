@@ -114,7 +114,7 @@ def combine_scores(
     return df
 
 
-def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None):
+def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None, method=""):
     """
     Use plink to calculate and sum the scores for each gene.
 

@@ -37,12 +37,12 @@ def prs_prompt(*, download, plink):
     output_file = click.prompt('Please provide an output file path', type=str)
     if file_type == 'vcf':
         p = call(
-            plink + " --vcf " + input_file + " --score " + pgs_file + " " + cols + " sum --out " + output_file,
+            plink + " --vcf " + input_file + " --score " + pgs_file + " " + cols + " --out " + output_file,
             shell=True
         )
     else:
         p = call(
-            plink + " --bfile " + input_file + " --score " + pgs_file + " " + cols + " sum --out " + output_file,
+            plink + " --bfile " + input_file + " --score " + pgs_file + " " + cols + " --out " + output_file,
             shell=True
         )
     return 'Process is complete. Have a nice day!'
