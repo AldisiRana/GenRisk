@@ -18,13 +18,13 @@ QQ-plot and Manhattan plot are presented below.
 
 The QQ-plot:
 
-.. image:: ../../ldl_example/linear_assoc_ldl_200k_qqplot.png
+.. image:: ../../ldl_example/200k_maf001_ldl_adj_qqplot.png
     :width: 400
     :align: center
 
 The Manhattan plot:
 
-.. image:: ../../ldl_example/linear_assoc_ldl_200k_manhattan.png
+.. image:: ../../ldl_example/200k_maf001_ldl_adj_manhattan.png
     :width: 400
     :align: center
 
