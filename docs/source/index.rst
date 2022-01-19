@@ -18,7 +18,8 @@ within a phenotype in a population
    utils
    model_types
    use_example
-   ldl_results
+   real_cases
+   methods_comparison
 
 
 Installation
