@@ -18,7 +18,7 @@ like linear or lasso regression, to be finalized.
 Total run time of prediction model generation in seconds
 ---------------------------------------------------------
 
-+------------+------------+-----------+
++------------+------------+-------------+-----------------+
 |            | 1K samples | 10K samples | 100K samples    |
 +============+============+=============+=================+
 | 10 feats   |     14     |     19      |    1690         |
