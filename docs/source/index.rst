@@ -20,6 +20,7 @@ within a phenotype in a population
    use_example
    real_cases
    methods_comparison
+   computation
 
 
 Installation
