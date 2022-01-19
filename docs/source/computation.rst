@@ -15,26 +15,18 @@ Another point to consider is that the time and memory usage also depends on the 
 best model fine-tuning and finalization. Some models, such as gradient boosting, might take more time than simpler models,
 like linear or lasso regression, to be finalized.
 
-.. list-table:: Total run time of prediction model generation in seconds
-   :widths: 25 25 50
-   :header-rows: 1
+Total run time of prediction model generation in seconds
+---------------------------------------------------------
 
-   * -
-     - 1K samples
-     - 10K samples
-     - 100K samples
-   * - 10 feats
-     - 14
-     - 19
-     - 1690
-   * - 100 feats
-     - 24
-     - 678
-     - 41649
-   * - 1000 feats
-     - 143
-     - 1034
-     - 432000 (≈ 5 days)
++------------+------------+-----------+
+|            | 1K samples | 10K samples | 100K samples    |
++============+============+=============+=================+
+| 10 feats   |     14     |     19      |    1690         |
++------------+------------+-------------+-----------------+
+| 100 feats  |      24    |     678     |       41649     |
++------------+------------+-------------+-----------------+
+| 1000 feats |     143    |    1034     | 432000(≈ 5days) |
++------------+------------+-------------+-----------------+
 
 Maximum memory used in GB
 --------------------------
