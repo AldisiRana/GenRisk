@@ -30,34 +30,19 @@ Total run time of prediction model generation in seconds
 
 Maximum memory used in GB
 --------------------------
-.. list-table:: Maximum memory used of prediction model generation in GB
-   :widths: 25 25 50
-   :header-rows: 1
 
-* -
-     - 1K samples
-     - 10K samples
-     - 100K samples
-   * - 10 feats
-     - 2.81
-     - 2.93
-     - 2.97
-   * - 100 feats
-     - 2.93
-     - 2.95
-     - 3.29
-   * - 1000 feats
-     - 3.51
-     - 3.82
-     - 8.29
++------------+------------+-------------+-----------------+
+|            | 1K samples | 10K samples | 100K samples    |
++============+============+=============+=================+
+| 10 feats   |    2.81    |     2.93    |      2.97       |
++------------+------------+-------------+-----------------+
+| 100 feats  |     2.93   |     2.95    |       3.29      |
++------------+------------+-------------+-----------------+
+| 1000 feats |     3.51   |    3.82     |       8.29      |
++------------+------------+-------------+-----------------+
 
-| | 1K samples | 10K samples | 100K samples |
-| ------------- | ------------- | :-------------: | -----:|
-| 10 feats | 2.81 | 2.93 | 2.97 |
-| 100 feats | 2.93 | 2.95 | 3.29 |
-| 1000 feats | 3.51 | 3.82 | 8.29 |
-
-
+Feature Selection
+------------------
 In general in the context of prediction models for big datasets we would suggest a feature selection using the “association” module and then generate prediction models.
 This is also in line with the expected genetic architecture of the majority of the traits in which only a small proportion of the genes plays a pivotal role.
 If instead we have a really highly polygenic phenotype the computation of genome-wide polygenic risk score (PRS) is probably the most appropriate approach, as PRS is a value per individual only a vector of scores would be generated and therefore the computational burden is limited.
