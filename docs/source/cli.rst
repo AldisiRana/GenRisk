@@ -14,9 +14,17 @@ score-genes
 .. autofunction:: genrisk.cli.score_genes
 
 find-association
-------------
+-----------------
 ::
 
     $ genrisk find-association [ARGS]
 
 .. autofunction:: genrisk.cli.find_association
+
+visualize
+----------
+::
+
+    $ genrisk visualize [ARGS]
+
+.. autofunction:: genrisk.cli.visualize
