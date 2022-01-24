@@ -103,9 +103,10 @@ def score_genes(
         the DataFrame is saved into the output path indicated in the arguments
 
     Example
-    --------
+    ---------
+    This function is performed using commandline interface::
 
-    $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/ --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT --variant-col ID --af-col AF --del-col CADD --gene-col Gene
+        $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/ --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT --variant-col ID --af-col AF --del-col CADD --gene-col Gene
 
     """
     confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
