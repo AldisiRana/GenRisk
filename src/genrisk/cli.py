@@ -79,7 +79,7 @@ def score_genes(
     output_file : str
         the location and name of the final output scores matrix.
     weight_func : str
-        the weighting function used on allele frequency in score calculation. [beta, log10]
+        the weighting function used on allele frequency in score calculation. [beta| log10]
         beta : this option uses two parameters α and β, to create beta distribution.
         log10 : this option uses -log distribution to upweight rare variants.
     variant_col : str
@@ -388,25 +388,53 @@ def create_model(
         seed,
         include_models,
 ):
-    """Create a prediction model with given dataset.
+    """
+    Create a prediction model with given dataset.
 
-    :param samples_col: the name of the column with samples identifiers.
-    :param data_file: file containing features and target.
-    :param output_folder: a folder path to save all outputs.
-    :param test_size: the size of testing set.
-    :param test: if True the dataset will be split into training and testing for extra evaluation after finalization.
-    :param model_name: the name of the model to be saved.
-    :param model_type: the type of model (regressor or classifier).
-    :param target_col: the name of the target column in data file.
-    :param imbalanced: if true methods will be used to account for the imbalance.
-    :param normalize:  if true the data will be normalized before training
-    :param normalize_method:
-    :param folds: the number of folds used for cross validation
-    :param metric: the metric used to choose best model after training.
-    :param include_models: list of specific models to compare. more information in the documentations
-    :param seed:
+    Parameters
+    ----------
+    data_file : str
+        file containing features and target.
+    output_folder : str
+        a folder path to save all outputs.
+    test_size : float
+        the size of testing set.
+    test : bool
+        if True the dataset will be split into training and testing for extra evaluation after finalization.
+    model_name : str
+        the name of the model to be saved.
+    model_type : str
+        the type of model [regressor| classifier].
+    target_col : str
+        the name of the target column in data file.
+    imbalanced : bool
+        if true methods will be used to account for the imbalance.
+    normalize : bool
+        if true the data will be normalized before training
+    normalize_method : str
+        method used to normalize data. [zscore| minmax| maxab| robust]
+    folds : int
+        the number of folds used for cross validation
+    metric : str
+        the metric used to choose best model after training.
+    samples_col : str
+        the name of the column with samples IDs.
+    seed : int
+        random seed number to run the machine learning models.
+    include_models : str
+        list of specific models to compare. more information in the documentations
 
-    :return: the final model
+    Returns
+    -------
+    Final prediction model
+
+    Example
+    --------
+     This function is performed using commandline interface::
+
+        $ genrisk create-model --data-file toy_example_regressor_features.tsv --model-type regressor
+        --output-folder toy_regressor  --test-size 0.25 --test --model-name toy_regressor
+        --target-col trait1 --imbalanced --normalize
     """
     logger.info('Create prediction model')
     logger.info(locals())

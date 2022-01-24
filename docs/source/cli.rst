@@ -28,3 +28,12 @@ visualize
     $ genrisk visualize [ARGS]
 
 .. autofunction:: genrisk.cli.visualize
+
+
+create-model
+-------------
+::
+
+    $ genrisk create-model [ARGS]
+
+.. autofunction:: genrisk.cli.create_model
