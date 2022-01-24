@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import os
 import random
 import shutil
@@ -62,49 +61,42 @@ def score_genes(
 ):
     """
     Calculate the gene-based scores for a given dataset.
+    \f
 
     Parameters
     ----------
     annotated_vcf : str
         an annotated containing variant IDs, alt, info and samples genotypes.
-
     bfiles : str
         the binary files for plink process.
         this arg is not needed if the annotated vcf contains all information.
-
     plink : str
         the location of plink, if not set in environment
-
     beta_param : tuple
         the parameters from beta weight function.
-
     temp_dir : str
         a temporary directory to save temporary files before merging.
-
     output_file : str
         the location and name of the final output scores matrix.
-
     weight_func : str
         the weighting function used on allele frequency in score calculation. [beta, log10]
-        beta : this function uses two parameters α and β, to create beta distribution.
-        log10 : this function uses -log distribution to upweight rare variants.
-
+        beta
+        +++++
+        this function uses two parameters α and β, to create beta distribution.
+        log10
+        ++++++
+        this function uses -log distribution to upweight rare variants.
     variant_col : str
         the column containing the variant IDs.
-
     gene_col : str
         the column containing gene names.
         If the genes are in the INFO column, use the identifier of the value (i.e gene=IF, identifier is 'gene')
-
     af_col : str
         the column containing allele frequency. If in INFO, follow previous example
-
     del_col : str
         the column containing deleteriousness score (functional annotation). If in INFO, follow previous example
-
     alt_col : str
         the column containing alternate base.
-
     maf_threshold : float
         the threshold for minor allele frequency.
 
@@ -188,37 +180,29 @@ def find_association(
 ):
     """
     Calculate the P-value between two given groups.
+    \f
 
     Parameters
     ----------
     scores_file : str
         the file containing gene-based scores.
-
     info_file : str
         file containing the phenotype.
-
     output_file : str
         path to the final output.
-
     genes : str
         a file that contains a list of genes to calculate p-values. if not, all genes in scoring file will be used.
-
     cases_col : str
         the name of the column with phenotypes. Phenotypes can be either binary or quantitative.
-
     samples_col : str
          the name of the column with sample IDs. All files need to have the same format.
-
     test : str
         the statistical test used for calculating p-values.
-
     adj_pval : str, optional
         the method used to adjust the p-values.
-
     covariates : str, optional
         the covariates used for calculation. Not all tests are able to include covariates.
         (e.g. Mann Whinteny U doesn't allow for covariates)
-
     processes : int, optional
         if more than 1 processer is selected, the function will be parallelized.
 
@@ -227,6 +211,14 @@ def find_association(
     DataFrame information
         the final dataframe information
         the DataFrame is saved into the output path indicated in the arguments
+
+    Example
+    ---------
+    This function is performed using commandline interface::
+
+        $ genrisk find-association --scores-file toy_example/toy_dataset_scores --info-file
+        toy_example/toy.pheno --cases-column trait1 --samples-column IID --test betareg --output-file
+        toy_dataset_betareg.tsv --covariates age,sex --adj-pval bonferroni
 
     """
     logger.info('Finding associations')
@@ -292,19 +284,41 @@ def visualize(
         chr_col,
         pos_col,
 ):
-    """Visualize manhatten plot and qqplot for the data.
+    """
+    Visualize manhatten plot and qqplot for the data.
+    \f
 
-    :param pvals_file: the file containing p-values.
-    :param info_file: file containing variant/gene info.
-    :param genescol_1: the name of the genes column in pvals file.
-    :param genescol_2: the name of the genes column in info file.
-    :param qq_output: the name of the qq plot file.
-    :param manhattan_output: the name of the manhatten plot file.
-    :param pval_col: the name of the pvalues column.
-    :param pos_col: the name of the position/start column.
-    :param chr_col: the name of chromosomes column.
+    Parameters
+    ----------
+    pvals_file : str
+        the file containing the calculated p-values.
+    info_file : str
+        file containing variant/gene info.
+    genescol_1 : str
+        the name of the genes column in pvals file.
+    genescol_2 : str
+        the name of the genes column in info file.
+    qq_output : str
+        the name of the qq plot file. If left empty no file will be produced.
+    manhattan_output : str
+        the name of the manhatten plot file. If left empty no file will be produced
+    pval_col : str
+        the name of the pvalues column.
+    chr_col : str
+        the name of chromosomes column.
+    pos_col : str
+        the name of the position/start column.
 
-    :return:
+    Returns
+    -------
+
+    Example
+    --------
+     This function is performed using commandline interface::
+
+        $ genrisk visualize --pvals-file toy_example/toy_dataset_scores
+        --info-file annotated_toy_dataset.vcf --qq-output toy_example/toy_dataset_qqplot.jpg
+        --manhattan-output toy_example/toy_dataset_manhattanplot.jpg
 
     """
     logger.info('Creating plots for data')
