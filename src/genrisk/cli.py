@@ -67,32 +67,45 @@ def score_genes(
     ----------
     annotated_vcf : str
         an annotated containing variant IDs, alt, info and samples genotypes.
+
     bfiles : str
         the binary files for plink process.
         this arg is not needed if the annotated vcf contains all information.
+
     plink : str
         the location of plink, if not set in environment
+
     beta_param : tuple
         the parameters from beta weight function.
+
     temp_dir : str
         a temporary directory to save temporary files before merging.
+
     output_file : str
         the location and name of the final output scores matrix.
+
     weight_func : str
         the weighting function used on allele frequency in score calculation. [beta, log10]
+
         beta - this function uses two parameters α and β, to create beta distribution.
         log10 - this function uses -log distribution to upweight rare variants.
+
     variant_col : str
         the column containing the variant IDs.
+
     gene_col : str
         the column containing gene names.
         If the genes are in the INFO column, use the identifier of the value (i.e gene=IF, identifier is 'gene')
+
     af_col : str
         the column containing allele frequency. If in INFO, follow previous example
+
     del_col : str
         the column containing deleteriousness score (functional annotation). If in INFO, follow previous example
+
     alt_col : str
         the column containing alternate base.
+
     maf_threshold : float
         the threshold for minor allele frequency.
 
@@ -106,7 +119,9 @@ def score_genes(
     ---------
     This function is performed using commandline interface::
 
-        $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/ --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT --variant-col ID --af-col AF --del-col CADD --gene-col Gene
+        $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/
+        --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT
+        --variant-col ID --af-col AF --del-col CADD --gene-col Gene
 
     """
     confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
@@ -172,6 +187,25 @@ def find_association(
         covariates,
         processes,
 ):
+    """
+
+    Parameters
+    ----------
+    scores_file
+    info_file
+    output_file
+    genes
+    cases_col
+    samples_col
+    test
+    adj_pval
+    covariates
+    processes
+
+    Returns
+    -------
+
+    """
     """Calculate the P-value between two given groups.
 
     :param scores_file: the file containing gene scores.
