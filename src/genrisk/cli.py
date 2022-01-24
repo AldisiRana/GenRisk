@@ -86,9 +86,8 @@ def score_genes(
 
     weight_func : str
         the weighting function used on allele frequency in score calculation. [beta, log10]
-
-        beta - this function uses two parameters α and β, to create beta distribution.
-        log10 - this function uses -log distribution to upweight rare variants.
+            beta : this function uses two parameters α and β, to create beta distribution.
+            log10 : this function uses -log distribution to upweight rare variants.
 
     variant_col : str
         the column containing the variant IDs.
@@ -188,16 +187,31 @@ def find_association(
         processes,
 ):
     """
+    Calculate the P-value between two given groups.
 
     Parameters
     ----------
-    scores_file
-    info_file
-    output_file
-    genes
-    cases_col
-    samples_col
-    test
+    scores_file : str
+        the file containing gene-based scores.
+
+    info_file : str
+        file containing the phenotype.
+
+    output_file : str
+        path to the final output.
+
+    genes : str
+        a file that contains a list of genes to calculate p-values. if not, all genes in scoring file will be used.
+
+    cases_col : str
+        the name of the column with phenotypes. Phenotypes can be either binary or quantitative.
+
+    samples_col : str
+         the name of the column with sample IDs. All files need to have the same format.
+
+    test : str
+        the statistical test used for calculating p-values.
+
     adj_pval
     covariates
     processes
