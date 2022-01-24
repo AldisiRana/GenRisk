@@ -55,6 +55,7 @@ extensions = [
     'sphinx_autodoc_typehints',
     'sphinx_click',
     'sphinx_rtd_theme'
+    'sphinx.ext.napoleon'
 ]
 
 html_sidebars = {

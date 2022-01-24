@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import os
 import random
 import shutil
@@ -44,40 +45,69 @@ def main():
 @click.option('-l', '--alt-col', default='Alt', help="the column containing the alternate base.")
 @click.option('-m', '--maf-threshold', default=0.01, help="the threshold for minor allele frequency.")
 def score_genes(
-    *,
-    annotated_vcf,
-    bfiles,
-    plink,
-    beta_param,
-    temp_dir,
-    output_file,
-    weight_func,
-    variant_col,
-    gene_col,
-    af_col,
-    del_col,
-    alt_col,
-    maf_threshold,
+        *,
+        annotated_vcf,
+        bfiles,
+        plink,
+        beta_param,
+        temp_dir,
+        output_file,
+        weight_func,
+        variant_col,
+        gene_col,
+        af_col,
+        del_col,
+        alt_col,
+        maf_threshold,
 ):
-    """Calculate the gene-based scores for a given dataset.
+    """
+    Calculate the gene-based scores for a given dataset.
 
-    :param bfiles: the binary files for plink process.
-    :param annotated_vcf: an annotated containing variant IDs, alt, info and samples genotypes.
-    :param plink: the directory of plink, if not set in environment
-    :param beta_param: the parameters from beta weight function.
-    :param temp_dir: a temporary directory to save temporary files before merging.
-    :param output_file: the final output scores matrix.
-    :param weight_func: the weighting function used in score calculation.
-    :param variant_col: the column containing the variant IDs.
-    :param gene_col: the column containing gene names.
-    :param af_col: the column containing allele frequency.
-    :param del_col: the column containing deleteriousness score.
-    :param alt_col: the column containing alternate base.
-    :param maf_threshold: the threshold for minor allele frequency.
+    Parameters
+    ----------
+    annotated_vcf : str
+        an annotated containing variant IDs, alt, info and samples genotypes.
+    bfiles : str
+        the binary files for plink process.
+        this arg is not needed if the annotated vcf contains all information.
+    plink : str
+        the location of plink, if not set in environment
+    beta_param : tuple
+        the parameters from beta weight function.
+    temp_dir : str
+        a temporary directory to save temporary files before merging.
+    output_file : str
+        the location and name of the final output scores matrix.
+    weight_func : str
+        the weighting function used on allele frequency in score calculation. [beta, log10]
+        beta - this function uses two parameters α and β, to create beta distribution.
+        log10 - this function uses -log distribution to upweight rare variants.
+    variant_col : str
+        the column containing the variant IDs.
+    gene_col : str
+        the column containing gene names.
+        If the genes are in the INFO column, use the identifier of the value (i.e gene=IF, identifier is 'gene')
+    af_col : str
+        the column containing allele frequency. If in INFO, follow previous example
+    del_col : str
+        the column containing deleteriousness score (functional annotation). If in INFO, follow previous example
+    alt_col : str
+        the column containing alternate base.
+    maf_threshold : float
+        the threshold for minor allele frequency.
 
-    :return: the final dataframe information.
+    Returns
+    -------
+    DataFrame information
+        the final scores dataframe information
+        the DataFrame is saved into the output path indicated in the arguments
 
-    :example:
+    Example
+    --------
+    literal blocks::
+
+    $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/ --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT --variant-col ID --af-col AF --del-col CADD --gene-col Gene
+
 
     """
     confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
@@ -131,17 +161,17 @@ def score_genes(
 @click.option('-v', '--covariates', default='PC1,PC2', help="the covariates used for calculation")
 @click.option('-p', '--processes', type=int, default=1, help='number of processes for parallelization')
 def find_association(
-    *,
-    scores_file,
-    info_file,
-    output_file,
-    genes,
-    cases_col,
-    samples_col,
-    test,
-    adj_pval,
-    covariates,
-    processes,
+        *,
+        scores_file,
+        info_file,
+        output_file,
+        genes,
+        cases_col,
+        samples_col,
+        test,
+        adj_pval,
+        covariates,
+        processes,
 ):
     """Calculate the P-value between two given groups.
 
@@ -210,16 +240,16 @@ def find_association(
 @click.option('-c', '--chr-col', default='Chr', help='the name of the chromosomes column')
 @click.option('-s', '--pos-col', default='Start', help='the name of the position/start of the gene column')
 def visualize(
-    *,
-    pvals_file,
-    info_file,
-    genescol_1,
-    genescol_2,
-    qq_output,
-    manhattan_output,
-    pval_col,
-    chr_col,
-    pos_col,
+        *,
+        pvals_file,
+        info_file,
+        genescol_1,
+        genescol_2,
+        qq_output,
+        manhattan_output,
+        pval_col,
+        chr_col,
+        pos_col,
 ):
     """Visualize manhatten plot and qqplot for the data.
 
@@ -280,6 +310,8 @@ def visualize(
 @click.option('-l', '--target-col', required=True, help='name of target column in data_file.')
 @click.option('-b', '--imbalanced', is_flag=True, help='if flagged methods will be used to account for the imbalance.')
 @click.option('--normalize', is_flag=True, help='if flagged the data will be normalized before training.')
+@click.option('--normalize-method', default='zscore', type=click.Choice(['zscore', 'minmax', 'maxabs', 'robust']),
+              help='features normalization method.')
 @click.option('-f', '--folds', default=10, type=int, help='number of cross-validation folds in training.')
 @click.option('--metric', help='the metric used to choose best model after training.')
 @SAMPLES_COL
@@ -288,21 +320,22 @@ def visualize(
 @click.option('--include-models', default=None,
               help='choose specific models to compare with comma in between. e.g lr,gbr,dt')
 def create_model(
-    *,
-    data_file,
-    output_folder,
-    test_size=None,
-    test,
-    model_name,
-    model_type,
-    target_col,
-    imbalanced,
-    normalize,
-    folds,
-    metric,
-    samples_col,
-    seed,
-    include_models
+        *,
+        data_file,
+        output_folder,
+        test_size=None,
+        test,
+        model_name,
+        model_type,
+        target_col,
+        imbalanced,
+        normalize,
+        normalize_method,
+        folds,
+        metric,
+        samples_col,
+        seed,
+        include_models,
 ):
     """Create a prediction model with given dataset.
 
@@ -316,6 +349,7 @@ def create_model(
     :param target_col: the name of the target column in data file.
     :param imbalanced: if true methods will be used to account for the imbalance.
     :param normalize:  if true the data will be normalized before training
+    :param normalize_method:
     :param folds: the number of folds used for cross validation
     :param metric: the metric used to choose best model after training.
     :param include_models: list of specific models to compare. more information in the documentations
@@ -350,6 +384,7 @@ def create_model(
         test_size=test_size,
         seed=int(seed),
         include_models=include_models,
+        normalize_method=normalize_method,
     )
     logger.info('Model is generated.')
     end_time = time.time()
@@ -366,13 +401,13 @@ def create_model(
 @click.option('-s', '--samples-col', default='IID', help='the samples column.')
 @OUTPUT_FILE
 def test_model(
-    *,
-    model_path,
-    input_file,
-    model_type,
-    label_col,
-    samples_col,
-    output_file,
+        *,
+        model_path,
+        input_file,
+        model_type,
+        label_col,
+        samples_col,
+        output_file,
 ):
     """Evaluate a prediction model with a given dataset.
 
@@ -401,8 +436,8 @@ def test_model(
 @main.command()
 @click.option('-p', '--plink', default='plink')
 def get_prs(
-    *,
-    plink,
+        *,
+        plink,
 ):
     """Calculate PRS. This command is interactive.
     This command gets a pgs file (provided by the user or downloaded) then calculates the PRS for dataset.
@@ -424,12 +459,12 @@ def get_prs(
               help='if desired, a list of columns can be chosen to save final file, e.g: col1,col2,col5')
 @OUTPUT_FILE
 def merge(
-    *,
-    files,
-    sep,
-    by,
-    cols,
-    output_file
+        *,
+        files,
+        sep,
+        by,
+        cols,
+        output_file
 ):
     """Merge all files given into one dataframe.
 
@@ -456,9 +491,11 @@ def merge(
 
 
 @main.command()
-@click.option('-s', '--scores-file', required=True, help='the gene-based scores file.')
-@click.option('-w', '--weights-file', default=None, help='a file containg the weights for each gene.')
-@click.option('-p', '--pheno-file', default=None, help='if no weights are given, pheno file is used to calculate them.')
+@click.option('-s', '--scores-file', required=True, type=click.Path(exists=True), help='the gene-based scores file.')
+@click.option('-w', '--weights-file', default=None, type=click.Path(exists=True),
+              help='a file containg the weights for each gene.')
+@click.option('-p', '--pheno-file', default=None, type=click.Path(exists=True),
+              help='if no weights are given, pheno file is used to calculate them.')
 @click.option('-c', '--pheno-col', default=None, help='the column containing the phenotype.')
 @click.option('-v', '--covariates', default='sex,age,bmi,PC1,PC2,PC3,PC4',
               help='the covariates to use in the linear model.')
@@ -471,22 +508,23 @@ def merge(
 @SAMPLES_COL
 @click.option('--pathway-file', required=True, help='.gmt file containing the pathway and its genes.')
 def get_gbrs(
-    *,
-    method,
-    scores_file,
-    weights_file,
-    pheno_file,
-    pheno_col,
-    covariates,
-    genes_col,
-    samples_col,
-    weights_col,
-    output_file,
-    split_size,
-    pathway_file
+        *,
+        method,
+        scores_file,
+        weights_file,
+        pheno_file,
+        pheno_col,
+        covariates,
+        genes_col,
+        samples_col,
+        weights_col,
+        output_file,
+        split_size,
+        pathway_file
 ):
     """Calculate gene-based risk scores for individuals.
 
+    :param pathway_file:
     :param split_size: the test size for weight calculations.
     :param scores_file: the gene-based scores file
     :param weights_file: the weights for each gene.
@@ -516,7 +554,7 @@ def get_gbrs(
         weights_df = find_pvalue(
             scores_file='scores_temp.tsv',
             info_file=pheno_file,
-            output_file='association_'+output_file,
+            output_file='association_' + output_file,
             cases_column=pheno_col,
             samples_column=samples_col,
             test='linear',
@@ -528,7 +566,7 @@ def get_gbrs(
         logger.info("Remove temporary files.")
         del scores_temp
         os.remove('scores_temp.tsv')
-        weights_df['zscore'] = weights_df['beta_coef']/weights_df['std_err']
+        weights_df['zscore'] = weights_df['beta_coef'] / weights_df['std_err']
     logger.info("Calculating GBRS now ...")
     weights_df[weights_col] = weights_df[weights_df[weights_col].apply(lambda x: x.isnumeric())]
     weights_df[weights_col] = pd.to_numeric(weights_df[weights_col])
@@ -552,14 +590,16 @@ def get_gbrs(
 @main.command()
 @OUTPUT_FILE
 @SAMPLES_COL
-@click.option('-p', '--pathway-file', required=True, help='.gmt file containing the pathway and its genes.')
-@click.option('-s', '--scores-file', required=True, help='genes scores file to calculate pathway scores.')
+@click.option('-p', '--pathway-file', required=True, type=click.Path(exists=True),
+              help='.gmt file containing the pathway and its genes.')
+@click.option('-s', '--scores-file', required=True, type=click.Path(exists=True),
+              help='genes scores file to calculate pathway scores.')
 def calculate_pathways(
-    *,
-    output_file,
-    pathway_file,
-    scores_file,
-    samples_col
+        *,
+        output_file,
+        pathway_file,
+        scores_file,
+        samples_col
 ):
     """Calculate pathway scores using gene-based scores and gmt pathway file.
 
@@ -576,7 +616,8 @@ def calculate_pathways(
     all_genes = [item for sublist in list(pathways.values()) for item in sublist]
     scored_genes = open(scores_file).readline().rstrip().split()
     combined_genes = list(set(all_genes) & set(scored_genes))
-    df = pathway_scoring(pathways=pathways, genes=combined_genes, scores_file=scores_file, samples_col=samples_col, logger=logger)
+    df = pathway_scoring(pathways=pathways, genes=combined_genes, scores_file=scores_file, samples_col=samples_col,
+                         logger=logger)
     df.to_csv(output_file, sep='\t', index=False)
     logger.info('Process is done.')
     return df
