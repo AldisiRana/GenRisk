@@ -54,7 +54,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx_autodoc_typehints',
     'sphinx_click',
-    'sphinx_rtd_theme'
+    'sphinx_rtd_theme',
     'sphinx.ext.napoleon'
 ]
 
