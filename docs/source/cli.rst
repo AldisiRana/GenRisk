@@ -1,7 +1,7 @@
 .. _cli:
 Command Line Interface
 #######################
-.. click:: genrisk.cli:main
+.. click:: cli:main
    :prog: genrisk
-   :show-nested:
+   :commands: score-genes
   
