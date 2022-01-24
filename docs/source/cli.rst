@@ -2,8 +2,6 @@
 Command Line Interface
 #######################
 
-score-genes
-------------
-.. autofunction:: genrisk.cli.score_genes
-
-
+.. click:: genrisk.cli:main
+   :prog: genrisk
+   :nested: full

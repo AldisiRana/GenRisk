@@ -86,8 +86,8 @@ def score_genes(
 
     weight_func : str
         the weighting function used on allele frequency in score calculation. [beta, log10]
-            beta : this function uses two parameters α and β, to create beta distribution.
-            log10 : this function uses -log distribution to upweight rare variants.
+        beta : this function uses two parameters α and β, to create beta distribution.
+        log10 : this function uses -log distribution to upweight rare variants.
 
     variant_col : str
         the column containing the variant IDs.
@@ -171,7 +171,7 @@ def score_genes(
 @click.option('-a', '--adj-pval', type=click.Choice(
     ['bonferroni', 'sidak', 'holm-sidak', 'holm',
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
-@click.option('-v', '--covariates', default='PC1,PC2', help="the covariates used for calculation")
+@click.option('-v', '--covariates', default='', help="the covariates used for calculation")
 @click.option('-p', '--processes', type=int, default=1, help='number of processes for parallelization')
 def find_association(
         *,
@@ -212,28 +212,22 @@ def find_association(
     test : str
         the statistical test used for calculating p-values.
 
-    adj_pval
-    covariates
-    processes
+    adj_pval : str, optional
+        the method used to adjust the p-values.
+
+    covariates : str, optional
+        the covariates used for calculation. Not all tests are able to include covariates.
+        (e.g. Mann Whinteny U doesn't allow for covariates)
+
+    processes : int, optional
+        if more than 1 processer is selected, the function will be parallelized.
 
     Returns
     -------
+    DataFrame information
+        the final dataframe information
+        the DataFrame is saved into the output path indicated in the arguments
 
-    """
-    """Calculate the P-value between two given groups.
-
-    :param scores_file: the file containing gene scores.
-    :param info_file: file containing the phenotype.
-    :param output_file: the path for final output.
-    :param genes: a list of genes to calculate. if not, all genes in scoring file will be used.
-    :param cases_col: the name of the column with phenotypes.
-    :param samples_col: the name of the column with sample IDs. All files need to have the same format.
-    :param test: the test used to calculate pvalue.
-    :param adj_pval: the adjustment method used (if any).
-    :param covariates: the column names of covariates to use, with comma in between. (e.g: PC1,PC2,age)
-    :param processes: number of processes for parallelization.
-
-    :return:
     """
     logger.info('Finding associations')
     logger.info(locals())
