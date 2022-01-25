@@ -13,7 +13,7 @@ from .gene_scoring import calculate_gbrs, pathway_scoring
 from .helpers import create_logger
 from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, model_testing, scoring_process
 from .prs_scoring import prs_prompt
-from .utils import draw_qqplot, draw_manhattan, merge_files
+from .utils import draw_qqplot, draw_manhattan, merge_files, normalize_data
 
 SAMPLES_COL = click.option('-m', '--samples-col', default='IID',
                            help="the name of the column that contains the samples.")
@@ -701,6 +701,60 @@ def calculate_pathways(
     logger.info('Process is done.')
     return df
 
+
+@main.command()
+@click.option('--method', required=True, type=click.Choice(['gene_length', 'zscore', 'minmax','maxabs', 'robust']))
+@click.option('--data-file', required=True, type=click.Path(exists=True))
+@click.option('--genes-info', default=None)
+@SAMPLES_COL
+@click.option('--genes-col', default='HGNC symbol', type=str)
+@click.option('--lengths-col', default='gene_length', type=str)
+@OUTPUT_FILE
+def normalize(
+        *,
+        method,
+        data_file,
+        genes_info,
+        samples_col,
+        genes_col,
+        lengths_col,
+        output_file,
+
+):
+    """
+    Normalize/standarize data.
+
+    Parameters
+    ----------
+    genes_info : str
+        the file containing genes names and length. if not provided ensembl database is used to retrieve data.
+    method : str
+        the method of normalizing data. [gene_length|zscore|minmax|maxabs|robust]
+    data_file : str
+        the file containg data to be normalized.
+    samples_col : str
+        the column containing sample ids.
+    genes_col : str
+        the column containing gene names. ignore if genes_info file is not provided.
+    lengths_col : str
+        the column containing gene lengths. ignore if genes_info file is not provided.
+    output_file : str
+        the name of the file for final output
+
+    Returns
+    -------
+    DataFrame with normalized data.
+
+    """
+    logger.info('GenRisk - normalizing data using '+ method)
+    logger.info(locals())
+    df = normalize_data(
+        method=method, data_file=data_file, samples_col=samples_col, genes_col=genes_col, length_col=lengths_col,
+        genes_info=genes_info,
+    )
+    df.to_csv(output_file, sep='\t', index=False)
+    logger.info('Process is done.')
+    return df
 
 if __name__ == '__main__':
     main()

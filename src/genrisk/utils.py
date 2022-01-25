@@ -6,50 +6,64 @@ import seaborn as sns
 from adjustText import adjust_text
 from qmplot import qqplot
 from tqdm import tqdm
+from pybiomart import Dataset
 
 
-def normalize_gene_len(
+def normalize_data(
     *,
-    genes_lengths_file,
-    genes_col='Gene name',
-    start_col='Gene end (bp)',
-    end_col='Gene start (bp)',
-    matrix_file,
+    method='gene_length',
+    genes_info=None,
+    genes_col='HGNC symbol',
+    length_col='gene_length',
+    data_file,
     samples_col,
-    output_path
 ):
     """
-    Normalize matrix by gene length.
 
-    :param end_col:
-    :param start_col:
-    :param genes_col:
-    :param genes_lengths_file: a file containing genes, and their start and end bps.
-    :param matrix_file: a tsv file containing a matrix of samples and their scores across genes.
-    :param samples_col: column containing the samples IDs.
-    :param output_path: the path to save the normalized matrix.
+    Parameters
+    ----------
+    method
+    genes_info
+    genes_col
+    length_col
+    data_file
+    samples_col
 
-    :return: a normalized dataframe.
+    Returns
+    -------
+
     """
-    genes_df = pd.read_csv(genes_lengths_file, sep='\t')
-    genes_lengths = {
-        row[genes_col]: round((row[start_col] - row[end_col]) / 1000, 3)
-        for _, row in genes_df.iterrows()
-    }
-    scores_df = pd.read_csv(matrix_file, sep=r'\s+')
+    scores_df = pd.read_csv(data_file, sep=r'\s+')
     unnormalized = []
-    for (name, data) in tqdm(scores_df.iteritems(), desc="Normalizing genes scores"):
-        if name == samples_col:
-            continue
-        if name not in genes_lengths.keys():
-            unnormalized.append(name)
-            continue
+    if method == 'gene_length':
+        if not genes_info:
+            dataset = Dataset(name='hsapiens_gene_ensembl',
+                              host='http://www.ensembl.org')
+            genes_df = dataset.query(attributes=['hgnc_symbol', 'start_position', 'end_position'])
+            genes_df['gene_length'] = genes_df['Gene end (bp)'] - genes_df['Gene start (bp)']
+        else:
+            genes_df = pd.read_csv(genes_info, sep='\t')
+        genes_lengths = genes_df.set_index(genes_col).to_dict()[length_col]
+        for (name, data) in tqdm(scores_df.drop(columns=[samples_col]).iteritems(), desc="Normalizing genes scores"):
+            if name not in genes_lengths.keys():
+                unnormalized.append(name)
+                continue
         # normalize genes by length
-        scores_df[name] = round(scores_df[name] / genes_lengths[name], 5)
-    # drop genes with unknown length
-    scores_df = scores_df.drop(unnormalized, axis=1)
-    if output_path:
-        scores_df.to_csv(output_path, sep='\t', index=False)
+            scores_df[name] = round(scores_df[name] / genes_lengths[name], 5)
+        scores_df = scores_df.drop(unnormalized, axis=1)
+    elif method == 'maxabs':
+        for col in scores_df.columns:
+            scores_df[col] = scores_df[col]/scores_df[col].abs().max()
+    elif method == 'minmax':
+        for col in scores_df.columns:
+            scores_df[col] = (scores_df[col] - scores_df[col].min()) / (scores_df[col].max() - scores_df[col].min())
+    elif method == 'zscore ':
+        scores_df.std(ddof=0)
+        for col in scores_df.columns:
+            scores_df[col] = (scores_df[col] - scores_df[col].mean()) / scores_df[col].std()
+    elif method == 'robust':
+        for col in scores_df.columns:
+            scores_df[col] = (scores_df[col] - scores_df[col].median()) / (scores_df[col].quantile(0.75) - scores_df[col].quantile(0.25))
     return scores_df
 
 
