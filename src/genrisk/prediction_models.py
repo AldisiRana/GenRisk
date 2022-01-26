@@ -18,12 +18,29 @@ def regression_model(
     testing_set,
     imbalanced,
     seed,
-    include_models
+    include_models,
+    normalize_method
 ):
+    """
+
+    :param y_col:
+    :param training_set:
+    :param normalize:
+    :param test_size:
+    :param folds:
+    :param metric:
+    :param model_name:
+    :param testing_set:
+    :param imbalanced:
+    :param seed:
+    :param include_models:
+    :param normalize_method:
+    :return:
+    """
     if not metric:
         metric = 'RMSE'
-    setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, train_size=1 - test_size,
-                        fold=folds, silent=True, session_id=seed)
+    setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, normalize_method=normalize_method,
+                        train_size=1 - test_size, fold=folds, silent=True, session_id=seed)
     best_model = pyreg.compare_models(sort=metric, include=include_models)
     pyreg.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)
     reg_model = pyreg.create_model(best_model)
@@ -55,11 +72,28 @@ def classification_model(
     imbalanced,
     seed,
     include_models,
+    normalize_method,
 ):
+    """
+
+    :param y_col:
+    :param training_set:
+    :param normalize:
+    :param test_size:
+    :param folds:
+    :param metric:
+    :param model_name:
+    :param testing_set:
+    :param imbalanced:
+    :param seed:
+    :param include_models:
+    :param normalize_method:
+    :return:
+    """
     if not metric:
         metric = 'AUC'
-    setup = pycl.setup(target=y_col, fix_imbalance=imbalanced, normalize=normalize, data=training_set,
-                       train_size=1 - test_size, silent=True, fold=folds, session_id=seed)
+    setup = pycl.setup(target=y_col, fix_imbalance=imbalanced, normalize=normalize, normalize_method=normalize_method,
+                       data=training_set, train_size=1 - test_size, silent=True, fold=folds, session_id=seed)
     best_model = pycl.compare_models(sort=metric, include=include_models)
     pycl.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)
     cl_model = pycl.create_model(best_model)
