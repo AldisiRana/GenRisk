@@ -488,15 +488,37 @@ def test_model(
         samples_col,
         output_file,
 ):
-    """Evaluate a prediction model with a given dataset.
+    """
+    Evaluate a prediction model with a given dataset.
 
-    :param model_path: the path to the ML model.
-    :param input_file: the testing dataset.
-    :param model_type: the type of model (classifier or regressor)
-    :param label_col: the labels/target column.
-    :param samples_col: the sample ids column.
+    Parameters
+    ----------
+    model_path : str
+        the path to the ML model.
+    input_file : str
+        the testing (independent) dataset.
+    model_type : str
+        the type of model [classifier|regressor].
+    label_col : str
+        the labels/target column.
+    samples_col : str
+        the sample ids column.
+    output_file : str
+        the path to the dataframe with the prediction results.
 
-    :return: a dataframe with predicted values.
+    Returns
+    -------
+    DataFrame
+        dataframe with the prediction results.
+
+
+    Example
+    --------
+     This function is performed using commandline interface::
+
+        $ genrisk test-model --model-path regressor_model.pkl --input-file testing_dataset.tsv
+        --model-type regressor --labels-col target --samples-col IID
+
     """
     logger.info('Testing prediction model')
     logger.info(locals())
@@ -518,13 +540,26 @@ def get_prs(
         *,
         plink,
 ):
-    """Calculate PRS. This command is interactive.
+    """
+    Calculate PRS. This command is interactive.
     This command gets a pgs file (provided by the user or downloaded) then calculates the PRS for dataset.
 
-    :param plink: provide plink path if not default in environment.
+    Parameters
+    ----------
+    plink : str
+        provide plink path if not default in environment.
 
-    :return:
+    Returns
+    -------
+
+    Example
+    -------
+    This function is performed using commandline interface::
+
+        $ genrisk get-prs
+
     """
+
     download = click.confirm('Do you want to download PGS file?')
     return prs_prompt(plink=plink, download=download)
 
@@ -545,15 +580,27 @@ def merge(
         cols,
         output_file
 ):
-    """Merge all files given into one dataframe.
+    """
+    Merge all files given into one dataframe.
 
-    :param files: all files to merge with a comma in between. E.g: file1,file2,file3
-    :param sep: the column seperator in files.
-    :param by: the common column between all files to merge.
-    :param cols: a list of columns can be chosen to save final file, e.g: col1,col2,col5
-    :param output_file: the name and path to save final dataframe
+    Parameters
+    ----------
+    files : str
+         all files to merge with a comma in between. E.g: file1,file2,file3
+    sep : str
+        the column seperator in files.
+    by : str
+        the common column between all files to merge.
+    cols : str
+        a list of columns can be chosen to save final file, e.g: col1,col2,col5. if empty all columns will be merged
+    output_file : str
+        the name and path to save final dataframe
 
-    :return: merged dataframe
+    Returns
+    -------
+    DataFrame
+        final merged dataframe.
+
     """
     logger.info('GenRisk - merging dataframes')
     logger.info(locals())
@@ -582,7 +629,7 @@ def merge(
 @click.option('-e', '--weights-col', default='zscore', help='the name and path to output results.')
 @OUTPUT_FILE
 @click.option('--split-size', default=0.25, help='the size ratio to split dataset for weight calculation.')
-@click.option('--method', type=click.Choice(['sum', 'pathways', 'gene']),
+@click.option('--method', type=click.Choice(['sum', 'pathways']),
               help='method for presenting the risk scores.')
 @SAMPLES_COL
 @click.option('--pathway-file', required=True, help='.gmt file containing the pathway and its genes.')
@@ -601,22 +648,41 @@ def get_gbrs(
         split_size,
         pathway_file
 ):
-    """Calculate gene-based risk scores for individuals.
+    """
+    Calculate gene-based risk score for individuals.
 
-    :param pathway_file:
-    :param split_size: the test size for weight calculations.
-    :param scores_file: the gene-based scores file
-    :param weights_file: the weights for each gene.
-    :param pheno_file: if no weights are given, pheno file is used to calculate them
-    :param pheno_col: the column containing the phenotype.
-    :param covariates: the covariates to use in the linear model.
-    :param genes_col: the column containing gene names.
-    :param samples_col: the column contatining sample ids.
-    :param weights_col: the column containing effect weight.
-    :param output_file: the name and path to output results.
-    :param method: for presenting the risk scores.
+    Parameters
+    ----------
+    method : str
+        for presenting the risk score, either sum of all genes or pathways.
+    scores_file : str
+        the gene-based scores file
+    weights_file : str
+        a file containing the weight for each gene.
+    pheno_file : str
+        if no weights are given, pheno file is used to calculate them
+    pheno_col : str
+        the column containing the phenotype.
+    covariates : str
+        the covariates to use in the linear model.
+    genes_col : str
+        column containing the gene names.
+    samples_col : str
+        column containing the samples ids.
+    weights_col : str
+        column containing the weights for each gene (in the weights file)
+    output_file : str
+        the name and path to output results.
+    split_size : str
+        the proportion of the dataset to use for calculating the weights. should be between 0.0 and 1.0.
+    pathway_file : str
+        if pathways method is chosen, a file with the pathways is needed
 
-    :return: gbrs dataframe
+    Returns
+    -------
+    DataFrame
+        df contianing the final risk scores.
+
     """
     logger.info('GenRisk - Calculating gene-based risk scores')
     logger.info(locals())
@@ -680,14 +746,25 @@ def calculate_pathways(
         scores_file,
         samples_col
 ):
-    """Calculate pathway scores using gene-based scores and gmt pathway file.
+    """
+    Calculate pathway scores using gene-based scores and gmt pathway file.
 
-    :param output_file: the final output
-    :param pathway_file: .gmt file containing the pathway and its genes.
-    :param scores_file: genes scores file to calculate pathway scores.
-    :param samples_col: column containing samples ids.
+    Parameters
+    ----------
+    output_file : str
+        the path to final output.
+    pathway_file : str
+        .gmt file containing the pathway and its genes.
+    scores_file : str
+        genes scores file to calculate pathway scores.
+    samples_col : str
+        column containing samples ids.
 
-    :return: the pathway scores df
+    Returns
+    -------
+    DataFrame
+        the pathway scores df
+
     """
     logger.info('GenRisk - calculating pathway scores')
     logger.info(locals())
@@ -745,6 +822,12 @@ def normalize(
     -------
     DataFrame with normalized data.
 
+    Example
+    --------
+     This function is performed using commandline interface::
+
+        $ genrisk normalize --data-file toy_example/toy_dataset_scores --method gene_length --samples-col IID
+        --output-file toy_dataset_scores_normalized.tsv
     """
     logger.info('GenRisk - normalizing data using '+ method)
     logger.info(locals())

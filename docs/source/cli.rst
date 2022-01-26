@@ -37,3 +37,30 @@ create-model
     $ genrisk create-model [ARGS]
 
 .. autofunction:: genrisk.cli.create_model
+
+
+test-model
+-------------
+::
+
+    $ genrisk test-model [ARGS]
+
+.. autofunction:: genrisk.cli.test_model
+
+
+get-prs
+-------------
+::
+
+    $ genrisk get-prs
+
+.. autofunction:: genrisk.cli.get-prs
+
+
+normalize
+-------------
+::
+
+    $ genrisk normalize [ARGS]
+
+.. autofunction:: genrisk.cli.normalize
