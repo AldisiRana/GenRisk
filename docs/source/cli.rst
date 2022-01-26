@@ -64,5 +64,5 @@ get-prs
 
     $ genrisk get-prs
 
-.. autofunction:: genrisk.cli.get-prs
+.. autofunction:: genrisk.cli.get_prs
 
