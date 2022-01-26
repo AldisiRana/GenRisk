@@ -13,6 +13,16 @@ score-genes
 
 .. autofunction:: genrisk.cli.score_genes
 
+
+normalize
+-------------
+::
+
+    $ genrisk normalize [ARGS]
+
+.. autofunction:: genrisk.cli.normalize
+
+
 find-association
 -----------------
 ::
@@ -56,11 +66,3 @@ get-prs
 
 .. autofunction:: genrisk.cli.get-prs
 
-
-normalize
--------------
-::
-
-    $ genrisk normalize [ARGS]
-
-.. autofunction:: genrisk.cli.normalize

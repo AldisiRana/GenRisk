@@ -61,7 +61,6 @@ def score_genes(
 ):
     """
     Calculate the gene-based scores for a given dataset.
-    \f
 
     Parameters
     ----------
@@ -176,7 +175,6 @@ def find_association(
 ):
     """
     Calculate the P-value between two given groups.
-    \f
 
     Parameters
     ----------
@@ -282,7 +280,6 @@ def visualize(
 ):
     """
     Visualize manhatten plot and qqplot for the data.
-    \f
 
     Parameters
     ----------

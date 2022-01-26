@@ -2,8 +2,11 @@
 Real use case
 ###############
 We ran the pipeline using about 200K samples from UKBiobank.
-We filtered for British to remove outliers and calculated the scores using 1% MAF threshold, beta 1-25 weighting parameter and CADD raw scores.
-Here we show two different phenotypes, LDL and alkaline phosphatase
+We filtered for British to remove outliers (150K after filtering) and calculated the scores using 1% MAF threshold, beta 1-25 weighting parameter and CADD raw scores.
+For each phenotype, we performed association analysis using linear regression with age, sex, BMI and PC1-4 as covariates.
+We alo generated 3 models for each phenotype, a PRS prediction model, a gene-based prediction model and a combined model.
+We generated the models using 25% of the dataset as external testing set and 75% were used in training with 10-fold cross-validation.
+To avoid colinearty, we excluded variants that were included in the gene scores from the PRS calculation.
 
 LDL Phenotype
 ***************
@@ -12,7 +15,6 @@ For this phenotype we adjusted the values for individuals who take statin.
 
 Association analysis
 ---------------------
-We used linear regression for the analysis and age, sex, BMI and PC1-4 were used as covaraites.
 The association analysis highlighted PCSK9 and LDLR as significant genes, both are known to be associated with LDL.
 QQ-plot and Manhattan plot are presented below.
 
@@ -31,10 +33,18 @@ The Manhattan plot:
 Regression model
 ------------------
 For the prediction model, we used LDL direct measurements (adjusted for statin) as target. For features, we used the scores of 477 selected genes (https://doi.org/10.1038/nrg2779) + BMI + age + sex + PC1-4.
-We also used PRS (PGS000688), to avoid colinearty, we excluded variants that were included in the gene scores from the PRS calculation.
-We then ran the pipeline using 25% of the dataset as external testing set and 75% were used in training with 10-fold cross-validation.
-The final prediction model was generated using gradiant boosting regression (CatBooster) which had an Rˆ2 of  0.1412 and an RMSE of 0.8035.
+For the PRS and combined models we used the following PRS (PGS000688).
+The final prediction models was generated using gradiant boosting regression, evaluation metric are shown in the table below.
 
++----------------+------------------+------------+----------------+
+|                | Gene-based model | PRS model  | Combined model |
++================+==================+============+================+
+|     Rˆ2        |   0.075          | 0.322      |  0.329         |
++----------------+------------------+------------+----------------+
+|  RMSE          |  0.849           |  0.729     |  0.725         |
++----------------+------------------+------------+----------------+
+
+The images below are the output of the final combined model.
 Feature importance plot:
 
 .. image:: ../../ldl_example/Feature_Importance.png
@@ -81,14 +91,50 @@ Regression model
 ------------------
 For the prediction model, we used alkaline phosphatase measurements as target. For feature selection,
 we applied linear regression on 50K of the samples and selected the genes with significant p-values (<0.05) as features (45 genes)
-We also used PRS (PGS000670) + BMI + age + sex + PC1-4, to avoid colinearty, we excluded variants that were included in the gene scores from the PRS calculation.
-We then ran the pipeline using 25% of the dataset as external testing set and 75% were used in training with 10-fold cross-validation.
-The final prediction model was generated using gradiant boosting regression (CatBooster) which had an Rˆ2 of  0.1412 and an RMSE of 0.8035.
+For the PRS and combined models we used the following PRS (PGS000670).
+The final prediction models was generated using gradiant boosting regression, evaluation metric are shown in the table below.
 
-Feature importance plot:
++----------------+------------------+------------+----------------+
+|                | Gene-based model | PRS model  | Combined model |
++================+==================+============+================+
+|     Rˆ2        |   0.084          |  0.255     |   0.281        |
++----------------+------------------+------------+----------------+
+|  RMSE          |   24.7           |  22.3      |    21.9        |
++----------------+------------------+------------+----------------+
+
+Feature importance plot for combined model:
 
 .. image:: ../../alp_example/Feature_Importance.png
     :width: 400
     :align: center
 
 
+Other phenotypes
+******************
+Here we show a table of other phenotypes that we analyzed. For each phenotype we include the number of genes considered
+in the models as well as the rˆ2 of the gene-based model, PRS model and combined model.
+
++---------------------------+-----------------+------------------+------------+----------------+
+|                           | Number of genes | Gene-based model | PRS model  | Combined model |
++===========================+=================+==================+============+================+
+|    apolipoprotein a       |       6         |      0.227       |   0.413    |     0.403      |
++---------------------------+-----------------+------------------+------------+----------------+
+|    apolipoprotein b*      |         5       |      0.059       |   0.267    |     0.269      |
++---------------------------+-----------------+------------------+------------+----------------+
+|aspartate aminotransferase |        57       |       0.039      |   0.124    |      0.128     |
++---------------------------+-----------------+------------------+------------+----------------+
+|       Cholesterol*        |       6         |      0.088       |   0.229    |      0.236     |
++---------------------------+-----------------+------------------+------------+----------------+
+|       Creatinine          |     128         |      0.228       |    0.454   |      0.448     |
++---------------------------+-----------------+------------------+------------+----------------+
+|      Hba1c                |      13         |      0.100       |    0.242   |      0.247     |
++---------------------------+-----------------+------------------+------------+----------------+
+|      lipoprotein a        |       3         |      0.004       |    0.582   |      0.603     |
++---------------------------+-----------------+------------------+------------+----------------+
+|      Triglyceride         |       5         |      0.143       |    0.316   |      0.315     |
++---------------------------+-----------------+------------------+------------+----------------+
+|         urea              |       2         |      0.074       |    0.173   |      0.179     |
++---------------------------+-----------------+------------------+------------+----------------+
+|      Urate                |       4         |      0.396       |    0.521   |      0.534     |
++---------------------------+-----------------+------------------+------------+----------------+
+* values adjusted for statin

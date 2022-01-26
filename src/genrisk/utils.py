@@ -19,18 +19,27 @@ def normalize_data(
     samples_col,
 ):
     """
+    Normalize dataset using gene_length, minmax, maxabs, zscore or robust
 
     Parameters
     ----------
-    method
-    genes_info
-    genes_col
-    length_col
-    data_file
-    samples_col
+    method : str
+        the normalization method. [zscore, gene_length, minmax, maxabs, robust]
+    genes_info : str
+        file containing the genes and their lengths. if gene_length method chosen with no file, info will be retrieved from ensembl database.
+    genes_col : str
+        the column containing genes (if genes_info file is provided)
+    length_col : str
+        the columns containing genes length (if genes_info file is provided)
+    data_file : str
+        file containing dataset to be normalized.
+    samples_col : str
+        the column containing samples ids.
 
     Returns
     -------
+    DataFrame
+        a df with the normalized dataset.
 
     """
     scores_df = pd.read_csv(data_file, sep=r'\s+')
@@ -64,6 +73,10 @@ def normalize_data(
     elif method == 'robust':
         for col in scores_df.columns:
             scores_df[col] = (scores_df[col] - scores_df[col].median()) / (scores_df[col].quantile(0.75) - scores_df[col].quantile(0.25))
+    else:
+        raise Exception(
+            'This function does not support the normalization method you selected. Methods: [zscore, gene_length, minmax, maxabs, robust]'
+        )
     return scores_df
 
 
@@ -71,14 +84,25 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
     """
     Generate  manhattan plot from a given dataset.
 
-    :param data: a dataframe with pvalues and gene information.
-    :param chr_col: the column with the chromosomes.
-    :param pos_col: the column containing the position/start.
-    :param pvals_col: the column containing the p_values.
-    :param genes_col: the column containing gene names.
-    :param manhattan_output: the path to output the manhattan plot image.
+    Parameters
+    ----------
+    data : pd.DataFrame
+        a dataframe with pvalues and gene information.
+    chr_col : str
+        the column with the chromosomes.
+    pos_col : str
+        the column containing the position/start.
+    pvals_col : str
+        the column containing the position/start.
+    genes_col : str
+        the column containing gene names.
+    manhattan_output : str
+        the path to output the manhattan plot image.
 
-    :return:
+    Returns
+    -------
+    Manhattan plot
+
     """
     data.drop_duplicates(subset=[genes_col], inplace=True)
     data.dropna(subset=[pvals_col], inplace=True)
@@ -91,12 +115,8 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
     data['i'] = data.index
     # Generate Manhattan plot: (#optional tweaks for relplot: linewidth=0, s=9)
     sns.set_style("white")
-    custom_palette = sns.color_palette(
-        ["#000000", "#808080", "#000000", "#808080", "#000000", "#808080", "#000000", "#808080", "#000000", "#808080",
-         "#000000", "#808080", "#000000", "#808080", "#000000", "#808080", "#000000", "#808080", "#000000", "#808080",
-         "#000000", "#808080", "#000000"])
     plot = sns.relplot(data=data, x='i', y='-logp', aspect=3.7,
-                       hue=chr_col, palette=custom_palette, kind='scatter', legend=None)
+                       hue=chr_col, palette=['grey', 'black'], kind='scatter', legend=None)
     plot.fig.suptitle(manhattan_output.split('.')[0])
     plot.ax.set_ylim(0.0, max(data["-logp"]) + 1)
 
@@ -113,16 +133,24 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
     plot.ax.axhline(-np.log10(1.00e-05), c='blue', ls='--')
     plot.ax.axhline(-np.log10(5.00e-08), c='red', ls='--')
     plot.savefig(manhattan_output)
+    return plot
 
 
 def draw_qqplot(*, pvals, qq_output):
     """
     Generate QQ-plot for given data.
 
-    :param pvals: the list of p_values.
-    :param qq_output: the path to output the QQplot image.
+    Parameters
+    ----------
+    pvals : pd.Series
+        the list of p_values.
+    qq_output : str
+        the path to output the QQplot image.
 
-    :return:
+    Returns
+    -------
+    QQPlot
+
     """
     pvals.dropna(inplace=True)
     f, ax = plt.subplots(figsize=(6, 6), facecolor="w", edgecolor="k")
@@ -134,6 +162,7 @@ def draw_qqplot(*, pvals, qq_output):
            dpi=300,
            figname=qq_output,
            ax=ax)
+    return ax
 
 
 def merge_files(*, files_lst, sep, by, cols=None):
