@@ -23,7 +23,7 @@ Weight functions
 Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
 The default for this function is [1,25] which are the same parameters used in SKAT-O.
 
-.. image::  https://en.wikipedia.org/wiki/File:Beta_distribution_pdf.svg
+.. image::  https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Beta_distribution_pdf.svg/1920px-Beta_distribution_pdf.svg.png
     :alt: Beta distribution
 image source: https://en.wikipedia.org/wiki/Beta_distribution
 
