@@ -79,8 +79,6 @@ def score_genes(
         the location and name of the final output scores matrix.
     weight_func : str
         the weighting function used on allele frequency in score calculation. [beta| log10]
-        beta : this option uses two parameters α and β, to create beta distribution.
-        log10 : this option uses -log distribution to upweight rare variants.
     variant_col : str
         the column containing the variant IDs.
     gene_col : str
