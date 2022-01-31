@@ -14,8 +14,8 @@ score-genes
 
 |
 .. click:: genrisk.cli:main
-  :prog: genrisk
   :commands: score-genes
+  :nested: full
 
 Gene-scoring equation
 ======================
@@ -32,6 +32,7 @@ C\ :sub:`i` is the allele count.
 
 
 .. collapse:: Weight functions
+    
     The weighting function is applied to the variant frequency. I can be used to up-weight the biological importance of rare variants.
 
     :beta: this option uses two parameters α and β, to create beta distribution. Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
@@ -59,6 +60,7 @@ normalize
 .. autofunction:: genrisk.cli.normalize
 
 .. collapse:: Normalization functions
+
     Multiple methods have been implemented to normalize a dataset. Below is a brief describtion of each function.
     :gene_length: This method divides each gene-based score by the length of the gene. The genes lengths can be provided by the user, or retrieved from ensembl database. The gene length from ensembl database is calculated as such: gene length = gene end (bp) - gene start (bp)
     :minmax: This method rescales the values of each column to [0,1] by using the following formula x`= x - min(x) / max(x) - min(x)
