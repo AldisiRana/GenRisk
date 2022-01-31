@@ -27,19 +27,17 @@ A\ :sub:`i` is the weighted allele frequency
 C\ :sub:`i` is the allele count.
 
 .. collapse:: Weight functions
--------------------------------
     |
     | The weighting function is applied to the variant frequency. I can be used to up-weight the biological importance of rare variants.
     |
-    :beta: this option uses two parameters α and β, to create beta distribution.
-    | Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
-    | The default for this function is [1,25] which are the same parameters used in SKAT-O.
+    :beta: this option uses two parameters α and β, to create beta distribution. Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
+    The default for this function is [1,25] which are the same parameters used in SKAT-O.
 
     .. image::  https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Beta_distribution_pdf.svg/1920px-Beta_distribution_pdf.svg.png
         :width: 300
         :alt: Beta distribution
     `image source here <https://en.wikipedia.org/wiki/Beta_distribution>`_
-    |
+
     :log10: this option uses -log distribution to upweight rare variants. This has been applied previously in another
     `gene-based score tool <https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2877-3>`_
 
@@ -93,9 +91,9 @@ create-model
 
 .. autofunction:: genrisk.cli.create_model
 
-Available models
-=================
-The types of models available for training can be found :ref:`model_types`
+.. collapse:: Available models
+    |
+    | The types of models available for training can be found :ref:`model_types`
 
 test-model
 ***********
