@@ -20,11 +20,11 @@ The gene scores are derived by the weighted sum of the variants in a gene.
 .. math::
     G_{sg}= \sum_{\it i=1}^{\it k} (D_i \times A_i) C_i
 
-D:sub:`i` is the functional annotation (e.g CADD)
+D\ :sub:`i` is the functional annotation (e.g CADD)
 
-A:sub:`i` is the weighted allele frequency
+A\ :sub:`i` is the weighted allele frequency
 
-C:sub:`i` is the allele count.
+C\ :sub:`i` is the allele count.
 
 Weight functions
 -----------------
