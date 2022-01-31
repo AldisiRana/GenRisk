@@ -53,7 +53,6 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinx_autodoc_typehints',
-    'sphinx_click',
     'sphinx_rtd_theme',
     'sphinx.ext.napoleon',
     'sphinx_toolbox.collapse',

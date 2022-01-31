@@ -11,10 +11,7 @@ score-genes
 
     $ genrisk score-genes [ARGS]
 
-.. click:: genrisk.cli:main
-    :prog: genrisk
-    :show-nested:
-    :commands: score-genes
+.. autofunction:: genrisk.cli.score_genes
 
 Gene-scoring equation
 ======================
