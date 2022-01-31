@@ -15,10 +15,17 @@ score-genes
 
 Gene-scoring equation
 ======================
+The gene scores are derived by the weighted sum of the variants in a gene.
 
+.. math::
+    G_{sg}= \sum_{\it i=1}^{\it k} (D_i \times A_i) C_i
+
+where D:sup:`i` is the functional annotation (e.g CADD), A:sup:`i` is the weighted allele frequency and C:sup:`i` is the allele count.
 
 Weight functions
 -----------------
+The weighting function is applied to the variant frequency. I can be used to up-weight the biological importance of rare variants.
+
 **beta** : this option uses two parameters α and β, to create beta distribution.
 Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
 The default for this function is [1,25] which are the same parameters used in SKAT-O.
