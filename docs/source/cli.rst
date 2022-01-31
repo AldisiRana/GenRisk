@@ -20,7 +20,11 @@ The gene scores are derived by the weighted sum of the variants in a gene.
 .. math::
     G_{sg}= \sum_{\it i=1}^{\it k} (D_i \times A_i) C_i
 
-where D:sup:`i` is the functional annotation (e.g CADD), A:sup:`i` is the weighted allele frequency and C:sup:`i` is the allele count.
+D:sub:`i` is the functional annotation (e.g CADD)
+
+A:sub:`i` is the weighted allele frequency
+
+C:sub:`i` is the allele count.
 
 Weight functions
 -----------------
@@ -31,6 +35,7 @@ Depending on the parameters chosen, the distribution can change its shape, givin
 The default for this function is [1,25] which are the same parameters used in SKAT-O.
 
 .. image::  https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Beta_distribution_pdf.svg/1920px-Beta_distribution_pdf.svg.png
+    :width: 300
     :alt: Beta distribution
 `image source here <https://en.wikipedia.org/wiki/Beta_distribution>`_
 
@@ -38,6 +43,7 @@ The default for this function is [1,25] which are the same parameters used in SK
 `gene-based score tool <https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2877-3>`_
 
 .. image::  https://ljvmiranda921.github.io/assets/png/cs231n-ann/neg_log.png
+    :width: 300
     :alt: -log distribution
 `image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
 
