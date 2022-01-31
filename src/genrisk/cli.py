@@ -60,7 +60,7 @@ def score_genes(
         maf_threshold,
 ):
     """
-    Calculate the gene-based scores for a given dataset. /f
+    Calculate the gene-based scores for a given dataset. \f
 
     Parameters
     ----------
@@ -172,7 +172,7 @@ def find_association(
         processes,
 ):
     """
-    Calculate the P-value between two given groups. /f
+    Calculate the P-value between two given groups. \f
 
     Parameters
     ----------
@@ -277,7 +277,7 @@ def visualize(
         pos_col,
 ):
     """
-    Visualize manhatten plot and qqplot for the data. /f
+    Visualize manhatten plot and qqplot for the data. \f
 
     Parameters
     ----------
@@ -384,7 +384,7 @@ def create_model(
         include_models,
 ):
     """
-    Create a prediction model with given dataset. /f
+    Create a prediction model with given dataset. \f
 
     Parameters
     ----------
@@ -484,7 +484,7 @@ def test_model(
         output_file,
 ):
     """
-    Evaluate a prediction model with a given dataset. /f
+    Evaluate a prediction model with a given dataset. \f
 
     Parameters
     ----------
@@ -537,7 +537,7 @@ def get_prs(
 ):
     """
     Calculate PRS. This command is interactive.
-    This command gets a pgs file (provided by the user or downloaded) then calculates the PRS for dataset. /f
+    This command gets a pgs file (provided by the user or downloaded) then calculates the PRS for dataset. \f
 
     Parameters
     ----------
@@ -576,7 +576,7 @@ def merge(
         output_file
 ):
     """
-    Merge all files given into one dataframe. /f
+    Merge all files given into one dataframe. \f
 
     Parameters
     ----------
@@ -644,7 +644,8 @@ def get_gbrs(
         pathway_file
 ):
     """
-    Calculate gene-based risk score for individuals. /f
+    Calculate gene-based risk score for individuals. 
+    \f
 
     Parameters
     ----------
@@ -742,7 +743,7 @@ def calculate_pathways(
         samples_col
 ):
     """
-    Calculate pathway scores using gene-based scores and gmt pathway file. /f
+    Calculate pathway scores using gene-based scores and gmt pathway file. \f
 
     Parameters
     ----------
@@ -794,7 +795,7 @@ def normalize(
 
 ):
     """
-    Normalize/standarize data. /f
+    Normalize/standarize data. \f
 
     Parameters
     ----------
