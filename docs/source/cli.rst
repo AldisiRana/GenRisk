@@ -1,22 +1,11 @@
 .. _cli:
 Command Line Interface
 #######################
-The genrisk command line interface includes multiple commands which can be used as follows::
+The genrisk command line interface includes multiple commands which can be used as follows:
 
-    $ genrisk COMMAND [ARGS]
-
-
-score-genes
-***********
-::
-
-    $ genrisk score-genes [ARGS]
-
-|
 .. click:: genrisk.cli:main
-    :prog: genrisk score-gene
-    :commands: score-genes
-    :nested: full
+    :prog: genrisk
+    :commands: score-genes, normalize, find-association, visualize, create-model, test-model, get-prs
 
 Gene-scoring equation
 ======================
@@ -52,13 +41,6 @@ C\ :sub:`i` is the allele count.
     `image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
 |
 |
-normalize
-**********
-::
-
-    $ genrisk normalize [ARGS]
-
-.. autofunction:: genrisk.cli.normalize
 
 .. collapse:: Normalization functions
 
@@ -69,51 +51,9 @@ normalize
     :zscore: This method uses the mean and standard deviation to normalize the values. Formula is x`= x - mean(x) / std
     :robust: Great choice for dataset with many outliers. In this method, the values are substracted by the median then divided by the interquantile range (difference between the third and the first quartile). Formula x`= x - median(x) / Q3(x) - Q1(x)
     Every normalization method has it's advantages and disadvantages, so choose the method that works best with your dataset. To learn more about the normalization methods, check out this helpful `article <https://towardsdatascience.com/data-normalization-with-pandas-and-scikit-learn-7c1cc6ed6475>`_
-|
-|
-find-association
-*****************
-::
 
-    $ genrisk find-association [ARGS]
-
-.. autofunction:: genrisk.cli.find_association
-
-visualize
-**********
-::
-
-    $ genrisk visualize [ARGS]
-
-.. autofunction:: genrisk.cli.visualize
-
-
-create-model
-*************
-::
-
-    $ genrisk create-model [ARGS]
-
-.. autofunction:: genrisk.cli.create_model
 
 .. collapse:: Available models
-    |
-    | The types of models available for training can be found :ref:`model_types`
+    The types of models available for training can be found :ref:`model_types`
 
-test-model
-***********
-::
-
-    $ genrisk test-model [ARGS]
-
-.. autofunction:: genrisk.cli.test_model
-
-
-get-prs
-********
-::
-
-    $ genrisk get-prs
-
-.. autofunction:: genrisk.cli.get_prs
 
