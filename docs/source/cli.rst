@@ -34,7 +34,8 @@ The default for this function is [1,25] which are the same parameters used in SK
     :alt: Beta distribution
 `image source here <https://en.wikipedia.org/wiki/Beta_distribution>`_
 
-**log10** : this option uses -log distribution to upweight rare variants.
+**log10** : this option uses -log distribution to upweight rare variants. This has been applied previously in another
+`gene-based score tool <https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2877-3>`_
 
 .. image::  https://ljvmiranda921.github.io/assets/png/cs231n-ann/neg_log.png
     :alt: -log distribution
