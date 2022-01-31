@@ -64,7 +64,7 @@ def score_genes(
 
     Example
     ---------
-    This function is performed using commandline interface::
+    ::
 
         $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/
         --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT
@@ -107,14 +107,6 @@ def score_genes(
     DataFrame information
         the final scores dataframe information
         the DataFrame is saved into the output path indicated in the arguments
-
-    Example
-    ---------
-    This function is performed using commandline interface::
-
-        $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/
-        --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT
-        --variant-col ID --af-col AF --del-col CADD --gene-col Gene
 
     """
     confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
@@ -181,7 +173,16 @@ def find_association(
         processes,
 ):
     """
-    Calculate the P-value between two given groups. \f
+    Calculate the P-value between two given groups.
+
+    Example
+    ---------
+    ::
+
+        $ genrisk find-association --scores-file toy_example/toy_dataset_scores --info-file
+        toy_example/toy.pheno --cases-column trait1 --samples-column IID --test betareg --output-file
+        toy_dataset_betareg.tsv --covariates age,sex --adj-pval bonferroni
+    \f
 
     Parameters
     ----------
@@ -212,14 +213,6 @@ def find_association(
     DataFrame information
         the final dataframe information
         the DataFrame is saved into the output path indicated in the arguments
-
-    Example
-    ---------
-    This function is performed using commandline interface::
-
-        $ genrisk find-association --scores-file toy_example/toy_dataset_scores --info-file
-        toy_example/toy.pheno --cases-column trait1 --samples-column IID --test betareg --output-file
-        toy_dataset_betareg.tsv --covariates age,sex --adj-pval bonferroni
 
     """
     logger.info('Finding associations')
@@ -286,7 +279,16 @@ def visualize(
         pos_col,
 ):
     """
-    Visualize manhatten plot and qqplot for the data. \f
+    Visualize manhatten plot and qqplot for the data.
+
+    Example
+    --------
+    ::
+
+        $ genrisk visualize --pvals-file toy_example/toy_dataset_scores
+        --info-file annotated_toy_dataset.vcf --qq-output toy_example/toy_dataset_qqplot.jpg
+        --manhattan-output toy_example/toy_dataset_manhattanplot.jpg
+    \f
 
     Parameters
     ----------
@@ -311,14 +313,6 @@ def visualize(
 
     Returns
     -------
-
-    Example
-    --------
-     This function is performed using commandline interface::
-
-        $ genrisk visualize --pvals-file toy_example/toy_dataset_scores
-        --info-file annotated_toy_dataset.vcf --qq-output toy_example/toy_dataset_qqplot.jpg
-        --manhattan-output toy_example/toy_dataset_manhattanplot.jpg
 
     """
     logger.info('Creating plots for data')
@@ -393,7 +387,16 @@ def create_model(
         include_models,
 ):
     """
-    Create a prediction model with given dataset. \f
+    Create a prediction model with given dataset.
+
+    Example
+    --------
+     ::
+
+        $ genrisk create-model --data-file toy_example_regressor_features.tsv --model-type regressor
+        --output-folder toy_regressor  --test-size 0.25 --test --model-name toy_regressor
+        --target-col trait1 --imbalanced --normalize
+    \f
 
     Parameters
     ----------
@@ -432,13 +435,6 @@ def create_model(
     -------
     Final prediction model
 
-    Example
-    --------
-     This function is performed using commandline interface::
-
-        $ genrisk create-model --data-file toy_example_regressor_features.tsv --model-type regressor
-        --output-folder toy_regressor  --test-size 0.25 --test --model-name toy_regressor
-        --target-col trait1 --imbalanced --normalize
     """
     logger.info('Create prediction model')
     logger.info(locals())
@@ -493,7 +489,15 @@ def test_model(
         output_file,
 ):
     """
-    Evaluate a prediction model with a given dataset. \f
+    Evaluate a prediction model with a given dataset.
+
+    Example
+    --------
+     ::
+
+        $ genrisk test-model --model-path regressor_model.pkl --input-file testing_dataset.tsv
+        --model-type regressor --labels-col target --samples-col IID
+    \f
 
     Parameters
     ----------
@@ -514,14 +518,6 @@ def test_model(
     -------
     DataFrame
         dataframe with the prediction results.
-
-
-    Example
-    --------
-     This function is performed using commandline interface::
-
-        $ genrisk test-model --model-path regressor_model.pkl --input-file testing_dataset.tsv
-        --model-type regressor --labels-col target --samples-col IID
 
     """
     logger.info('Testing prediction model')
@@ -546,7 +542,14 @@ def get_prs(
 ):
     """
     Calculate PRS. This command is interactive.
-    This command gets a pgs file (provided by the user or downloaded) then calculates the PRS for dataset. \f
+    This command gets a pgs file (provided by the user or downloaded) then calculates the PRS for dataset.
+
+    Example
+    -------
+    This function is performed using commandline interface::
+
+        $ genrisk get-prs
+    \f
 
     Parameters
     ----------
@@ -555,12 +558,6 @@ def get_prs(
 
     Returns
     -------
-
-    Example
-    -------
-    This function is performed using commandline interface::
-
-        $ genrisk get-prs
 
     """
 
@@ -804,7 +801,15 @@ def normalize(
 
 ):
     """
-    Normalize/standarize data. \f
+    Normalize/standarize data.
+
+    Example
+    --------
+    ::
+
+        $ genrisk normalize --data-file toy_example/toy_dataset_scores --method gene_length --samples-col IID
+        --output-file toy_dataset_scores_normalized.tsv
+    \f
 
     Parameters
     ----------
@@ -827,12 +832,6 @@ def normalize(
     -------
     DataFrame with normalized data.
 
-    Example
-    --------
-     This function is performed using commandline interface::
-
-        $ genrisk normalize --data-file toy_example/toy_dataset_scores --method gene_length --samples-col IID
-        --output-file toy_dataset_scores_normalized.tsv
     """
     logger.info('GenRisk - normalizing data using '+ method)
     logger.info(locals())

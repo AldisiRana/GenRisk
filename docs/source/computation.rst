@@ -7,7 +7,7 @@ It should be noted that the aim of our work is to provide a novel framework more
 For all the computation below, we use a “standard” workstation (RAM=64GB with 6 CPU dual core).
 
 Gene-based scoring and analysis
-*******************
+********************************
 In the following table we show the computation time for the gene-core computation and association analysis with linear regression of the biggest chromosome (1,727,756 variants, MAF filtering = <1%) which includes also the higher number of genes (1,972 genes) by considering different numbers of individuals.
 
 +----------------------------------------------+------------+-------------+-----------------+

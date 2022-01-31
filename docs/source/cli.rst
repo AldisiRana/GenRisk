@@ -11,7 +11,10 @@ The genrisk command line interface includes multiple commands which can be used 
 |
 |
 
+More information:
+==================
 .. collapse:: Gene-scoring equation
+
     The gene scores are derived by the weighted sum of the variants in a gene.
 
     .. math::
