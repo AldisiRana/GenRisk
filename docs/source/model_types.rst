@@ -2,7 +2,7 @@
 
 Model types
 #############
-Model types that can be computed. Lists taken from `Pycaret <https://pycaret.readthedocs.io/en/latest/index.html#>`_ Documentation
+Model types that can be computed. Lists taken from `Pycaret <https://pycaret.gitbook.io/docs/>`_ Documentation
 
 Regression models:
 *******************
