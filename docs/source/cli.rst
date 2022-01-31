@@ -25,13 +25,13 @@ The default for this function is [1,25] which are the same parameters used in SK
 
 .. image::  https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Beta_distribution_pdf.svg/1920px-Beta_distribution_pdf.svg.png
     :alt: Beta distribution
-image source: https://en.wikipedia.org/wiki/Beta_distribution
+`image source here <https://en.wikipedia.org/wiki/Beta_distribution>`_
 
 **log10** : this option uses -log distribution to upweight rare variants.
 
 .. image::  https://ljvmiranda921.github.io/assets/png/cs231n-ann/neg_log.png
     :alt: -log distribution
-image source: https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/
+`image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
 
 
 normalize
@@ -70,7 +70,7 @@ create-model
 
 Available models
 =================
-The types of models available for training can be found :ref:`_model_types`
+The types of models available for training can be found :ref:`model_types`
 
 test-model
 ***********
