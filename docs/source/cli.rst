@@ -5,12 +5,14 @@ The genrisk command line interface includes multiple commands which can be used 
 
     $ genrisk COMMAND [ARGS]
 
+
 score-genes
 ***********
 ::
 
     $ genrisk score-genes [ARGS]
 
+| 
 .. autofunction:: genrisk.cli.score_genes
 
 Gene-scoring equation
@@ -25,9 +27,10 @@ D\ :sub:`i` is the functional annotation (e.g CADD)
 A\ :sub:`i` is the weighted allele frequency
 
 C\ :sub:`i` is the allele count.
-
+|
+|
 .. collapse:: Weight functions
-
+    |
     The weighting function is applied to the variant frequency. I can be used to up-weight the biological importance of rare variants.
 
     :beta: this option uses two parameters α and β, to create beta distribution. Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
@@ -44,7 +47,8 @@ C\ :sub:`i` is the allele count.
         :width: 300
         :alt: -log distribution
     `image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
-
+|
+|
 normalize
 **********
 ::
@@ -54,6 +58,7 @@ normalize
 .. autofunction:: genrisk.cli.normalize
 
 .. collapse:: Normalization functions
+    |
     Multiple methods have been implemented to normalize a dataset. Below is a brief describtion of each function.
 
     :gene_length: This method divides each gene-based score by the length of the gene. The genes lengths can be provided by the user, or retrieved from ensembl database. The gene length from ensembl database is calculated as such: gene length = gene end (bp) - gene start (bp)
@@ -61,9 +66,11 @@ normalize
     :maxabs: In this method, the values are normalized by the maximum absolute to [-1,1] using the following formula x` = x / max(|x|)
     :zscore: This method uses the mean and standard deviation to normalize the values. Formula is x`= x - mean(x) / std
     :robust: Great choice for dataset with many outliers. In this method, the values are substracted by the median then divided by the interquantile range (difference between the third and the first quartile). Formula x`= x - median(x) / Q3(x) - Q1(x)
-
+    |
     Every normalization method has it's advantages and disadvantages, so choose the method that works best with your dataset. To learn more about the normalization methods, check out this helpful `article <https://towardsdatascience.com/data-normalization-with-pandas-and-scikit-learn-7c1cc6ed6475>`_
-
+    |
+|
+|
 find-association
 *****************
 ::
