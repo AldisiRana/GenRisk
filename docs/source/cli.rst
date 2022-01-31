@@ -14,8 +14,9 @@ score-genes
 
 |
 .. click:: genrisk.cli:main
-  :commands: score-genes
-  :nested: full
+    :prog: genrisk score-gene
+    :commands: score-genes
+    :nested: full
 
 Gene-scoring equation
 ======================
@@ -32,7 +33,7 @@ C\ :sub:`i` is the allele count.
 
 
 .. collapse:: Weight functions
-    
+
     The weighting function is applied to the variant frequency. I can be used to up-weight the biological importance of rare variants.
 
     :beta: this option uses two parameters α and β, to create beta distribution. Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
