@@ -56,6 +56,18 @@ normalize
 
 .. autofunction:: genrisk.cli.normalize
 
+.. collapse:: Normalization functions
+
+    Multiple methods have been implemented to normalize a dataset. Below is a brief describtion of each function.
+
+    **gene_length** : This method divides each gene-based score by the length of the gene. The genes lengths can be provided by the user, or retrieved from ensembl database. The gene length from ensembl database is calculated as such: gene length = gene end (bp) - gene start (bp)
+    **minmax** : This method rescales the values of each column to [0,1] by using the following formula x`= x - min(x) / max(x) - min(x)
+    **maxabs** : In this method, the values are normalized by the maximum absolute to [-1,1] using the following formula x` = x / max(|x|)
+    **zscore** : This method uses the mean and standard deviation to normalize the values. Formula is x`= x - mean(x) / std
+    **robust** : Great choice for dataset with many outliers. In this method, the values are substracted by the median then divided by the interquantile range (difference between the third and the first quartile). Formula x`= x - median(x) / Q3(x) - Q1(x)
+
+    Every normalization method has it's advantages and disadvantages, so choose the method that works best with your dataset. To learn more about the normalization methods, check out this helpful `article <https://towardsdatascience.com/data-normalization-with-pandas-and-scikit-learn-7c1cc6ed6475>`_
+
 Normalization functions
 ========================
 Multiple methods have been implemented to normalize a dataset. Below is a brief describtion of each function.
