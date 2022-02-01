@@ -15,7 +15,7 @@ from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, mod
 from .prs_scoring import prs_prompt
 from .utils import draw_qqplot, draw_manhattan, merge_files, normalize_data
 
-SAMPLES_COL = click.option('-m', '--samples-col', default='IID',
+SAMPLES_COL = click.option('-m', '--samples-col',  default='IID', show_default=True,
                            help="the name of the column that contains the samples.")
 OUTPUT_FILE = click.option('-o', '--output-file', required=True, help="the final output path")
 logger = create_logger()
@@ -27,22 +27,22 @@ def main():
 
 
 @main.command()
-@click.option('-a', '--annotated-vcf', required=True, type=click.Path(exists=True), help='the annotated vcf')
+@click.option('-a', '--annotated-vcf', required=True, type=click.Path(exists=True), help='an annotated containing variant IDs, alt, info and samples genotypes.')
 @click.option('-b', '--bfiles', default=None,
               help='provide binary files if annotated vcf does not contain the samples info')
 @click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
 @click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
 @OUTPUT_FILE
-@click.option('-p', '--beta-param', default=(1.0, 25.0), nargs=2, type=float,
+@click.option('-p', '--beta-param', show_default=True, default=(1.0, 25.0), nargs=2, type=float,
               help="the parameters from beta weight function.")
-@click.option('-w', '--weight-func', default='beta', type=click.Choice(['beta', 'log10']),
+@click.option('-w', '--weight-func', show_default=True, default='beta', type=click.Choice(['beta', 'log10']),
               help="the weighting function used in score calculation.")
-@click.option('-v', '--variant-col', default='SNP', help="the column containing the variant IDs.")
-@click.option('-g', '--gene-col', default='Gene.refGene', help="the column containing gene names.")
-@click.option('-f', '--af-col', default='MAF', help="the column containing allele frequency.")
-@click.option('-d', '--del-col', default='CADD_raw', help="the column containing the deleteriousness score.")
-@click.option('-l', '--alt-col', default='Alt', help="the column containing the alternate base.")
-@click.option('-m', '--maf-threshold', default=0.01, help="the threshold for minor allele frequency.")
+@click.option('-v', '--variant-col', show_default=True, default='SNP', help="the column containing the variant IDs.")
+@click.option('-g', '--gene-col', show_default=True, default='Gene.refGene', help="the column containing gene names.")
+@click.option('-f', '--af-col', show_default=True, default='MAF', help="the column containing allele frequency.")
+@click.option('-d', '--del-col', show_default=True, default='CADD_raw', help="the column containing the deleteriousness score.")
+@click.option('-l', '--alt-col', show_default=True, default='Alt', help="the column containing the alternate base.")
+@click.option('-m', '--maf-threshold', show_default=True, default=0.01, help="the threshold for minor allele frequency.")
 def score_genes(
         *,
         annotated_vcf,
@@ -74,33 +74,14 @@ def score_genes(
     ----------------------
     The gene scores are derived by the weighted sum of the variants in a gene.
 
-    .. math::
-        G_{sg}= \sum_{\it i=1}^{\it k} (D_i \times A_i) C_i
+        .. math::
+            G_{sg}= \sum_{\it i=1}^{\it k} (D_i \times A_i) C_i
 
-    D\ :sub:`i` is the functional annotation (e.g CADD)
+        D\ :sub:`i` is the functional annotation (e.g CADD)
 
-    A\ :sub:`i` is the weighted allele frequency
+        A\ :sub:`i` is the weighted allele frequency
 
-    C\ :sub:`i` is the allele count.
-
-    Weight functions
-    ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ
-    The weighting function is applied to the variant frequency. I can be used to up-weight the biological importance of rare variants.
-
-    :beta: this option uses two parameters α and β, to create beta distribution. Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
-    The default for this function is [1,25] which are the same parameters used in SKAT-O.
-
-    .. image::  https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Beta_distribution_pdf.svg/1920px-Beta_distribution_pdf.svg.png
-        :width: 300
-        :alt: Beta distribution
-    `image source here <https://en.wikipedia.org/wiki/Beta_distribution>`_
-
-    :log10: this option uses -log distribution to upweight rare variants. This has been applied previously in another `gene-based score tool <https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2877-3>`_
-
-    .. image::  https://ljvmiranda921.github.io/assets/png/cs231n-ann/neg_log.png
-        :width: 300
-        :alt: -log distribution
-    `image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
+        C\ :sub:`i` is the allele count.
 
     \f
 
@@ -121,6 +102,22 @@ def score_genes(
         the location and name of the final output scores matrix.
     weight_func : str
         the weighting function used on allele frequency in score calculation. [beta| log10]
+        \b
+        **beta**: this option uses two parameters α and β, to create beta distribution. Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
+        The default for this function is [1,25] which are the same parameters used in SKAT-O.
+
+        .. image::  https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Beta_distribution_pdf.svg/1920px-Beta_distribution_pdf.svg.png
+            :width: 300
+            :alt: Beta distribution
+        `image source here <https://en.wikipedia.org/wiki/Beta_distribution>`_
+
+        **log10**: this option uses -log distribution to upweight rare variants. This has been applied previously in another `gene-based score tool <https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2877-3>`_
+
+        .. image::  https://ljvmiranda921.github.io/assets/png/cs231n-ann/neg_log.png
+            :width: 300
+            :alt: -log distribution
+        `image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
+
     variant_col : str
         the column containing the variant IDs.
     gene_col : str
@@ -191,7 +188,7 @@ def score_genes(
     ['bonferroni', 'sidak', 'holm-sidak', 'holm',
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
 @click.option('-v', '--covariates', default='', help="the covariates used for calculation")
-@click.option('-p', '--processes', type=int, default=1, help='number of processes for parallelization')
+@click.option('-p', '--processes', show_default=True, type=int, default=1, help='number of processes for parallelization')
 def find_association(
         *,
         scores_file,
@@ -292,13 +289,13 @@ def find_association(
 @main.command()
 @click.option('-p', '--pvals-file', required=True, type=click.Path(exists=True), help="the file containing p-values.")
 @click.option('-i', '--info-file', type=click.Path(exists=True), help="file containing variant/gene info.")
-@click.option('--genescol-1', default='gene', help="the name of the genes column in pvals file.")
-@click.option('--genescol-2', default='Gene.refGene', help="the name of the genes column in info file.")
+@click.option('--genescol-1', show_default=True, default='gene', help="the name of the genes column in pvals file.")
+@click.option('--genescol-2', show_default=True, default='Gene.refGene', help="the name of the genes column in info file.")
 @click.option('-q', '--qq-output', default=None, help="the name of the qq plot file.")
 @click.option('-m', '--manhattan-output', default=None, help="the name of the manhatten plot file.")
-@click.option('-v', '--pval-col', default='p_value', help="the name of the pvalues column.")
-@click.option('-c', '--chr-col', default='Chr', help='the name of the chromosomes column')
-@click.option('-s', '--pos-col', default='Start', help='the name of the position/start of the gene column')
+@click.option('-v', '--pval-col', show_default=True, default='p_value', help="the name of the pvalues column.")
+@click.option('-c', '--chr-col', show_default=True, default='Chr', help='the name of the chromosomes column')
+@click.option('-s', '--pos-col', show_default=True, default='Start', help='the name of the position/start of the gene column')
 def visualize(
         *,
         pvals_file,
@@ -383,7 +380,7 @@ def visualize(
 @click.option('-d', '--data-file', type=click.Path(exists=True), required=True,
               help='file with all features and target for training model.')
 @click.option('-o', '--output-folder', required=True, help='path of folder that will contain all outputs.')
-@click.option('-i', '--test-size', default=0.25, help='test size for cross validation and evaluation.')
+@click.option('-i', '--test-size', show_default=True, default=0.25, help='test size for cross validation and evaluation.')
 @click.option('-t', '--test', is_flag=True,
               help='if flagged, a test set will be created for evaluating the final model.')
 @click.option('-n', '--model-name', required=True, help='name of model file.')
@@ -392,9 +389,9 @@ def visualize(
 @click.option('-l', '--target-col', required=True, help='name of target column in data_file.')
 @click.option('-b', '--imbalanced', is_flag=True, help='if flagged methods will be used to account for the imbalance.')
 @click.option('--normalize', is_flag=True, help='if flagged the data will be normalized before training.')
-@click.option('--normalize-method', default='zscore', type=click.Choice(['zscore', 'minmax', 'maxabs', 'robust']),
+@click.option('--normalize-method', show_default=True, default='zscore', type=click.Choice(['zscore', 'minmax', 'maxabs', 'robust']),
               help='features normalization method.')
-@click.option('-f', '--folds', default=10, type=int, help='number of cross-validation folds in training.')
+@click.option('-f', '--folds', show_default=True, default=10, type=int, help='number of cross-validation folds in training.')
 @click.option('--metric', help='the metric used to choose best model after training.')
 @SAMPLES_COL
 @click.option('--seed', default=random.randint(1, 2147483647),
@@ -429,6 +426,10 @@ def create_model(
         $ genrisk create-model --data-file toy_example_regressor_features.tsv --model-type regressor
         --output-folder toy_regressor  --test-size 0.25 --test --model-name toy_regressor
         --target-col trait1 --imbalanced --normalize
+
+    Notes
+    -------
+    The types of models available for training can be found :ref:`model_types`
     \f
 
     Parameters
@@ -510,7 +511,7 @@ def create_model(
 @click.option('-i', '--input-file', required=True, type=click.Path(exists=True), help='testing dataset')
 @click.option('-l', '--label-col', required=True, help='the target/phenotype/label column')
 @click.option('-m', '--model-path', required=True, type=click.Path(exists=True), help='path to the trained model.')
-@click.option('-s', '--samples-col', default='IID', help='the samples column.')
+@click.option('-s', '--samples-col', show_default=True, default='IID', help='the samples column.')
 @OUTPUT_FILE
 def test_model(
         *,
@@ -601,8 +602,8 @@ def get_prs(
 @main.command()
 @click.option('-f', '--files', required=True,
               help='input all files to merge with a comma in between. E.g: file1,file2,file3')
-@click.option('-s', '--sep', default='\t', help='the column seperator in files.')
-@click.option('-b', '--by', default='IID', help='the common column between all files to merge.')
+@click.option('-s', '--sep', show_default=True, default='\t', help='the column seperator in files.')
+@click.option('-b', '--by', show_default=True, default='IID', help='the common column between all files to merge.')
 @click.option('-c', '--cols', default=None,
               help='if desired, a list of columns can be chosen to save final file, e.g: col1,col2,col5')
 @OUTPUT_FILE
@@ -657,12 +658,12 @@ def merge(
 @click.option('-p', '--pheno-file', default=None, type=click.Path(exists=True),
               help='if no weights are given, pheno file is used to calculate them.')
 @click.option('-c', '--pheno-col', default=None, help='the column containing the phenotype.')
-@click.option('-v', '--covariates', default='sex,age,bmi,PC1,PC2,PC3,PC4',
+@click.option('-v', '--covariates', show_default=True, default='sex,age,bmi,PC1,PC2,PC3,PC4',
               help='the covariates to use in the linear model.')
-@click.option('-g', '--genes-col', default='genes', help='the column containing gene names.')
-@click.option('-e', '--weights-col', default='zscore', help='the name and path to output results.')
+@click.option('-g', '--genes-col', show_default=True, default='genes', help='the column containing gene names.')
+@click.option('-e', '--weights-col', show_default=True, default='zscore', help='the name and path to output results.')
 @OUTPUT_FILE
-@click.option('--split-size', default=0.25, help='the size ratio to split dataset for weight calculation.')
+@click.option('--split-size', show_default=True, default=0.25, help='the size ratio to split dataset for weight calculation.')
 @click.option('--method', type=click.Choice(['sum', 'pathways']),
               help='method for presenting the risk scores.')
 @SAMPLES_COL
@@ -819,8 +820,8 @@ def calculate_pathways(
 @click.option('--data-file', required=True, type=click.Path(exists=True))
 @click.option('--genes-info', default=None)
 @SAMPLES_COL
-@click.option('--genes-col', default='HGNC symbol', type=str)
-@click.option('--lengths-col', default='gene_length', type=str)
+@click.option('--genes-col', show_default=True, default='HGNC symbol', type=str)
+@click.option('--lengths-col', show_default=True, default='gene_length', type=str)
 @OUTPUT_FILE
 def normalize(
         *,
