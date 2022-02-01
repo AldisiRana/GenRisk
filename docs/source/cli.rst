@@ -3,9 +3,8 @@ Command Line Interface
 #######################
 The genrisk command line interface includes multiple commands which can be used as follows:
 
-.. click:: genrisk.cli:score-genes
+.. click:: genrisk.cli:score_genes
     :prog: genrisk score-genes
-    :nested: full
 
 Gene-scoring equation
 ----------------------
@@ -36,11 +35,10 @@ Weighting functions
     :width: 300
     :alt: -log distribution
 `image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
-|
-|
+
 .. click:: genrisk.cli:normalize
     :prog: genrisk normalize
-    :nested: full
+
 
 Normalization methods
 ----------------------
@@ -59,29 +57,24 @@ Multiple methods have been implemented to normalize a dataset. Below is a brief 
 Every normalization method has it's advantages and disadvantages, so choose the method that works best with your dataset. To learn more about the normalization methods, check out this helpful `article <https://towardsdatascience.com/data-normalization-with-pandas-and-scikit-learn-7c1cc6ed6475>`_
 
 
-.. click:: genrisk.cli:find-association
+.. click:: genrisk.cli:find_association
     :prog: genrisk find-association
-    :nested: full
 
 
 .. click:: genrisk.cli:visualize
     :prog: genrisk visualize
-    :nested: full
 
 
-.. click:: genrisk.cli:create-model
-    :prog: genrisk create-mode
-    :nested: full
+.. click:: genrisk.cli:create_model
+    :prog: genrisk create-model
 
 
-.. click:: genrisk.cli:test-model
+.. click:: genrisk.cli:test_model
     :prog: genrisk test-model
-    :nested: full
 
 
-.. click:: genrisk.cli:get-prs
+.. click:: genrisk.cli:get_prs
     :prog: genrisk get-prs
-    :nested: full
 
 |
 |
