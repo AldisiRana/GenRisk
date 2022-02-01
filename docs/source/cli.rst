@@ -6,9 +6,7 @@ The genrisk command line interface includes multiple commands which can be used 
 .. click:: genrisk.cli:score_genes
     :prog: genrisk score-genes
 
-------
-
-.. collapse:: Gene-scoring equation
+.. topic:: Gene-scoring equation
 
     The gene scores are derived by the weighted sum of the variants in a gene.
 
@@ -21,7 +19,8 @@ The genrisk command line interface includes multiple commands which can be used 
 
     C\ :sub:`i` is the allele count.
 
-.. collapse:: Weighting functions
+.. topic:: Weighting functions
+
     :beta: this option uses two parameters α and β, to create beta distribution. Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
         The default for this function is [1,25] which are the same parameters used in SKAT-O.
 
@@ -37,13 +36,14 @@ The genrisk command line interface includes multiple commands which can be used 
         :alt: -log distribution
     `image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
 
-
+|
+|
 
 
 .. click:: genrisk.cli:normalize
     :prog: genrisk normalize
 
-.. collapse:: Normalization methods
+.. topic:: Normalization methods
 
     Multiple methods have been implemented to normalize a dataset. Below is a brief describtion of each function.
 
@@ -59,7 +59,8 @@ The genrisk command line interface includes multiple commands which can be used 
 
     Every normalization method has it's advantages and disadvantages, so choose the method that works best with your dataset. To learn more about the normalization methods, check out this helpful `article <https://towardsdatascience.com/data-normalization-with-pandas-and-scikit-learn-7c1cc6ed6475>`_
 
-
+|
+|
 
 
 .. click:: genrisk.cli:find_association
