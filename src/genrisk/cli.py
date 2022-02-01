@@ -62,6 +62,14 @@ def score_genes(
     """
     Calculate the gene-based scores for a given dataset.
 
+    Example
+    ---------
+    ::
+
+        $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/
+        --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT
+        --variant-col ID --af-col AF --del-col CADD --gene-col Gene
+
     Gene-scoring equation
     ----------------------
     The gene scores are derived by the weighted sum of the variants in a gene.
@@ -76,11 +84,12 @@ def score_genes(
     C\ :sub:`i` is the allele count.
 
     Weight functions
-    -----------------
+    ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ
     The weighting function is applied to the variant frequency. I can be used to up-weight the biological importance of rare variants.
 
     :beta: this option uses two parameters α and β, to create beta distribution. Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
     The default for this function is [1,25] which are the same parameters used in SKAT-O.
+
     .. image::  https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Beta_distribution_pdf.svg/1920px-Beta_distribution_pdf.svg.png
         :width: 300
         :alt: Beta distribution
@@ -93,13 +102,6 @@ def score_genes(
         :alt: -log distribution
     `image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
 
-    Example
-    ---------
-    ::
-
-        $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/
-        --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT
-        --variant-col ID --af-col AF --del-col CADD --gene-col Gene
     \f
 
     Parameters
@@ -834,6 +836,13 @@ def normalize(
     """
     Normalize/standarize data.
 
+    Example
+    -------
+    ::
+
+        $ genrisk normalize --data-file toy_example/toy_dataset_scores --method gene_length --samples-col IID
+        --output-file toy_dataset_scores_normalized.tsv
+
     Normalization methods
     ----------------------
     Multiple methods have been implemented to normalize a dataset. Below is a brief describtion of each function.
@@ -849,12 +858,6 @@ def normalize(
     :robust: Great choice for dataset with many outliers. In this method, the values are substracted by the median then divided by the interquantile range (difference between the third and the first quartile). Formula x`= x - median(x) / Q3(x) - Q1(x)
     Every normalization method has it's advantages and disadvantages, so choose the method that works best with your dataset. To learn more about the normalization methods, check out this helpful `article <https://towardsdatascience.com/data-normalization-with-pandas-and-scikit-learn-7c1cc6ed6475>`_
 
-    Example
-    --------
-    ::
-
-        $ genrisk normalize --data-file toy_example/toy_dataset_scores --method gene_length --samples-col IID
-        --output-file toy_dataset_scores_normalized.tsv
     \f
 
     Parameters
