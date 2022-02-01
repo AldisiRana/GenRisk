@@ -7,7 +7,7 @@ The genrisk command line interface includes multiple commands which can be used 
     :prog: genrisk score-genes
 
 Gene-scoring equation
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 The gene scores are derived by the weighted sum of the variants in a gene.
 
 .. math::
@@ -36,12 +36,13 @@ Weighting functions
     :alt: -log distribution
 `image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
 
+
 .. click:: genrisk.cli:normalize
     :prog: genrisk normalize
 
 
 Normalization methods
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 Multiple methods have been implemented to normalize a dataset. Below is a brief describtion of each function.
 
 :gene_length: This method divides each gene-based score by the length of the gene. The genes lengths can be provided by the user, or retrieved from ensembl database. The gene length from ensembl database is calculated as such: gene length = gene end (bp) - gene start (bp)
