@@ -7,7 +7,7 @@ The genrisk command line interface includes multiple commands which can be used 
     :prog: genrisk score-genes
 
 Gene-scoring equation
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 The gene scores are derived by the weighted sum of the variants in a gene.
 
 .. math::
@@ -37,12 +37,16 @@ Weighting functions
 `image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
 
 
+
+
+
+
+
 .. click:: genrisk.cli:normalize
     :prog: genrisk normalize
 
-
 Normalization methods
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 Multiple methods have been implemented to normalize a dataset. Below is a brief describtion of each function.
 
 :gene_length: This method divides each gene-based score by the length of the gene. The genes lengths can be provided by the user, or retrieved from ensembl database. The gene length from ensembl database is calculated as such: gene length = gene end (bp) - gene start (bp)
@@ -56,6 +60,12 @@ Multiple methods have been implemented to normalize a dataset. Below is a brief 
 :robust: Great choice for dataset with many outliers. In this method, the values are substracted by the median then divided by the interquantile range (difference between the third and the first quartile). Formula x`= x - median(x) / Q3(x) - Q1(x)
 
 Every normalization method has it's advantages and disadvantages, so choose the method that works best with your dataset. To learn more about the normalization methods, check out this helpful `article <https://towardsdatascience.com/data-normalization-with-pandas-and-scikit-learn-7c1cc6ed6475>`_
+
+
+
+
+
+
 
 
 .. click:: genrisk.cli:find_association
