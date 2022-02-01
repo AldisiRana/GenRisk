@@ -9,12 +9,17 @@ The genrisk command line interface includes multiple commands which can be used 
     :nested: full
 
 
-.. click:: genrisk.cli:main
+.. click:: genrisk.cli:normalize
+    :prog: genrisk normalize
+    :nested: full
+
+.. click:: genrisk.cli:normalize
+    :prog: genrisk normalize
+    :nested: short
+
+.. click:: genrisk.cli:normalize
     :prog: genrisk normalize
     :nested: none
-
-
-.. autofunction:: genrisk.cli.normalize
 
 |
 |
