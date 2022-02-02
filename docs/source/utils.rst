@@ -3,4 +3,3 @@ Utilities
 ##########
 .. autofunction:: genrisk.utils.draw_qqplot
 .. autofunction:: genrisk.utils.draw_manhattan
-.. autofunction:: genrisk.utils.normalize_data

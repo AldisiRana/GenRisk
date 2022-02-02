@@ -10,6 +10,7 @@ from statsmodels.stats.multitest import multipletests
 from .association_analysis import run_mannwhitneyu, run_ttest, get_pvals_logit, get_pvals_linear
 from .gene_scoring import get_gene_info, plink_process, combine_scores
 from .prediction_models import regression_model, classification_model, test_classifier, test_regressor
+from .utils import gene_length_normalize
 
 PATH = os.path.abspath(os.path.join((__file__), os.pardir, os.pardir, os.pardir))
 BETAREG_SHELL = os.path.join(PATH, 'scripts', 'betareg_shell.R')
@@ -385,3 +386,61 @@ def model_testing(
     prediction_df = unseen_predictions[['Label']]
     return prediction_df
 
+
+def normalize_data(
+    *,
+    method='gene_length',
+    genes_info=None,
+    genes_col='HGNC symbol',
+    length_col='gene_length',
+    data_file,
+    samples_col,
+):
+    """
+    Normalize dataset using gene_length, minmax, maxabs, zscore or robust
+
+    Parameters
+    ----------
+    method : str
+        the normalization method. [zscore, gene_length, minmax, maxabs, robust]
+    genes_info : str
+        file containing the genes and their lengths. if gene_length method chosen with no file, info will be retrieved from ensembl database.
+    genes_col : str
+        the column containing genes (if genes_info file is provided)
+    length_col : str
+        the columns containing genes length (if genes_info file is provided)
+    data_file : str
+        file containing dataset to be normalized.
+    samples_col : str
+        the column containing samples ids.
+
+    Returns
+    -------
+    DataFrame
+        a df with the normalized dataset.
+
+    """
+    scores_df = pd.read_csv(data_file, sep=r'\s+')
+    if method == 'gene_length':
+        scores_df = gene_length_normalize(
+            genes_info=genes_info, genes_col=genes_col, length_col=length_col, scores_df=scores_df,
+            samples_col=samples_col
+        )
+    elif method == 'maxabs':
+        for col in scores_df.columns:
+            scores_df[col] = scores_df[col]/scores_df[col].abs().max()
+    elif method == 'minmax':
+        for col in scores_df.columns:
+            scores_df[col] = (scores_df[col] - scores_df[col].min()) / (scores_df[col].max() - scores_df[col].min())
+    elif method == 'zscore ':
+        scores_df.std(ddof=0)
+        for col in scores_df.columns:
+            scores_df[col] = (scores_df[col] - scores_df[col].mean()) / scores_df[col].std()
+    elif method == 'robust':
+        for col in scores_df.columns:
+            scores_df[col] = (scores_df[col] - scores_df[col].median()) / (scores_df[col].quantile(0.75) - scores_df[col].quantile(0.25))
+    else:
+        raise Exception(
+            'This function does not support the normalization method you selected. Methods: [zscore, gene_length, minmax, maxabs, robust]'
+        )
+    return scores_df

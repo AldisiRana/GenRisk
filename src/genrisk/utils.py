@@ -9,74 +9,23 @@ from tqdm import tqdm
 from pybiomart import Dataset
 
 
-def normalize_data(
-    *,
-    method='gene_length',
-    genes_info=None,
-    genes_col='HGNC symbol',
-    length_col='gene_length',
-    data_file,
-    samples_col,
-):
-    """
-    Normalize dataset using gene_length, minmax, maxabs, zscore or robust
-
-    Parameters
-    ----------
-    method : str
-        the normalization method. [zscore, gene_length, minmax, maxabs, robust]
-    genes_info : str
-        file containing the genes and their lengths. if gene_length method chosen with no file, info will be retrieved from ensembl database.
-    genes_col : str
-        the column containing genes (if genes_info file is provided)
-    length_col : str
-        the columns containing genes length (if genes_info file is provided)
-    data_file : str
-        file containing dataset to be normalized.
-    samples_col : str
-        the column containing samples ids.
-
-    Returns
-    -------
-    DataFrame
-        a df with the normalized dataset.
-
-    """
-    scores_df = pd.read_csv(data_file, sep=r'\s+')
+def gene_length_normalize(*, genes_info, genes_col, length_col, scores_df, samples_col):
     unnormalized = []
-    if method == 'gene_length':
-        if not genes_info:
-            dataset = Dataset(name='hsapiens_gene_ensembl',
-                              host='http://www.ensembl.org')
-            genes_df = dataset.query(attributes=['hgnc_symbol', 'start_position', 'end_position'])
-            genes_df['gene_length'] = genes_df['Gene end (bp)'] - genes_df['Gene start (bp)']
-        else:
-            genes_df = pd.read_csv(genes_info, sep='\t')
-        genes_lengths = genes_df.set_index(genes_col).to_dict()[length_col]
-        for (name, data) in tqdm(scores_df.drop(columns=[samples_col]).iteritems(), desc="Normalizing genes scores"):
-            if name not in genes_lengths.keys():
-                unnormalized.append(name)
-                continue
-        # normalize genes by length
-            scores_df[name] = round(scores_df[name] / genes_lengths[name], 5)
-        scores_df = scores_df.drop(unnormalized, axis=1)
-    elif method == 'maxabs':
-        for col in scores_df.columns:
-            scores_df[col] = scores_df[col]/scores_df[col].abs().max()
-    elif method == 'minmax':
-        for col in scores_df.columns:
-            scores_df[col] = (scores_df[col] - scores_df[col].min()) / (scores_df[col].max() - scores_df[col].min())
-    elif method == 'zscore ':
-        scores_df.std(ddof=0)
-        for col in scores_df.columns:
-            scores_df[col] = (scores_df[col] - scores_df[col].mean()) / scores_df[col].std()
-    elif method == 'robust':
-        for col in scores_df.columns:
-            scores_df[col] = (scores_df[col] - scores_df[col].median()) / (scores_df[col].quantile(0.75) - scores_df[col].quantile(0.25))
+    if not genes_info:
+        dataset = Dataset(name='hsapiens_gene_ensembl',
+                          host='http://www.ensembl.org')
+        genes_df = dataset.query(attributes=['hgnc_symbol', 'start_position', 'end_position'])
+        genes_df['gene_length'] = genes_df['Gene end (bp)'] - genes_df['Gene start (bp)']
     else:
-        raise Exception(
-            'This function does not support the normalization method you selected. Methods: [zscore, gene_length, minmax, maxabs, robust]'
-        )
+        genes_df = pd.read_csv(genes_info, sep='\t')
+    genes_lengths = genes_df.set_index(genes_col).to_dict()[length_col]
+    for (name, data) in tqdm(scores_df.drop(columns=[samples_col]).iteritems(), desc="Normalizing genes scores"):
+        if name not in genes_lengths.keys():
+            unnormalized.append(name)
+            continue
+        # normalize genes by length
+        scores_df[name] = round(scores_df[name] / genes_lengths[name], 5)
+    scores_df = scores_df.drop(unnormalized, axis=1)
     return scores_df
 
 
