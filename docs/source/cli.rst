@@ -1,4 +1,8 @@
 .. _cli:
+
+.. contents:: a title for the contents
+    :depth: 3
+
 Command Line Interface
 #######################
 The genrisk command line interface includes multiple commands which can be used as follows:
@@ -6,8 +10,9 @@ The genrisk command line interface includes multiple commands which can be used 
 .. click:: genrisk.cli:score_genes
     :prog: genrisk score-genes
 
-Gene-scoring equation
-**********************
+|
+
+.. note:: Gene-scoring equation
 
     The gene scores are derived by the weighted sum of the variants in a gene.
 
@@ -20,8 +25,7 @@ Gene-scoring equation
 
     C\ :sub:`i` is the allele count.
 
-Weighting functions
-''''''''''''''''''''
+.. note:: Weighting functions
 
     :beta: this option uses two parameters α and β, to create beta distribution. Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
         The default for this function is [1,25] which are the same parameters used in SKAT-O.
@@ -45,8 +49,9 @@ Weighting functions
 .. click:: genrisk.cli:normalize
     :prog: genrisk normalize
 
-Normalization methods
-______________________
+|
+
+.. note:: Normalization methods
 
     Multiple methods have been implemented to normalize a dataset. Below is a brief describtion of each function.
 
