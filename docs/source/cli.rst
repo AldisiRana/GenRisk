@@ -2,8 +2,8 @@
 
 Command Line Interface
 #######################
-.. note:: See Also
-    Detailed information about the functions in the :ref:`pipeline`.
+.. note::
+    Detailed information about the functions can be found in the `pipeline <pipeline.rst>`_.
 
 The genrisk command line interface includes multiple commands which can be used as follows:
 
