@@ -9,24 +9,44 @@ Real use case
 .. topic:: Gene scoring
 
     We calculated the scored for the 150K samples.
-    :MAF threshold: 1% MAF threshold.
-    :Weighting function: beta 1-25 weighting parameter.
-    :Functional annotation: CADD raw scores.
+
+    :MAF threshold:
+        1% MAF threshold.
+
+    :Weighting function:
+        beta 1-25 weighting parameter.
+
+    :Functional annotation:
+        CADD raw scores.
 
 .. topic:: Association analysis
 
     For each phenotype, we performed association analysis including all the samples (150K)
-    :Method: linear regression
-    :Covarites: age, sex, BMI and PC1-4
+
+    :Method:
+        linear regression
+
+    :Covarites:
+        age, sex, BMI and PC1-4
 
 .. topic:: Prediction models
 
     We also generated 3 models for each phenotype, a PRS prediction model, a gene-based prediction model and a combined model.
-    :Feature Selection: we used portion of the samples (50K) for feature selection with linear regression. The genes with p-values <0.05 were selected as features.
-    :Covariates: age, sex, BMI and PC1-4 were also included in the features.
-    :model trainng: Of the remaining 100K samples, 75% were used in training with 10-fold cross-validation.
-    :model testing: the 25% remaining of the dataset was used as external testing set for final model evaluation.
-    :PRS calculation: To avoid colinearty, we excluded variants that were included in the gene scores from the PRS calculation.
+
+    :Feature Selection:
+        we used portion of the samples (50K) for feature selection with linear regression. The genes with p-values <0.05 were selected as features.
+
+    :Covariates:
+        age, sex, BMI and PC1-4 were also included in the features.
+
+    :model trainng:
+        Of the remaining 100K samples, 75% were used in training with 10-fold cross-validation.
+
+    :model testing:
+        the 25% remaining of the dataset was used as external testing set for final model evaluation.
+
+    :PRS calculation:
+        To avoid colinearty, we excluded variants that were included in the gene scores from the PRS calculation.
 
 LDL Phenotype
 ***************
