@@ -1,17 +1,39 @@
 .. _real_cases:
 Real use case
 ###############
-We ran the pipeline using about 200K samples from UKBiobank.
-We filtered for British to remove outliers (150K after filtering) and calculated the scores using 1% MAF threshold, beta 1-25 weighting parameter and CADD raw scores.
-For each phenotype, we performed association analysis using linear regression with age, sex, BMI and PC1-4 as covariates.
-We alo generated 3 models for each phenotype, a PRS prediction model, a gene-based prediction model and a combined model.
-We generated the models using 25% of the dataset as external testing set and 75% were used in training with 10-fold cross-validation.
-To avoid colinearty, we excluded variants that were included in the gene scores from the PRS calculation.
+
+.. topic:: Data
+
+    We ran the pipeline using about 200K samples from UKBiobank. We filtered for British to remove outliers (150K after filtering)
+
+.. topic:: Gene scoring
+
+    We calculated the scored for the 150K samples.
+    :MAF threshold: 1% MAF threshold.
+    :Weighting function: beta 1-25 weighting parameter.
+    :Functional annotation: CADD raw scores.
+
+.. topic:: Association analysis
+
+    For each phenotype, we performed association analysis including all the samples (150K)
+    :Method: linear regression
+    :Covarites: age, sex, BMI and PC1-4
+
+.. topic:: Prediction models
+
+    We also generated 3 models for each phenotype, a PRS prediction model, a gene-based prediction model and a combined model.
+    :Feature Selection: we used portion of the samples (50K) for feature selection with linear regression. The genes with p-values <0.05 were selected as features.
+    :Covariates: age, sex, BMI and PC1-4 were also included in the features.
+    :model trainng: Of the remaining 100K samples, 75% were used in training with 10-fold cross-validation.
+    :model testing: the 25% remaining of the dataset was used as external testing set for final model evaluation.
+    :PRS calculation: To avoid colinearty, we excluded variants that were included in the gene scores from the PRS calculation.
 
 LDL Phenotype
 ***************
-We ran association analysis on the samples with LDL direct measurements as phenotype(quantitative).
-For this phenotype we adjusted the values for individuals who take statin.
+We performed the analysis on the samples with LDL direct measurements as phenotype(quantitative).
+
+.. note::
+    For this phenotype we adjusted the values for individuals who take statin.
 
 Association analysis
 ---------------------
@@ -32,16 +54,17 @@ The Manhattan plot:
 
 Regression model
 ------------------
-For the prediction model, we used LDL direct measurements (adjusted for statin) as target. For features, we used the scores of 477 selected genes (https://doi.org/10.1038/nrg2779) + BMI + age + sex + PC1-4.
+For the prediction model, we used LDL direct measurements (adjusted for statin) as target.
+For features, we used the scores of 3 selected genes + BMI + age + sex + PC1-4.
 For the PRS and combined models we used the following PRS (PGS000688).
 The final prediction models was generated using gradiant boosting regression, evaluation metric are shown in the table below.
 
 +----------------+------------------+------------+----------------+
 |                | Gene-based model | PRS model  | Combined model |
 +================+==================+============+================+
-|     Rˆ2        |   0.075          | 0.322      |  0.329         |
+|     Rˆ2        |   0.075          |  0.322     |  0.329         |
 +----------------+------------------+------------+----------------+
-|  RMSE          |  0.849           |  0.729     |  0.725         |
+|  RMSE          |     0.849        |  0.729     |  0.725         |
 +----------------+------------------+------------+----------------+
 
 The images below are the output of the final combined model.
@@ -66,7 +89,7 @@ Model residuals:
 
 Alkaline phosphatase
 **********************
-We ran association analysis on the samples with ALP measurements as phenotype(quantitative).
+We performed the analysis on the samples with ALP measurements as phenotype(quantitative).
 
 Association analysis
 ---------------------
@@ -90,7 +113,7 @@ The Manhattan plot:
 Regression model
 ------------------
 For the prediction model, we used alkaline phosphatase measurements as target. For feature selection,
-we applied linear regression on 50K of the samples and selected the genes with significant p-values (<0.05) as features (45 genes)
+For features we used 45 selected genes as features (45 genes) + BMI + age + sex + PC1-4.
 For the PRS and combined models we used the following PRS (PGS000670).
 The final prediction models was generated using gradiant boosting regression, evaluation metric are shown in the table below.
 
@@ -112,7 +135,7 @@ Feature importance plot for combined model:
 Other phenotypes
 ******************
 Here we show a table of other phenotypes that we analyzed. For each phenotype we include the number of genes considered
-in the models as well as the rˆ2 of the gene-based model, PRS model and combined model.
+in the models as well as the Rˆ2 of the gene-based model, PRS model and combined model.
 
 +---------------------------+-----------------+------------------+------------+----------------+
 |                           | Number of genes | Gene-based model | PRS model  | Combined model |
