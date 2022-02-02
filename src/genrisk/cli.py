@@ -11,9 +11,10 @@ from sklearn.model_selection import train_test_split
 
 from .gene_scoring import calculate_gbrs, pathway_scoring
 from .helpers import create_logger
-from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, model_testing, scoring_process
+from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, model_testing, scoring_process, \
+    normalize_data
 from .prs_scoring import prs_prompt
-from .utils import draw_qqplot, draw_manhattan, merge_files, normalize_data
+from .utils import draw_qqplot, draw_manhattan, merge_files
 
 SAMPLES_COL = click.option('-m', '--samples-col',  default='IID', show_default=True,
                            help="the name of the column that contains the samples.")
