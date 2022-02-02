@@ -6,7 +6,8 @@ The genrisk command line interface includes multiple commands which can be used 
 .. click:: genrisk.cli:score_genes
     :prog: genrisk score-genes
 
-.. rubric:: Gene-scoring equation
+Gene-scoring equation
+---------------------
 
     The gene scores are derived by the weighted sum of the variants in a gene.
 
@@ -43,7 +44,7 @@ The genrisk command line interface includes multiple commands which can be used 
 .. click:: genrisk.cli:normalize
     :prog: genrisk normalize
 
-.. rubric:: Normalization methods
+.. sidebar:: Normalization methods
 
     Multiple methods have been implemented to normalize a dataset. Below is a brief describtion of each function.
 
