@@ -138,11 +138,11 @@ def test_regressor(
     y_col,
     output
 ):
-    unseen_predictions = pyreg.predict_model(model, data=x_set)
-    r2 = metrics.r2_score(y_col, unseen_predictions.Label)
-    rmse = metrics.mean_squared_error(y_col, unseen_predictions.Label, squared=False)
+    x_set['Label'] = model.predict(x_set)
+    r2 = metrics.r2_score(y_col, x_set.Label)
+    rmse = metrics.mean_squared_error(y_col, x_set.Label, squared=False)
     plot = generate_scatterplot(
-        x_axis=unseen_predictions.Label, y_axis=y_col, output=output)
+        x_axis=x_set.Label, y_axis=y_col, output=output)
     input_list = [output + '\nTesting model report: \n', 'R^2 = ' + str(r2) + '\n', 'RMSE = ' + str(rmse) + '\n']
     write_output(input_list=input_list, output=output + "_report.txt")
-    return unseen_predictions
+    return x_set
