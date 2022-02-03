@@ -138,7 +138,9 @@ def test_regressor(
     y_col,
     output
 ):
+    print('model prediction')
     x_set['Label'] = model.predict(x_set)
+    print('model evaluatio')
     r2 = metrics.r2_score(y_col, x_set.Label)
     rmse = metrics.mean_squared_error(y_col, x_set.Label, squared=False)
     plot = generate_scatterplot(
