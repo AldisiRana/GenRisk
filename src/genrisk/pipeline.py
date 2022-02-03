@@ -376,6 +376,8 @@ def model_testing(
     model = joblib.load(model_path)
     print('model loaded')
     testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col)
+    testing_df = testing_df.dropna(subset=[label_col])
+    testing_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
     x_set = testing_df.drop(columns=label_col)
     model_func = {'classifier': test_classifier, 'regressor': test_regressor}
     unseen_predictions = model_func.get(model_type)(
