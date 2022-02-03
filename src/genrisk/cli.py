@@ -6,6 +6,7 @@ import time
 
 import click
 import pandas as pd
+import numpy as np
 
 from sklearn.model_selection import train_test_split
 
@@ -448,6 +449,7 @@ def create_model(
     start_time = time.time()
     training_set = pd.read_csv(data_file, sep='\t', index_col=samples_col)
     training_set.dropna(subset=[target_col], inplace=True)
+    training_set.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
     testing_set = pd.DataFrame()
     if test:
         training_set, testing_set = train_test_split(training_set, test_size=test_size, random_state=int(seed))
