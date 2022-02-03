@@ -52,7 +52,7 @@ def regression_model(
     pyreg.plot_model(final_model, plot='error', save=True)
     if len(testing_set.index) != 0:
         unseen_predictions = test_regressor(
-            model=final_model, x_set=testing_set, y_col=testing_set[y_col], output=model_name
+            model=final_model, x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
         )
         unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=True)
     pyreg.save_model(final_model, model_name)
@@ -138,9 +138,7 @@ def test_regressor(
     y_col,
     output
 ):
-    print('model prediction')
     x_set['Label'] = model.predict(x_set)
-    print('model evaluatio')
     r2 = metrics.r2_score(y_col, x_set.Label)
     rmse = metrics.mean_squared_error(y_col, x_set.Label, squared=False)
     plot = generate_scatterplot(

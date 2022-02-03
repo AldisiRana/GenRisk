@@ -374,7 +374,6 @@ def model_testing(
 
     """
     model = joblib.load(model_path)
-    print('model loaded')
     testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col)
     testing_df = testing_df.dropna(subset=[label_col])
     testing_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
