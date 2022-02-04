@@ -75,6 +75,9 @@ Statistical methods
 --------------------
 ... coming soon ...
 
+P-value adjustment (correction) methods
+----------------------------------------
+
 
 Prediction model generation
 ****************************

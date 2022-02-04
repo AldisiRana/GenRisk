@@ -10,6 +10,20 @@ from pybiomart import Dataset
 
 
 def gene_length_normalize(*, genes_info, genes_col, length_col, scores_df, samples_col):
+    """
+
+    Parameters
+    ----------
+    genes_info
+    genes_col
+    length_col
+    scores_df
+    samples_col
+
+    Returns
+    -------
+
+    """
     unnormalized = []
     if not genes_info:
         dataset = Dataset(name='hsapiens_gene_ensembl',
@@ -116,13 +130,23 @@ def draw_qqplot(*, pvals, qq_output):
 
 def merge_files(*, files_lst, sep, by, cols=None):
     """
-    Merge a list of files into one dataframe.
+    Merge a list of files with the same format into one dataframe.
 
-    :param files_lst: a list with files to merge.
-    :param sep: the column seperator.
-    :param by:  the common column between all files.
-    :param cols: selected columns to remain in dataframe.
-    :return: merged dataframe
+    Parameters
+    ----------
+    files_lst
+        a list with files to merge.
+    sep
+        the column seperator.
+    by
+        the common column between all files.
+    cols
+        selected columns to remain in dataframe.
+
+    Returns
+    -------
+    merged dataframe
+
     """
     df = pd.read_csv(files_lst[0], sep=sep)
     for file in files_lst[1:]:

@@ -22,20 +22,38 @@ def regression_model(
     normalize_method
 ):
     """
+    Build a regression model for prediction.
 
-    :param y_col:
-    :param training_set:
-    :param normalize:
-    :param test_size:
-    :param folds:
-    :param metric:
-    :param model_name:
-    :param testing_set:
-    :param imbalanced:
-    :param seed:
-    :param include_models:
-    :param normalize_method:
-    :return:
+    Parameters
+    ----------
+    y_col : str
+        the name of the target column.
+    training_set : pd.DataFrame
+        DataFrame containing the training data.
+    normalize : bool
+        if True the dataset will be normalized before training.
+    test_size : float
+        Between [0.0-1.0]. The size of the split for test within the training set.
+    folds : int
+        number of folds for cross validation.
+    metric : str
+        the metric used for evaluating the best model.
+    model_name : str
+        the name to save the model.
+    testing_set : pd.DataFrame
+        the external dataset for evaluating the best model.
+    imbalanced
+    seed : int
+        random number to initilize the process.
+    include_models : List
+        a list of models to be included in the process.
+    normalize_method : str
+        The method used for normalizing the data.
+
+    Returns
+    -------
+    Final regression model
+
     """
     if not metric:
         metric = 'RMSE'
@@ -75,20 +93,39 @@ def classification_model(
     normalize_method,
 ):
     """
+    Build a classification model for prediction.
 
-    :param y_col:
-    :param training_set:
-    :param normalize:
-    :param test_size:
-    :param folds:
-    :param metric:
-    :param model_name:
-    :param testing_set:
-    :param imbalanced:
-    :param seed:
-    :param include_models:
-    :param normalize_method:
-    :return:
+    Parameters
+    ----------
+    y_col : str
+        the name of the target column.
+    training_set : pd.DataFrame
+        DataFrame containing the training data.
+    normalize : bool
+        if True the dataset will be normalized before training.
+    test_size : float
+        Between [0.0-1.0]. The size of the split for test within the training set.
+    folds : int
+        number of folds for cross validation.
+    metric : str
+        the metric used for evaluating the best model.
+    model_name : str
+        the name to save the model.
+    testing_set : pd.DataFrame
+        the external dataset for evaluating the best model.
+    imbalanced : bool
+        if True the imbalance will be fixed before the training.
+    seed : int
+        random number to initilize the process.
+    include_models : List
+        a list of models to be included in the process.
+    normalize_method : str
+        The method used for normalizing the data.
+
+    Returns
+    -------
+    Final classification model
+
     """
     if not metric:
         metric = 'AUC'
@@ -105,7 +142,7 @@ def classification_model(
     pycl.plot_model(final_model, plot='feature', save=True)
     if len(testing_set.index) != 0:
         unseen_predictions = test_classifier(
-            model=final_model, x_set=testing_set, y_col=testing_set[y_col], output=model_name
+            model=final_model, x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
         )
         unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=True)
     pycl.save_model(final_model, model_name)
@@ -119,16 +156,37 @@ def test_classifier(
     y_col,
     output
 ):
-    unseen_predictions = pycl.predict_model(model, data=x_set)
-    report = metrics.classification_report(y_col, unseen_predictions.Label)
-    acc = metrics.accuracy_score(y_col, unseen_predictions.Label)
-    auc = metrics.auc(y_col, unseen_predictions.Label)
+    """
+        Test a model with an independent dataset.
+
+        Parameters
+        ----------
+        model
+            the model used for prediction
+        x_set : pd.DataFrame
+            the independent testing set (without the target)
+        y_col : pd.Series
+            the target true values.
+        output : str
+            the name for the evaluation output
+
+        Returns
+        -------
+        pd.DataFrame
+            the testing dataset with the true and predicted values.
+
+        """
+    x_set['Label'] = model.predict(x_set)
+    x_set['True value'] = y_col
+    report = metrics.classification_report(y_col, x_set.Label)
+    acc = metrics.accuracy_score(y_col, x_set.Label)
+    auc = metrics.auc(y_col, x_set.Label)
     plot = generate_confusion_matrix(x_set=x_set, y_set=y_col, output=output)
     input_list = [
         output, '\nTesting model report: \n', report + '\n', 'AUC = ' + str(auc) + '\n', 'Accuracy = ' + str(acc) + '\n'
     ]
     write_output(input_list=input_list, output=output + "_report.txt")
-    return unseen_predictions
+    return x_set
 
 
 def test_regressor(
@@ -138,7 +196,28 @@ def test_regressor(
     y_col,
     output
 ):
+    """
+    Test a model with an independent dataset.
+
+    Parameters
+    ----------
+    model
+        the model used for prediction
+    x_set : pd.DataFrame
+        the independent testing set (without the target)
+    y_col : pd.Series
+        the target true values.
+    output : str
+        the name for the evaluation output
+
+    Returns
+    -------
+    pd.DataFrame
+        the testing dataset with the true and predicted values.
+
+    """
     x_set['Label'] = model.predict(x_set)
+    x_set['True value'] = y_col
     r2 = metrics.r2_score(y_col, x_set.Label)
     rmse = metrics.mean_squared_error(y_col, x_set.Label, squared=False)
     plot = generate_scatterplot(

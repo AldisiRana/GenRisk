@@ -11,9 +11,16 @@ def prs_prompt(*, download, plink):
     """
     Interactive function to download and calculate prs.
 
-    :param download: if true, PGS file will be downloaded given an ID
-    :param plink:
-    :return: a statement
+    Parameters
+    ----------
+    download : bool
+        if true, PGS file will be downloaded given an ID
+    plink : str
+        the path to plink. if not default in environment.
+
+    Returns
+    -------
+        a statement
     """
     if download:
         pgs_id = click.prompt('Please input PGS ID', type=str)
@@ -53,11 +60,17 @@ def download_pgs(
         prs_id,
 ):
     """
-    Get PGS from pgscatalog
+    Get PGS from pgscatalog.
 
-    :param prs_id: the PRS ID in the pgscatalog.
+    Parameters
+    ----------
+    prs_id : str
+        the PRS ID in the pgscatalog.
 
-    :return:
+    Returns
+    -------
+        a file containing the prs file
+
     """
     # make sure that the columns are present and matching
     resp = get('https://www.pgscatalog.org/rest/score/%s' % prs_id)

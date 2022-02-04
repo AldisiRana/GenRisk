@@ -28,18 +28,33 @@ def get_gene_info(
     """
     Create temporary files with variant information for each gene, plus the weights calculated.
 
-    :param annotated_vcf: a file containing the variant, AF, ALT, Gene, and deleterious score.
-    :param variant_col: the name of the variant column.
-    :param af_col: the name of the AF column.
-    :param alt_col: the name of the ALT column.
-    :param del_col: the name of deleterious score column.
-    :param output_dir: directory to save in temporary files.
-    :param genes_col: the name of genes column.
-    :param maf_threshold: the minor allele frequency threshold, default is 0.01.
-    :param beta_param: the parameters of the beta function, if chosen for weighting.
-    :param weight_func: the weighting function, beta or log10.
+    Parameters
+    ----------
+    annotated_vcf : str
+        a file containing the variant, AF, ALT, Gene, and deleterious score.
+    variant_col : str
+        the name of the variant column.
+    af_col : str
+        the name of the Allele Frequency column.
+    alt_col : str
+        the name of the alternate allele column.
+    del_col : str
+        the name of functional annotation column.
+    output_dir : str
+        directory to save in temporary files.
+    genes_col : str
+        the name of genes column.
+    maf_threshold : float
+        between [0.0-1.0]. the minor allele frequency threshold, default is 0.01.
+    beta_param : tuple
+        the parameters of the beta function, if chosen for weighting.
+    weight_func : str
+        the weighting function, beta or log10.
 
-    :return: returns the output directory with all the temporary files.
+    Returns
+    -------
+        output directory with all the temporary files.
+
     """
     skip = 0
     if annotated_vcf.endswith('.gz'):
@@ -96,10 +111,18 @@ def combine_scores(
     """
     Combine the files that contain the scores into one file.
 
-    :param input_path: the directory containing scores files.
-    :param output_path: the name of the output file.
+    Parameters
+    ----------
+    input_path : str
+        the directory containing scores files.
+    output_path : str
+        the name of the output file.
 
-    :return: dataframe with all the scores.
+    Returns
+    -------
+    pd.DataFrame
+        dataframe with all the scores.
+
     """
     all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(input_path) for name in files]
     profile_files = [f for f in all_files if re.match(r'.+profile$', f)]
@@ -118,11 +141,22 @@ def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None, method="")
     """
     Use plink to calculate and sum the scores for each gene.
 
-    :param genes_folder: the folder containing the temporary genes files.
-    :param plink: the directory of plink (if not default).
-    :param annotated_vcf: vcf with samples information
+    Parameters
+    ----------
+    genes_folder : str
+        the folder containing the temporary genes files.
+    plink : str
+        the directory of plink (if not default).
+    annotated_vcf : str
+        vcf with samples information
+    bfiles : str
+        the name of the binary files, not needed if annotated file is given.
+    method : str
+        if empty method is the average. if 'sum', then the variants scores will be summed.
 
-    :return:
+    Returns
+    -------
+
     """
     genes = [line.strip() for line in open(genes_folder + '.genes', 'r')]
     if bfiles:
@@ -152,13 +186,30 @@ def calculate_gbrs(
     """
     Calculate a gene-based risk score for each individual in a given dataset.
 
-    :param scores_df: the matrix with gene-based scores.
-    :param weights_df: the matrix with weights for each gene.
-    :param weights_col: the name of the column with the weights.
-    :param genes_col: the name of the column with the genes.
-    :param sum: if True it will sum the gene-based risk scores into one value.
+    Parameters
+    ----------
+    scores_df : pd.DataFrame
+        the matrix with gene-based scores.
+    weights_df : pd.DataFrame
+        the matrix with weights for each gene.
+    weights_col : str
+        the name of the column with the weights.
+    genes_col : str
+        the name of the column with the genes.
+    pathway_file : str
+        if pathway method chosen, the file contains a list of pathways
+    samples_col : str
+        the name of the column with samples IDs.
+    method : str
+        the method used to calulate the gene-based risk scores. [sum | pathways]
+    logger
+        the logger to log the process
 
-    :return: a dataframe with the gene-based risk scores.
+    Returns
+    -------
+    pd.DataFrame
+        a dataframe with the gene-based risk scores.
+
     """
     genes = set(weights_df[genes_col]).intersection(set(scores_df.columns))
     df = scores_df[genes]
@@ -188,6 +239,28 @@ def pathway_scoring(
     samples_col,
     logger
 ):
+    """
+    sum the gene-based scores to pathway-based scores.
+
+    Parameters
+    ----------
+    pathways : dict
+        the pathways (keys) and their genes (values)
+    genes : str
+        the genes to select from the gene-based scores.
+    scores_file : str
+        the gene-based scores file.
+    samples_col : str
+        the name the column of the samples IDs.
+    logger
+        the logger to log the process
+
+    Returns
+    -------
+    pd.DataFrame
+        dataframe containing the pathway-based scores.
+
+    """
     logger.info('reading scores file ...')
     scores_df = pd.read_csv(scores_file, sep=r'\s+', usecols=[samples_col] + genes)
     pathway_scores = pd.DataFrame(columns=[samples_col] + list(pathways))

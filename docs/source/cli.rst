@@ -3,7 +3,7 @@
 Command Line Interface
 #######################
 .. note::
-    Detailed information about the functions can be found in the `pipeline <pipeline.rst>`_.
+    Detailed information about the functions can be found in the `pipeline <pipeline.html>`_.
 
 The genrisk command line interface includes multiple commands which can be used as follows:
 

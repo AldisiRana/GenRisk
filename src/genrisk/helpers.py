@@ -13,10 +13,18 @@ def uni_profiles(df, f):
     """
     Merge two dataframes.
 
-    :param df: the main dataframe with all the scores.
-    :param f: the file containing the scores of one gene.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        the main dataframe with all the scores.
+    f : str
+        the file containing the scores of one gene.
 
-    :return: the merged dataframe.
+    Returns
+    -------
+    pd.DataFrame
+        the merged dataframe
+
     """
     df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
     r = re.compile("([a-zA-Z0-9_.-]*).profile$")
@@ -28,12 +36,21 @@ def uni_profiles(df, f):
 
 def generate_scatterplot(*, x_axis, y_axis, output):
     """
+    Generate scatterplot.
 
-    Generate a scatterplot.
-    :param x_axis: the x axis column.
-    :param y_axis: the y axis column.
-    :param output: the output image path.
-    :return: a scatterplot
+    Parameters
+    ----------
+    x_axis : str
+        the name of the x-axis column.
+    y_axis : str
+        the name of the y-axis columns.
+    output : str
+        the output image path.
+
+    Returns
+    -------
+    a scatterplot
+
     """
     plt.scatter(x_axis, y_axis, alpha=0.5)
     m, b = np.polyfit(x_axis, y_axis, 1)
@@ -49,10 +66,19 @@ def generate_confusion_matrix(x_set, y_set, output):
     """
     Generate a confusion matrix for a dataset.
 
-    :param x_set: the features set.
-    :param y_set: the target set.
-    :param output: the output image path
-    :return: confusion matrix plot
+    Parameters
+    ----------
+    x_set : pd.DataFrame
+        the features set.
+    y_set : pd.Series
+        the target set.
+    output : str
+        the output image path
+
+    Returns
+    -------
+        confusion matric plot
+
     """
     confusion = metrics.plot_confusion_matrix(x_set, y_set)
     confusion.ax_.set_title('Classifier confusion matrix')
@@ -64,8 +90,16 @@ def write_output(*, input_list, output):
     """
     Write list info a txt file.
 
-    :param input_list: a list of lines
-    :param output: the output file
+    Parameters
+    ----------
+    input_list : List
+        a list of lines
+    output : str
+        the output file
+
+    Returns
+    -------
+
     """
     textfile = open(output, "w")
     for line in input_list:
@@ -77,7 +111,10 @@ def create_logger():
     """
     Create a logger to output command information.
 
-    :return: logger
+    Returns
+    -------
+        logger
+
     """
     logger = logging.getLogger('genrisk')
     logger.setLevel(logging.DEBUG)

@@ -20,12 +20,22 @@ def calc_corr(
     """
     Calculate the pearson's correlation between same genes in two scoring matices.
 
-    :param first_file: the path to the first scores file.
-    :param second_file: the path to the second scores file.
-    :param samples_col: the column containing the samples IDs.
-    :param output_file: the path to the output file with correlation values.
+    Parameters
+    ----------
+    first_file : str
+        the path to the first scores file.
+    second_file : str
+        the path to the second scores file.
+    samples_col : str
+        the column containing the samples IDs.
+    output_file : str
+        the path to the output file with correlation values.
 
-    :return:
+    Returns
+    -------
+    pd.DataFrame
+        the correlation dataframe.
+
     """
     with open(first_file) as f:
         genes_01 = re.split('\s+', f.readline().strip('\n'))
@@ -53,11 +63,20 @@ def run_linear(gene_col, x_set, y_set):
     """
     Helper function to run linear regression association.
 
-    :param gene_col: a tuple from df.iteritems()
-    :param x_set: the covariates.
-    :param y_set: the target.
+    Parameters
+    ----------
+    gene_col : tuple
+        a tuple from df.iteritems()
+    x_set : pd.DataFrame
+        a dataframe with the covariates.
+    y_set : pd.Series
+        the target.
 
-    :return: a list with gene name, pvalues, coefs and std err.
+    Returns
+    -------
+    List
+         a list with gene name, pvalues, coefs and std err.
+
     """
     x_set[gene_col[0]] = gene_col[1]
     x_set = sm.add_constant(x_set)
@@ -73,11 +92,20 @@ def run_logit(gene_col, x_set, y_set):
     """
     Helper function to run logistic regression association.
 
-    :param gene_col: a tuple from df.iteritems()
-    :param x_set: the covariates.
-    :param y_set: the target.
+    Parameters
+    ----------
+    gene_col : tuple
+        a tuple from df.iteritems()
+    x_set : pd.DataFrame
+        a dataframe with the covariates.
+    y_set : pd.Series
+        the target.
 
-    :return: a list with gene name, pvalues, and std err.
+    Returns
+    -------
+    List
+         a list with gene name, pvalues, coefs and std err.
+
     """
     try:
         x_set[gene_col[0]] = gene_col[1]
@@ -92,6 +120,25 @@ def run_logit(gene_col, x_set, y_set):
 
 
 def run_mannwhitneyu(*, df, genes, cases_column, **kwargs):
+    """
+    Helper function to run mann whitney u association.
+
+    Parameters
+    ----------
+    df : df.DataFrame
+        the dataframe with all info.
+    genes : List
+        the list of genes to run the association
+    cases_column : str
+        the taget column
+    kwargs
+
+    Returns
+    -------
+    pd.DataFrame
+        dataframe containing the p_values.
+
+    """
     p_values = []
     df_by_cases = df.groupby(cases_column)
     kwargs['logger'].info(df_by_cases.size())
