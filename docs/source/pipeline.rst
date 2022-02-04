@@ -71,14 +71,6 @@ Beta regression function
 -------------------------
 .. autofunction:: genrisk.pipeline.betareg_pvalues
 
-Statistical methods
---------------------
-... coming soon ...
-
-P-value adjustment (correction) methods
-----------------------------------------
-
-
 Prediction model generation
 ****************************
 .. autofunction:: genrisk.pipeline.create_prediction_model
