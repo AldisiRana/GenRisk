@@ -178,9 +178,9 @@ def test_classifier(
         """
     x_set['Label'] = model.predict(x_set)
     x_set['True value'] = y_col
-    report = metrics.classification_report(y_col, x_set.Label)
-    acc = metrics.accuracy_score(y_col, x_set.Label)
-    auc = metrics.auc(y_col, x_set.Label)
+    report = metrics.classification_report(y_col, x_set['Label'])
+    acc = metrics.accuracy_score(y_col, x_set['Label'])
+    auc = metrics.auc(y_col, x_set['Label'])
     plot = generate_confusion_matrix(x_set=x_set, y_set=y_col, output=output)
     input_list = [
         output, '\nTesting model report: \n', report + '\n', 'AUC = ' + str(auc) + '\n', 'Accuracy = ' + str(acc) + '\n'
@@ -218,10 +218,10 @@ def test_regressor(
     """
     x_set['Label'] = model.predict(x_set)
     x_set['True value'] = y_col
-    r2 = metrics.r2_score(y_col, x_set.Label)
-    rmse = metrics.mean_squared_error(y_col, x_set.Label, squared=False)
+    r2 = metrics.r2_score(y_col, x_set['Label'])
+    rmse = metrics.mean_squared_error(y_col, x_set['Label'], squared=False)
     plot = generate_scatterplot(
-        x_axis=x_set.Label, y_axis=y_col, output=output)
+        x_axis=x_set['Label'], y_axis=y_col, output=output)
     input_list = [output + '\nTesting model report: \n', 'R^2 = ' + str(r2) + '\n', 'RMSE = ' + str(rmse) + '\n']
     write_output(input_list=input_list, output=output + "_report.txt")
     return x_set
