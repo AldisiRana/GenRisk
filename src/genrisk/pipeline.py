@@ -374,7 +374,6 @@ def model_testing(
         the results of predictions.
 
     """
-    model = joblib.load(model_path)
     testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col)
     testing_df = testing_df.dropna(subset=[label_col])
     testing_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
@@ -383,7 +382,7 @@ def model_testing(
     unseen_predictions = model_func.get(model_type)(
         y_col=testing_df[label_col],
         output=output,
-        model=model,
+        model_path=model_path,
         x_set=x_set
     )
     return unseen_predictions

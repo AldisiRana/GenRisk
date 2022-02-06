@@ -1,4 +1,4 @@
-
+import joblib
 import pycaret.classification as pycl
 import pycaret.regression as pyreg
 import sklearn.metrics as metrics
@@ -68,12 +68,12 @@ def regression_model(
     pyreg.plot_model(final_model, save=True)
     pyreg.plot_model(final_model, plot='feature', save=True)
     pyreg.plot_model(final_model, plot='error', save=True)
+    pyreg.save_model(final_model, model_name)
     if len(testing_set.index) != 0:
         unseen_predictions = test_regressor(
-            model=final_model, x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
+            model_path=model_name, x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
         )
         unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=True)
-    pyreg.save_model(final_model, model_name)
     return final_model
 
 
@@ -140,18 +140,18 @@ def classification_model(
     pycl.plot_model(final_model, plot='pr', save=True)
     pycl.plot_model(final_model, plot='confusion_matrix', save=True)
     pycl.plot_model(final_model, plot='feature', save=True)
+    pycl.save_model(final_model, model_name)
     if len(testing_set.index) != 0:
         unseen_predictions = test_classifier(
-            model=final_model, x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
+            model_path=model_name, x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
         )
         unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=True)
-    pycl.save_model(final_model, model_name)
     return final_model
 
 
 def test_classifier(
     *,
-    model,
+    model_path,
     x_set,
     y_col,
     output
@@ -161,7 +161,7 @@ def test_classifier(
 
         Parameters
         ----------
-        model
+        model_path
             the model used for prediction
         x_set : pd.DataFrame
             the independent testing set (without the target)
@@ -176,6 +176,7 @@ def test_classifier(
             the testing dataset with the true and predicted values.
 
         """
+    model = joblib.load(model_path)
     x_set['Label'] = model.predict(x_set)
     x_set['True value'] = y_col
     report = metrics.classification_report(y_col, x_set['Label'])
@@ -191,7 +192,7 @@ def test_classifier(
 
 def test_regressor(
     *,
-    model,
+    model_path,
     x_set,
     y_col,
     output
@@ -201,7 +202,7 @@ def test_regressor(
 
     Parameters
     ----------
-    model
+    model_path
         the model used for prediction
     x_set : pd.DataFrame
         the independent testing set (without the target)
@@ -216,6 +217,7 @@ def test_regressor(
         the testing dataset with the true and predicted values.
 
     """
+    model = joblib.load(model_path)
     x_set['Label'] = model.predict(x_set)
     x_set['True value'] = y_col
     r2 = metrics.r2_score(y_col, x_set['Label'])
