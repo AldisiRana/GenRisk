@@ -71,7 +71,7 @@ def regression_model(
     pyreg.save_model(final_model, model_name)
     if len(testing_set.index) != 0:
         unseen_predictions = test_regressor(
-            model_path=model_name, x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
+            model_path=model_name+'.pkl', x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
         )
         unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=True)
     return final_model
@@ -143,7 +143,7 @@ def classification_model(
     pycl.save_model(final_model, model_name)
     if len(testing_set.index) != 0:
         unseen_predictions = test_classifier(
-            model_path=model_name, x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
+            model_path=model_name+'.pkl', x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
         )
         unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=True)
     return final_model
