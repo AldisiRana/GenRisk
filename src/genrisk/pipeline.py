@@ -385,8 +385,7 @@ def model_testing(
         model=model,
         x_set=x_set
     )
-    prediction_df = unseen_predictions[['Label']]
-    return prediction_df
+    return unseen_predictions
 
 
 def normalize_data(
