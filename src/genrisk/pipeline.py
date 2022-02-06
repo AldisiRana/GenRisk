@@ -349,7 +349,8 @@ def model_testing(
     input_file,
     samples_col,
     label_col,
-    model_type
+    model_type,
+    output
 ):
     """
     Load a prediction model and use it to predict label values in an independent dataset.
@@ -381,7 +382,7 @@ def model_testing(
     model_func = {'classifier': test_classifier, 'regressor': test_regressor}
     unseen_predictions = model_func.get(model_type)(
         y_col=testing_df[label_col],
-        output=input_file.split('.')[0],
+        output=output,
         model=model,
         x_set=x_set
     )

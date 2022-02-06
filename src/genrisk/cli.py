@@ -536,6 +536,7 @@ def test_model(
         label_col=label_col,
         samples_col=samples_col,
         model_type=model_type,
+        output=output_file.split('.')[0],
     )
     logger.info('saving test predictions')
     testing_df.to_csv(output_file, sep='\t')
