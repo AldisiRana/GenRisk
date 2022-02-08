@@ -157,25 +157,24 @@ def test_classifier(
     output
 ):
     """
-        Test a model with an independent dataset.
+    Test a model with an independent dataset.
 
-        Parameters
-        ----------
-        model_path
-            the model used for prediction
-        x_set : pd.DataFrame
-            the independent testing set (without the target)
-        y_col : pd.Series
-            the target true values.
-        output : str
-            the name for the evaluation output
+    Parameters
+    ----------
+    model_path
+        the model used for prediction
+    x_set : pd.DataFrame
+        the independent testing set (without the target)
+    y_col : pd.Series
+        the target true values.
+    output : str
+        the name for the evaluation output
 
-        Returns
-        -------
-        pd.DataFrame
-            the testing dataset with the true and predicted values.
-
-        """
+    Returns
+    -------
+    pd.DataFrame
+        the testing dataset with the true and predicted values.
+    """
     model = joblib.load(model_path)
     x_set['Label'] = model.predict(x_set)
     x_set['True value'] = y_col

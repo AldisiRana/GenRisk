@@ -9,19 +9,27 @@ from tqdm import tqdm
 from pybiomart import Dataset
 
 
-def gene_length_normalize(*, genes_info, genes_col, length_col, scores_df, samples_col):
+def gene_length_normalize(*, genes_info, genes_col='HGNC symbol', length_col='gene_length', scores_df, samples_col):
     """
+    Normalize dataset by gene length. if gene lengths file is not provided, info will be retrieved from ensembl.
 
     Parameters
     ----------
-    genes_info
-    genes_col
-    length_col
-    scores_df
-    samples_col
+    genes_info : str
+        file containing gene lengths. If file is not provided, info will be retrieved from ensembl
+    genes_col : str
+        column containing gene names.
+    length_col : str
+        column containing the length of each gene.
+    scores_df : pd.DataFrame
+        dataframe containing data to normalize.
+    samples_col : str
+        column containing samples IDs.
 
     Returns
     -------
+    pd.Dataframe
+        dataframe containing normalized dataframe.
 
     """
     unnormalized = []
