@@ -86,8 +86,9 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
     data['i'] = data.index
     # Generate Manhattan plot: (#optional tweaks for relplot: linewidth=0, s=9)
     sns.set_style("white")
+    data['color group'] = data[chr_col].apply(lambda x: 'A' if x % 2 == 0 else 'B')
     plot = sns.relplot(data=data, x='i', y='-logp', aspect=3.7,
-                       hue=chr_col, palette=['grey', 'black'] * 11, kind='scatter', legend=None)
+                       hue='color group', palette=['grey', 'black'], kind='scatter', legend=None)
     plot.fig.suptitle(manhattan_output.split('.')[0])
     plot.ax.set_ylim(0.0, max(data["-logp"]) + 1)
 
