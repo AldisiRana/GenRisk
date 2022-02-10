@@ -577,7 +577,7 @@ def get_prs(
 @main.command()
 @click.option('-f', '--files', required=True,
               help='input all files to merge with a comma in between. E.g: file1,file2,file3')
-@click.option('-s', '--sep', show_default=True, default='\t', help='the column seperator in files.')
+@click.option('-s', '--sep', show_default=True, default=r'\s+', help='the column seperator in files.')
 @click.option('-b', '--by', show_default=True, default='IID', help='the common column between all files to merge.')
 @click.option('-c', '--cols', default=None,
               help='if desired, a list of columns can be chosen to save final file, e.g: col1,col2,col5')
