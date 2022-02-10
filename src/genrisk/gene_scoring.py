@@ -246,7 +246,7 @@ def pathway_scoring(
     ----------
     pathways : dict
         the pathways (keys) and their genes (values)
-    genes : str
+    genes : List
         the genes to select from the gene-based scores.
     scores_file : str
         the gene-based scores file.
