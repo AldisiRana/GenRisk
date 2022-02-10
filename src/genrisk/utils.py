@@ -160,7 +160,7 @@ def merge_files(*, files_lst, sep, by, cols=None):
     df = pd.read_csv(files_lst[0], sep=sep)
     for file in files_lst[1:]:
         df2 = pd.read_csv(file, sep=sep)
-        df = pd.merge(df, df2, by=by)
+        df = pd.merge(df, df2, on=by)
     if cols:
         df = df[[cols]]
     return df
