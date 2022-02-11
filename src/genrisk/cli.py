@@ -622,7 +622,7 @@ def merge(
         cols=cols
     )
     logger.info('saving merged dataframe.')
-    df.to_csv(output_file, sep=sep)
+    df.to_csv(output_file, sep='\t')
     return df
 
 
