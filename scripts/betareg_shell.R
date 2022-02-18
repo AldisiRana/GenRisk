@@ -45,6 +45,10 @@ genes = strsplit(x, "[[:space:]]+")
 
 header <- colnames(fread(opt$scoresfile, nrows = 0))
 
+if (is.na(genes) || genes == ''){
+    genes = header[header!=opt$samplescol]
+}
+
 genes <- intersect(genes, header)
 
 mydata= fread(opt$scoresfile, select=c(genes, opt$samplescol), verbose=TRUE)

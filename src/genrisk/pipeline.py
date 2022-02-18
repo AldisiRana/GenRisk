@@ -251,6 +251,8 @@ def betareg_pvalues(
 
     """
     logger.info("The p_values will be calculated using beta regression.")
+    if not genes:
+        genes = ""
     try:
         p = subprocess.call(
             ["Rscript", BETAREG_SHELL,
