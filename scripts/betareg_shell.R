@@ -17,6 +17,7 @@ library(utils)
 if (!require(parallel)) install.packages("parallel", repos = "https://CRAN.R-project.org/")
 library(parallel)
 if (!require(lmtest)) install.packages("lmtest", repos = "https://CRAN.R-project.org/")
+library(lmtest)
 
 
 option_list = list(
