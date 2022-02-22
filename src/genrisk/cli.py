@@ -149,7 +149,7 @@ def score_genes(
 @click.option('-i', '--info-file', required=True, type=click.Path(exists=True),
               help="File containing information about the cohort.")
 @OUTPUT_FILE
-@click.option('-g', '--genes',
+@click.option('-g', '--genes', default="",
               help="a file containing the genes to calculate. if not provided all genes will be used.")
 @click.option('-t', '--test', required=True,
               type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'betareg', 'linear']),
