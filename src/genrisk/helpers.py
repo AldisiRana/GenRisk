@@ -26,10 +26,12 @@ def uni_profiles(df, f):
         the merged dataframe
 
     """
-    df2 = pd.read_csv(str(f), usecols=['IID', 'SCORESUM'], sep=r'\s+').astype({'SCORESUM': np.float32})
+    df2 = pd.read_csv(str(profile_files[0]), sep=r'\s+').iloc[:, [1, -1]]
+    scores_col = df2.columns[1]
+    df2.astype({scores_col: np.float32})
     r = re.compile("([a-zA-Z0-9_.-]*).profile$")
     gene2 = r.findall(str(f))
-    df2.rename(columns={'SCORESUM': gene2[0]}, inplace=True)
+    df2.rename(columns={scores_col: gene2[0]}, inplace=True)
     df = pd.merge(df, df2, on='IID')
     return df
 
