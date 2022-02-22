@@ -26,7 +26,7 @@ def uni_profiles(df, f):
         the merged dataframe
 
     """
-    df2 = pd.read_csv(str(profile_files[0]), sep=r'\s+').iloc[:, [1, -1]]
+    df2 = pd.read_csv(str(f), sep=r'\s+').iloc[:, [1, -1]]
     scores_col = df2.columns[1]
     df2.astype({scores_col: np.float32})
     r = re.compile("([a-zA-Z0-9_.-]*).profile$")
