@@ -39,16 +39,15 @@ opt = parse_args(opt_parser);
 
 message("Reading files...")
 
-x <- scan(opt$genes, what="", sep="\n")
-# Separate elements by one or more whitepace
-
-genes = strsplit(x, "[[:space:]]+")
-
+genes = opt$genes
 header <- colnames(fread(opt$scoresfile, nrows = 0))
 
 if (is.na(genes) || genes == ''){
     genes = header[header!=opt$samplescol]
+} else {
+    genes = strsplit(x, "[[:space:]]+")
 }
+
 
 genes <- intersect(genes, header)
 
