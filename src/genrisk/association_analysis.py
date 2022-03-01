@@ -114,9 +114,10 @@ def run_logit(gene_col, x_set, y_set):
         result = logit_model.fit()
         pval = list(result.pvalues)
         std_err = result.bse[-1]
+        coef = result.params[-1]
     except:
         return
-    return [gene_col[0]] + pval + [std_err]
+    return [gene_col[0]] + [coef, std_err] + pval
 
 
 def run_mannwhitneyu(*, df, genes, cases_column, **kwargs):
@@ -196,7 +197,7 @@ def get_pvals_logit(*, df, genes, cases_column, **kwargs):
     pool = multiprocessing.Pool(processes=kwargs['processes'])
     partial_func = partial(run_logit, x_set=x_set, y_set=y_set)
     p_values = list(pool.imap(partial_func, genes_df.iteritems()))
-    cols = ['genes', 'const_pval'] + covariates + ['p_value', 'std_err']
+    cols = ['genes', 'const_pval'] + covariates + ['coef', 'std_err', 'p_value']
     p_values_df = pd.DataFrame(list(filter(None, p_values)), columns=cols).sort_values(by=['p_value'])
     return p_values_df
 
