@@ -162,6 +162,7 @@ def score_genes(
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
 @click.option('-v', '--covariates', default='', help="the covariates used for calculation")
 @click.option('-p', '--processes', show_default=True, type=int, default=1, help='number of processes for parallelization')
+@click.option('--zero-threshold', type=float, default=1.0, help='the threshold for the frequency of zeros per gene to be included')
 def find_association(
         *,
         scores_file,
@@ -174,6 +175,7 @@ def find_association(
         adj_pval,
         covariates,
         processes,
+        zero_threshold,
 ):
     """
     Calculate the P-value between two given groups.
@@ -252,7 +254,8 @@ def find_association(
             adj_pval=adj_pval,
             covariates=covariates,
             processes=processes,
-            logger=logger
+            logger=logger,
+            zero_threshold=zero_threshold
         )
         end_time = time.time()
         logger.info(f"Runtime of the program is {end_time - start_time}")

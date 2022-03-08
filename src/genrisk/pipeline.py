@@ -36,7 +36,7 @@ def scoring_process(
     alt_col,
     bfiles,
     plink,
-    output_file
+    output_file,
 ):
     """
     Calculate gene-based scores.
@@ -125,7 +125,8 @@ def find_pvalue(
     cases=None,
     controls=None,
     processes=1,
-    logger
+    logger,
+    zero_threshold,
 ):
     """
     Calculate the significance of a gene in a population using different statistical analyses [mannwhitneyu, logit, linear, ttest_ind]
@@ -190,6 +191,14 @@ def find_pvalue(
     merged_df.apply(lambda x: x.fillna(x.mean()), axis=1)
     genes = scores_df.columns.tolist()[1:]
     del scores_df
+    sample_size = merged_df.shape[0]
+    if zero_threshold != 1.0:
+        for gene in genes:
+            df = pd.DataFrame(merged_df[gene].value_counts()).reset_index()
+            zeros = df.loc[df['index'] == 0.0].iloc[0,1]
+            freq = zeros / sample_size
+            if freq >= zero_threshold:
+                merged_df.drop(columns=gene)
     args = {
         'processes': processes, 'cases': cases, 'controls': controls, 'covariates': covariates, 'logger': logger,
     }
