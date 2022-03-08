@@ -195,8 +195,11 @@ def find_pvalue(
     if zero_threshold != 1.0:
         for gene in genes:
             df = pd.DataFrame(merged_df[gene].value_counts()).reset_index()
-            zeros = df.loc[df['index'] == 0.0].iloc[0,1]
-            freq = zeros / sample_size
+            try:
+                zeros = df.loc[df['index'] == 0.0].iloc[0,1]
+                freq = zeros / sample_size
+            except:
+                freq = 0
             if freq >= zero_threshold:
                 merged_df.drop(columns=gene)
     args = {
