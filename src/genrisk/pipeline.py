@@ -187,8 +187,7 @@ def find_pvalue(
         genotype_df.dropna(subset=[cases_column], inplace=True)
     logger.info("Processing files...")
     merged_df = pd.merge(scores_df, genotype_df, how='inner', on=samples_column)
-    merged_df.replace([np.inf, -np.inf], np.nan, inplace=True)
-    merged_df.apply(lambda x: x.fillna(x.mean()), axis=1)
+    merged_df.replace([np.inf, -np.inf], 0.0, inplace=True)
     genes = scores_df.columns.tolist()[1:]
     del scores_df
     sample_size = merged_df.shape[0]
