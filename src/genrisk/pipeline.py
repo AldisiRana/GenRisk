@@ -202,7 +202,7 @@ def find_pvalue(
                 freq = 0
             if freq >= zero_threshold:
                 drop_out.append(gene)
-        merged_df.drop(columns=drop_out)
+        merged_df.drop(columns=drop_out, inplace=True)
     args = {
         'processes': processes, 'cases': cases, 'controls': controls, 'covariates': covariates, 'logger': logger,
     }
