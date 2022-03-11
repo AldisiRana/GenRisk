@@ -201,6 +201,7 @@ def find_pvalue(
                 freq = 0
             if freq >= zero_threshold:
                 merged_df.drop(columns=gene, inplace=True)
+                genes.remove(gene)
     args = {
         'processes': processes, 'cases': cases, 'controls': controls, 'covariates': covariates, 'logger': logger,
     }
