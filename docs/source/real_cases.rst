@@ -157,41 +157,40 @@ Other phenotypes
 Association analysis
 ---------------------
 +---------------------------+--------------------------------------+
-|  biomarker | Top 3 significantly associated genes |
+|         biomarker         | Top 3 significantly associated genes |
 +===========================+======================================+
 |    Alanine aminotransferase      |      GPT, THRA, ACVR2B        |
-+---------------------------+-----------------+
-|   Albumi      |        FCGRT, ALB, IQGAP2       |
-+---------------------------+-----------------+
-|Alkaline phosphatase |       ALPL, GPLD1, ASGR1       |
-+---------------------------+-----------------+
-|       Apolipoprotein A       |       ABCA1, LIPG, LCAT         |
-+---------------------------+-----------------+
-|      Apolipoprotein B*       |    PCSK9, LDLR, NKPD     |
-+---------------------------+-----------------+
-|   Aspartate aminotransferase  |    GOT1, GABRA5, THRA      |
-+---------------------------+-----------------+
-|     Cholesterol*     |     PCSK9, LDLR, ABCA1         |
-+---------------------------+-----------------+
-|      C reactive protein      |    CRP, PTGES3L, SLN   |
-+---------------------------+-----------------+
-|  Creatinine (in serum) | NAA20, PRAMEF19, CLIC4 |
-+------------------------+------------------------+
-|Gamma glutamyltranferase | GGT1, CCL1, RORC |
-+------------------------+-------------------+
-| Glucose | G6PC2, GCK, DYNLL1|
-+----------+------------------+
-|Glycated Haemoglobin (HbA1C) | HBB, PIEZO1, GCK |
-+-----------------------------+------------------+
-| Lipoprotein A | LPA, PLG, MRPL18|
-+----------------+------------------------+
-|Triglycerides | APOA5I, APOC3, PLA2G12A|
-+--------------+------------------------+
++----------------------------------+-------------------------------+
+|                   Albumin        |        FCGRT, ALB, IQGAP2     |
++----------------------------------+-------------------------------+
+|     Alkaline phosphatase         |       ALPL, GPLD1, ASGR1      |
++----------------------------------+-------------------------------+
+|       Apolipoprotein A           |       ABCA1, LIPG, LCAT       |
++----------------------------------+-------------------------------+
+|          Apolipoprotein B*       |         PCSK9, LDLR, NKPD     |
++----------------------------------+-------------------------------+
+|   Aspartate aminotransferase     |       GOT1, GABRA5, THRA      |
++----------------------------------+-------------------------------+
+|                 Cholesterol*     |     PCSK9, LDLR, ABCA1        |
++----------------------------------+-------------------------------+
+|      C reactive protein          |    CRP, PTGES3L, SLN          |
++----------------------------------+-------------------------------+
+|      Creatinine (in serum)       | NAA20, PRAMEF19, CLIC4        |
++----------------------------------+-------------------------------+
+|     Gamma glutamyltranferase     | GGT1, CCL1, RORC              |
++----------------------------------+-------------------------------+
+|           Glucose                | G6PC2, GCK, DYNLL1            |
++----------------------------------+-------------------------------+
+|     Glycated Haemoglobin (HbA1C) |              HBB, PIEZO1, GCK |
++----------------------------------+-------------------------------+
+|       Lipoprotein A              |           LPA, PLG, MRPL18    |
++----------------------------------+-------------------------------+
+|       Triglycerides              |      APOA5I, APOC3, PLA2G12A  |
++----------------------------------+-------------------------------+
+ * values adjusted for statin
 
-
-
-* values adjusted for statin
-
+.. note::
+    summary statistics for biomarkers association analysis will be added soon.
 
 
 
@@ -223,4 +222,4 @@ in the models as well as the Rˆ2 of the gene-based model, PRS model and combine
 +---------------------------+-----------------+------------------+------------+----------------+
 |      Urate                |       4         |      0.396       |    0.521   |      0.534     |
 +---------------------------+-----------------+------------------+------------+----------------+
-* values adjusted for statin
+ * values adjusted for statin
