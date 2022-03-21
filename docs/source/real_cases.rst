@@ -159,7 +159,7 @@ Association analysis
 +----------------------------------+------------------------------------------------------------+
 |         biomarker                | Top 3 significantly associated genes                       |
 +==================================+============================================================+
-|    Alanine aminotransferase      |      GPT, THRA, ACVR2B, :doc:`alanine_aminotransferase.rst`|              |
+|    Alanine aminotransferase      |      GPT, THRA, ACVR2B, :doc:`alanine_aminotransferase.rst`|
 +----------------------------------+------------------------------------------------------------+
 |                   Albumin        |        FCGRT, ALB, IQGAP2                                  |
 +----------------------------------+------------------------------------------------------------+
