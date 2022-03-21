@@ -1,9 +1,11 @@
+.. _alanine-aminotransferase:
+
 Alanine Aminotransferase Association Analysis
 ==============================================
 
 .. csv-table:: Alanine Aminotransferase associations
    :file: ../association_results/linear_assoc_alanine_aminotransferase_cov_filtered.csv
-   :widths: 30, 70
+   :delim: "tab"
    :header-rows: 1
 
 The QQ-plot:

@@ -59,6 +59,7 @@ extensions = [
     'sphinx_toolbox.collapse',
 ]
 
+
 html_sidebars = {
     '**': [
         'about.html',

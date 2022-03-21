@@ -1,4 +1,4 @@
-.. _computation_info:
+.. _computation-info:
 
 Computation information
 ########################

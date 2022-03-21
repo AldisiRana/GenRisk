@@ -1,4 +1,4 @@
-.. _methods_comparison:
+.. _methods-comparison:
 Methods Comparisons
 #####################
 We have compared GenRisk scores association test results with different burden test methods.

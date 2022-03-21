@@ -1,4 +1,4 @@
-.. _model_types:
+.. _model-types:
 
 Model types
 #############
