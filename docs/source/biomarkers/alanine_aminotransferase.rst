@@ -2,18 +2,7 @@
 
 Alanine Aminotransferase Association Analysis
 ==============================================
-
-The QQ-plot:
-------------
-.. image:: ../association_results/linear_assoc_alanine_aminotransferase_cov_filtered_qqplot.png
-    :width: 400
-    :align: center
-
-The Manhattan plot:
---------------------
-.. image:: ../association_results/linear_assoc_alanine_aminotransferase_cov_filtered_manhattan.png
-    :width: 400
-    :align: center
+Download :download:`full summary statistics <../association_results/linear_assoc_alanine_aminotransferase_cov_filtered.csv>`
 
 .. csv-table:: Alanine Aminotransferase associations
    :delim: ;
@@ -51,3 +40,15 @@ The Manhattan plot:
    C11orf71;0.0004617205481426396;0.03736564358159515;0.010669453925446411;0.2887962376069731
    MVB12B;0.0004669048894270959;0.023519041069384954;0.006721381874559413;0.2887962376069731
 
+
+The QQ-plot:
+------------
+.. image:: ../association_results/linear_assoc_alanine_aminotransferase_cov_filtered_qqplot.png
+    :width: 400
+    :align: center
+
+The Manhattan plot:
+--------------------
+.. image:: ../association_results/linear_assoc_alanine_aminotransferase_cov_filtered_manhattan.png
+    :width: 400
+    :align: center
