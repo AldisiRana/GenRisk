@@ -2,7 +2,7 @@
 
 Albumin Association Analysis
 ==============================================
-Download :download:`full summary statistics <../association_results/linear_assoc_albumin_cov_filtered.csv>`
+Download :download:`full summary statistics <../../association_results/linear_assoc_albumin_cov_filtered.csv>`
 
 .. csv-table:: Albumi associations
    :delim: "tab"
@@ -43,12 +43,12 @@ Download :download:`full summary statistics <../association_results/linear_assoc
 
 The QQ-plot:
 ------------
-.. image:: ../association_results/linear_assoc_albumin_cov_filtered_qqplot.png
+.. image:: ../../association_results/linear_assoc_albumin_cov_filtered_qqplot.png
     :width: 400
     :align: center
 
 The Manhattan plot:
 --------------------
-.. image:: ../association_results/linear_assoc_albumin_cov_filtered_manhattan.png
+.. image:: ../../association_results/linear_assoc_albumin_cov_filtered_manhattan.png
     :width: 400
     :align: center
