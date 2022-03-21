@@ -62,13 +62,13 @@ QQ-plot and Manhattan plot are presented below.
 
 The QQ-plot:
 
-.. image:: ../../ldl_example/200k_maf001_ldl_adj_qqplot.png
+.. image:: ../ldl_example/200k_maf001_ldl_adj_qqplot.png
     :width: 400
     :align: center
 
 The Manhattan plot:
 
-.. image:: ../../ldl_example/200k_maf001_ldl_adj_manhattan.png
+.. image:: ../ldl_example/200k_maf001_ldl_adj_manhattan.png
     :width: 400
     :align: center
 
@@ -90,19 +90,19 @@ The final prediction models was generated using gradiant boosting regression, ev
 The images below are the output of the final combined model.
 Feature importance plot:
 
-.. image:: ../../ldl_example/Feature_Importance.png
+.. image:: ../ldl_example/Feature_Importance.png
     :width: 400
     :align: center
 
 Actual vs Predicted:
 
-.. image:: ../../ldl_example/regressor_scatterplot.png
+.. image:: ../ldl_example/regressor_scatterplot.png
     :width: 400
     :align: center
 
 Model residuals:
 
-.. image:: ../../ldl_example/Residuals.png
+.. image:: ../ldl_example/Residuals.png
     :width: 400
     :align: center
 
@@ -119,13 +119,13 @@ QQ-plot and Manhattan plot are presented below.
 
 The QQ-plot:
 
-.. image:: ../../alp_example/linear_assoc_alkaline_phosphatase_cov_200k_qqplot.png
+.. image:: ../alp_example/linear_assoc_alkaline_phosphatase_cov_200k_qqplot.png
     :width: 400
     :align: center
 
 The Manhattan plot:
 
-.. image:: ../../alp_example/linear_assoc_alkaline_phosphatase_cov_200k_manhattan.png
+.. image:: ../alp_example/linear_assoc_alkaline_phosphatase_cov_200k_manhattan.png
     :width: 400
     :align: center
 
@@ -147,7 +147,7 @@ The final prediction models was generated using gradiant boosting regression, ev
 
 Feature importance plot for combined model:
 
-.. image:: ../../alp_example/Feature_Importance.png
+.. image:: ../alp_example/Feature_Importance.png
     :width: 400
     :align: center
 
@@ -156,37 +156,37 @@ Other phenotypes
 ******************
 Association analysis
 ---------------------
-+---------------------------+--------------------------------------+
-|         biomarker         | Top 3 significantly associated genes |
-+===========================+======================================+
-|    Alanine aminotransferase      |      GPT, THRA, ACVR2B        |
-+----------------------------------+-------------------------------+
-|                   Albumin        |        FCGRT, ALB, IQGAP2     |
-+----------------------------------+-------------------------------+
-|     Alkaline phosphatase         |       ALPL, GPLD1, ASGR1      |
-+----------------------------------+-------------------------------+
-|       Apolipoprotein A           |       ABCA1, LIPG, LCAT       |
-+----------------------------------+-------------------------------+
-|          Apolipoprotein B*       |         PCSK9, LDLR, NKPD     |
-+----------------------------------+-------------------------------+
-|   Aspartate aminotransferase     |       GOT1, GABRA5, THRA      |
-+----------------------------------+-------------------------------+
-|                 Cholesterol*     |     PCSK9, LDLR, ABCA1        |
-+----------------------------------+-------------------------------+
-|      C reactive protein          |    CRP, PTGES3L, SLN          |
-+----------------------------------+-------------------------------+
-|      Creatinine (in serum)       | NAA20, PRAMEF19, CLIC4        |
-+----------------------------------+-------------------------------+
-|     Gamma glutamyltranferase     | GGT1, CCL1, RORC              |
-+----------------------------------+-------------------------------+
-|           Glucose                | G6PC2, GCK, DYNLL1            |
-+----------------------------------+-------------------------------+
-|     Glycated Haemoglobin (HbA1C) |              HBB, PIEZO1, GCK |
-+----------------------------------+-------------------------------+
-|       Lipoprotein A              |           LPA, PLG, MRPL18    |
-+----------------------------------+-------------------------------+
-|       Triglycerides              |      APOA5I, APOC3, PLA2G12A  |
-+----------------------------------+-------------------------------+
++----------------------------------+-------------------------------------------------------------------+
+|         biomarker                | Top 3 significantly associated genes                              |
++==================================+===================================================================+
+|    Alanine aminotransferase      |      GPT, THRA, ACVR2B, :doc:`more <alanine_aminotransferase.rst>`|
++----------------------------------+-------------------------------------------------------------------+
+|                   Albumin        |        FCGRT, ALB, IQGAP2                                         |
++----------------------------------+-------------------------------------------------------------------+
+|     Alkaline phosphatase         |       ALPL, GPLD1, ASGR1                                          |
++----------------------------------+-------------------------------------------------------------------+
+|       Apolipoprotein A           |       ABCA1, LIPG, LCAT                                           |
++----------------------------------+-------------------------------------------------------------------+
+|          Apolipoprotein B*       |         PCSK9, LDLR, NKPD                                         |
++----------------------------------+-------------------------------------------------------------------+
+|   Aspartate aminotransferase     |       GOT1, GABRA5, THRA                                          |
++----------------------------------+-------------------------------------------------------------------+
+|                 Cholesterol*     |     PCSK9, LDLR, ABCA1                                            |
++----------------------------------+-------------------------------------------------------------------+
+|      C reactive protein          |    CRP, PTGES3L, SLN                                              |
++----------------------------------+-------------------------------------------------------------------+
+|      Creatinine (in serum)       | NAA20, PRAMEF19, CLIC4                                            |
++----------------------------------+-------------------------------------------------------------------+
+|     Gamma glutamyltranferase     | GGT1, CCL1, RORC                                                  |
++----------------------------------+-------------------------------------------------------------------+
+|           Glucose                | G6PC2, GCK, DYNLL1                                                |
++----------------------------------+-------------------------------------------------------------------+
+|     Glycated Haemoglobin (HbA1C) |              HBB, PIEZO1, GCK                                     |
++----------------------------------+-------------------------------------------------------------------+
+|       Lipoprotein A              |           LPA, PLG, MRPL18                                        |
++----------------------------------+-------------------------------------------------------------------+
+|       Triglycerides              |      APOA5I, APOC3, PLA2G12A                                      |
++----------------------------------+-------------------------------------------------------------------+
  * values adjusted for statin
 
 .. note::
