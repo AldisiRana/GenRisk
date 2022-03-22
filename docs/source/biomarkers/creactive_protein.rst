@@ -1,6 +1,6 @@
 .. _creactive-protein:
 
-`Back to overview <https://genrisk.readthedocs.io/en/latest/real_cases.html#other-phenotypes>_`
+`Back to overview <https://genrisk.readthedocs.io/en/latest/real_cases.html#other-phenotypes>`_
 
 C-reactive Protein Association Analysis
 ==============================================

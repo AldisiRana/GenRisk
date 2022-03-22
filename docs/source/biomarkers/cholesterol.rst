@@ -1,6 +1,6 @@
 .. _cholesterol:
 
-`Back to overview <https://genrisk.readthedocs.io/en/latest/real_cases.html#other-phenotypes>_`
+`Back to overview <https://genrisk.readthedocs.io/en/latest/real_cases.html#other-phenotypes>`_
 
 Cholesterol Association Analysis
 ==============================================

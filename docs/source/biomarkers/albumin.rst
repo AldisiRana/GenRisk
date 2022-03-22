@@ -1,6 +1,6 @@
 .. _albumin:
 
-`Back to overview <https://genrisk.readthedocs.io/en/latest/real_cases.html#other-phenotypes>_`
+`Back to overview <https://genrisk.readthedocs.io/en/latest/real_cases.html#other-phenotypes>`_
 
 Albumin Association Analysis
 ==============================================

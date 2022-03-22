@@ -1,6 +1,6 @@
 .. _alkaline-phosphatase:
 
-`Back to overview <https://genrisk.readthedocs.io/en/latest/real_cases.html#other-phenotypes>_`
+`Back to overview <https://genrisk.readthedocs.io/en/latest/real_cases.html#other-phenotypes>`_
 
 Alkaline Phosphatase Association Analysis
 ==============================================
