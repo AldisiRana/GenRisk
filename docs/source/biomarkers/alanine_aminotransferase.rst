@@ -45,7 +45,6 @@ The QQ-plot:
 ------------
 .. image:: ../../association_results/linear_assoc_alanine_aminotransferase_cov_filtered_qqplot.png
     :width: 400
-
     :align: center
 
 The Manhattan plot:
