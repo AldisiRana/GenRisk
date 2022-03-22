@@ -1,5 +1,7 @@
 .. _albumin:
 
+`Back to overview <https://genrisk.readthedocs.io/en/latest/real_cases.html#other-phenotypes>_`
+
 Albumin Association Analysis
 ==============================================
 Download :download:`full summary statistics <../../association_results/linear_assoc_albumin_cov_filtered.csv>`

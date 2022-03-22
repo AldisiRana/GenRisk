@@ -1,5 +1,7 @@
 .. _alkaline-phosphatase:
 
+`Back to overview <https://genrisk.readthedocs.io/en/latest/real_cases.html#other-phenotypes>_`
+
 Alkaline Phosphatase Association Analysis
 ==============================================
 Download :download:`full summary statistics <../../association_results/linear_assoc_alkaline_phosphatase_cov_filtered.csv>`

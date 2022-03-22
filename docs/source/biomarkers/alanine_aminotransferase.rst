@@ -1,7 +1,10 @@
 .. _alanine-aminotransferase:
 
+`Back to overview <https://genrisk.readthedocs.io/en/latest/real_cases.html#other-phenotypes>_`
+
 Alanine Aminotransferase Association Analysis
 ==============================================
+
 Download :download:`full summary statistics <../../association_results/linear_assoc_alanine_aminotransferase_cov_filtered.csv>`
 
 .. csv-table:: Alanine Aminotransferase associations
