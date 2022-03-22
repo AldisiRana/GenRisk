@@ -1,10 +1,10 @@
-.. _albumin:
+.. _alkaline-phosphatase:
 
-Albumin Association Analysis
+Alkaline Phosphatase Association Analysis
 ==============================================
 Download :download:`full summary statistics <../../association_results/linear_assoc_alkaline_phosphatase_cov_filtered.csv>`
 
-.. csv-table:: Albumin associations
+.. csv-table:: Alkaline Phosphatase associations
    :delim: ;
    :header-rows: 1
 

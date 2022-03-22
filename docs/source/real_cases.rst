@@ -163,9 +163,9 @@ Association analysis
 +----------------------------------+----------------------------------------------------------------------------------------------------------------+
 |                   Albumin        | FCGRT, ALB, IQGAP2, `More <https://genrisk.readthedocs.io/en/latest/biomarkers/albumin.html>`_                 |
 +----------------------------------+----------------------------------------------------------------------------------------------------------------+
-|     Alkaline phosphatase         |       ALPL, GPLD1, ASGR1                                                                                       |
+|     Alkaline phosphatase         |  ALPL, GPLD1, ASGR1, `More <https://genrisk.readthedocs.io/en/latest/biomarkers/alkaline_phosphatase.html>`_   |
 +----------------------------------+----------------------------------------------------------------------------------------------------------------+
-|       Apolipoprotein A           |       ABCA1, LIPG, LCAT                                                                                        |
+|       Apolipoprotein A           |    ABCA1, LIPG, LCAT, `More <https://genrisk.readthedocs.io/en/latest/biomarkers/apolipoprotein_a.html>`_      |
 +----------------------------------+----------------------------------------------------------------------------------------------------------------+
 |          Apolipoprotein B*       |         PCSK9, LDLR, NKPD                                                                                      |
 +----------------------------------+----------------------------------------------------------------------------------------------------------------+
