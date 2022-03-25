@@ -128,7 +128,7 @@ def combine_scores(
     profile_files = [f for f in all_files if re.match(r'.+profile$', f)]
     df = pd.read_csv(str(profile_files[0]), sep=r'\s+').iloc[:, [1, -1]]
     scores_col = df.columns[1]
-    df.astype({scores_col: np.float32}, inplace=True)
+    df.astype({scores_col: np.float32})
     r = re.compile("([a-zA-Z0-9_.-]*).profile$")
     gene = r.findall(str(profile_files[0]))
     df.rename(columns={scores_col: gene[0]}, inplace=True)
