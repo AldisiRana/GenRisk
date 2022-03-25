@@ -128,12 +128,12 @@ def combine_scores(
     profile_files = [f for f in all_files if re.match(r'.+profile$', f)]
     df = pd.read_csv(str(profile_files[0]), sep=r'\s+').iloc[:, [1, -1]]
     scores_col = df.columns[1]
-    df.astype({scores_col: np.float32})
+    df.astype({scores_col: np.float32}, inplace=True)
     r = re.compile("([a-zA-Z0-9_.-]*).profile$")
     gene = r.findall(str(profile_files[0]))
     df.rename(columns={scores_col: gene[0]}, inplace=True)
     pf = profile_files
-    for i in tqdm(range(1, len(pf) - 1), desc='merging in process'):
+    for i in tqdm(range(1, len(pf)), desc='merging in process'):
         df = uni_profiles(df, pf[i])
     df.to_csv(output_path, sep='\t', index=False)
     return df
