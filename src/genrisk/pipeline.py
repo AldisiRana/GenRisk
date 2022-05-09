@@ -298,6 +298,7 @@ def create_prediction_model(
     seed,
     include_models,
     normalize_method,
+    feature_selection
 ):
     """
     Create a prediction model (classifier or regressor) using the provided dataset.
@@ -350,7 +351,8 @@ def create_prediction_model(
             imbalanced=imbalanced,
             seed=seed,
             include_models=include_models,
-            normalize_method=normalize_method
+            normalize_method=normalize_method,
+            feature_selection=feature_selection
         )
     except Exception:
         raise Exception('Model requested is not available. Please choose regressor or classifier.')

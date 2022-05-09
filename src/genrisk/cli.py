@@ -374,6 +374,8 @@ def visualize(
               help='add number to create reproduciple train_test splitting.')
 @click.option('--include-models', default=None,
               help='choose specific models to compare with comma in between. e.g lr,gbr,dt')
+@click.option('--feature-selection', is_flag=True,
+              help='if selected feature selection will be implemented in training.')
 def create_model(
         *,
         data_file,
@@ -391,6 +393,7 @@ def create_model(
         samples_col,
         seed,
         include_models,
+        feature_selection,
 ):
     """
     Create a prediction model with given dataset.
@@ -475,6 +478,7 @@ def create_model(
         seed=int(seed),
         include_models=include_models,
         normalize_method=normalize_method,
+        feature_selection=feature_selection
     )
     logger.info('Model is generated.')
     end_time = time.time()
