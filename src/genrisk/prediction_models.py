@@ -180,7 +180,7 @@ def test_classifier(
     x_set['True value'] = y_col
     report = metrics.classification_report(y_col, x_set['Label'])
     acc = metrics.accuracy_score(y_col, x_set['Label'])
-    auc = metrics.auc(y_col, x_set['Label'])
+    auc = metrics.roc_auc_score(y_col, x_set['Label'])
     plot = generate_confusion_matrix(x_set=x_set, y_set=y_col, output=output)
     input_list = [
         output, '\nTesting model report: \n', report + '\n', 'AUC = ' + str(auc) + '\n', 'Accuracy = ' + str(acc) + '\n'
