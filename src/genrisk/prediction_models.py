@@ -186,6 +186,9 @@ def test_classifier(
     model = joblib.load(model_path)
     x_set['Label'] = model.predict(x_set)
     x_set['True value'] = y_col
+    if len(x_set.groupby('True value').groups) == 2:
+        x_set['True value'] = np.interp(
+            x_set['True value'], (x_set['True value'].min(), x_set['True value'].max()), (0, 1))
     report = metrics.classification_report(y_col, x_set['Label'])
     acc = metrics.accuracy_score(y_col, x_set['Label'])
     auc = metrics.roc_auc_score(y_col, x_set['Label'])
