@@ -1,4 +1,5 @@
 import joblib
+import numpy as np
 import pycaret.classification as pycl
 import pycaret.regression as pyreg
 import sklearn.metrics as metrics
@@ -132,6 +133,9 @@ def classification_model(
     """
     if not metric:
         metric = 'AUC'
+    if len(training_set.groupby(y_col).groups) == 2:
+        training_set[y_col] = np.interp(
+            training_set[y_col], (training_set[y_col].min(), training_set[y_col].max()), (0, 1))
     setup = pycl.setup(target=y_col, fix_imbalance=imbalanced, normalize=normalize, normalize_method=normalize_method,
                        data=training_set, train_size=1 - test_size, silent=True, fold=folds, session_id=seed,
                        feature_selection=feature_selection)
