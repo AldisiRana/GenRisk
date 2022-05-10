@@ -192,7 +192,7 @@ def test_classifier(
     report = metrics.classification_report(y_col, x_set['Label'])
     acc = metrics.accuracy_score(y_col, x_set['Label'])
     auc = metrics.roc_auc_score(y_col, x_set['Label'])
-    plot = generate_confusion_matrix(x_set=x_set, y_set=y_col, output=output)
+    plot = generate_confusion_matrix(y_true=x_set['True value'], y_pred=x_set['Label'], output=output)
     input_list = [
         output, '\nTesting model report: \n', report + '\n', 'AUC = ' + str(auc) + '\n', 'Accuracy = ' + str(acc) + '\n'
     ]

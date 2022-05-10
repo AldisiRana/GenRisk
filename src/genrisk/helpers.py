@@ -64,7 +64,7 @@ def generate_scatterplot(*, x_axis, y_axis, output):
     return plt.show()
 
 
-def generate_confusion_matrix(x_set, y_set, output):
+def generate_confusion_matrix(y_true, y_pred, output):
     """
     Generate a confusion matrix for a dataset.
 
@@ -82,8 +82,9 @@ def generate_confusion_matrix(x_set, y_set, output):
         confusion matric plot
 
     """
-    confusion = metrics.plot_confusion_matrix(x_set, y_set)
-    confusion.ax_.set_title('Classifier confusion matrix')
+    cm = metrics.confusion_matrix(y_true, y_pred)
+    cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=cm).plot()
+    cm_display.ax_.set_title('Classifier confusion matrix')
     plt.savefig(output + '_classifier_confusion_matrix.png')
     return plt.show()
 
