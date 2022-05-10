@@ -189,9 +189,9 @@ def test_classifier(
     if len(x_set.groupby('True value').groups) == 2:
         x_set['True value'] = np.interp(
             x_set['True value'], (x_set['True value'].min(), x_set['True value'].max()), (0, 1))
-    report = metrics.classification_report(y_col, x_set['Label'])
-    acc = metrics.accuracy_score(y_col, x_set['Label'])
-    auc = metrics.roc_auc_score(y_col, x_set['Label'])
+    report = metrics.classification_report(x_set['True value'], x_set['Label'])
+    acc = metrics.accuracy_score(x_set['True value'], x_set['Label'])
+    auc = metrics.roc_auc_score(x_set['True value'], x_set['Label'])
     plot = generate_confusion_matrix(y_true=x_set['True value'], y_pred=x_set['Label'], output=output)
     input_list = [
         output, '\nTesting model report: \n', report + '\n', 'AUC = ' + str(auc) + '\n', 'Accuracy = ' + str(acc) + '\n'
