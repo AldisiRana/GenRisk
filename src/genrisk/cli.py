@@ -711,7 +711,7 @@ def get_gbrs(
     else:
         logger.info("No weights available, weights will be caluclated now.")
         logger.info("Creating temporary files...")
-        scores_df, scores_temp = train_test_split(scores_df, test_size=split_size, random_state=0)
+        scores_df, scores_temp = train_test_split(scores_df, test_size=split_size, random_state=1)
         scores_temp.to_csv('scores_temp.tsv', sep='\t', index=False)
         logger.info("The process for calculating the p_values will start now.")
         weights_df = find_pvalue(
