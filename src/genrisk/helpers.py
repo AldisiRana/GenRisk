@@ -86,7 +86,7 @@ def generate_confusion_matrix(y_true, y_pred, output):
     cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=cm).plot()
     cm_display.ax_.set_title('Classifier confusion matrix')
     plt.savefig(output + '_classifier_confusion_matrix.png')
-    return plt.show()
+    return
 
 
 def write_output(*, input_list, output):
