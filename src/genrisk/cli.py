@@ -649,7 +649,7 @@ def merge(
 @click.option('--method', type=click.Choice(['sum', 'pathways']),
               help='method for presenting the risk scores.')
 @SAMPLES_COL
-@click.option('--pathway-file', required=True, help='.gmt file containing the pathway and its genes.')
+@click.option('--pathway-file', default=None, help='.gmt file containing the pathway and its genes.')
 def get_gbrs(
         *,
         method,
