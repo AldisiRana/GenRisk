@@ -459,6 +459,7 @@ def create_model(
     testing_set = pd.DataFrame()
     if test:
         training_set, testing_set = train_test_split(training_set, test_size=test_size, random_state=int(seed))
+        test_size = 0
     os.mkdir(output_folder)
     os.chdir(output_folder)
     logger.info('Model generation starting ...')
@@ -730,6 +731,7 @@ def get_gbrs(
         del scores_temp
         os.remove('scores_temp.tsv')
         weights_df['zscore'] = weights_df['beta_coef'] / weights_df['std_err']
+        weights_df.to_csv(output_file+'.weights', sep='\t', index=False)
     logger.info("Calculating GBRS now ...")
     weights_df[weights_col] = pd.to_numeric(weights_df[weights_col], errors='coerce')
     df = calculate_gbrs(
