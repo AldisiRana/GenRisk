@@ -136,6 +136,8 @@ def classification_model(
     if len(training_set.groupby(y_col).groups) == 2:
         training_set[y_col] = np.interp(
             training_set[y_col], (training_set[y_col].min(), training_set[y_col].max()), (0, 1))
+        testing_set[y_col] = np.interp(
+            testing_set[y_col], (testing_set[y_col].min(), testing_set[y_col].max()), (0, 1))
     setup = pycl.setup(target=y_col, fix_imbalance=imbalanced, normalize=normalize, normalize_method=normalize_method,
                     data=training_set, test_data=testing_set, silent=True, fold=folds, session_id=seed,
                     feature_selection=feature_selection)
