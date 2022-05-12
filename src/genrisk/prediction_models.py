@@ -137,7 +137,7 @@ def classification_model(
         training_set[y_col] = np.interp(
             training_set[y_col], (training_set[y_col].min(), training_set[y_col].max()), (0, 1))
     setup = pycl.setup(target=y_col, fix_imbalance=imbalanced, normalize=normalize, normalize_method=normalize_method,
-                       data=training_set, train_size=1 - test_size, silent=True, fold=folds, session_id=seed,
+                       data=training_set, train_size=1.0 - test_size, silent=True, fold=folds, session_id=seed,
                        feature_selection=feature_selection)
     best_model = pycl.compare_models(sort=metric, include=include_models)
     pycl.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)

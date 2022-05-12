@@ -459,7 +459,7 @@ def create_model(
     testing_set = pd.DataFrame()
     if test:
         training_set, testing_set = train_test_split(training_set, test_size=test_size, random_state=int(seed))
-        test_size = 0
+        test_size = 0.0
     os.mkdir(output_folder)
     os.chdir(output_folder)
     logger.info('Model generation starting ...')
