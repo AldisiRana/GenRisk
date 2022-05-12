@@ -357,8 +357,6 @@ def visualize(
               help='file with all features and target for training model.')
 @click.option('-o', '--output-folder', required=True, help='path of folder that will contain all outputs.')
 @click.option('-i', '--test-size', show_default=True, default=0.25, help='test size for cross validation and evaluation.')
-@click.option('-t', '--test', is_flag=True,
-              help='if flagged, a test set will be created for evaluating the final model.')
 @click.option('-n', '--model-name', required=True, help='name of model file.')
 @click.option('--model-type', required=True, type=click.Choice(['regressor', 'classifier']),
               help='type of prediction model.')
@@ -453,13 +451,11 @@ def create_model(
     logger.info(locals())
     logger.info('Reading and preparing data ...')
     start_time = time.time()
-    training_set = pd.read_csv(data_file, sep='\t', index_col=samples_col)
-    training_set.dropna(subset=[target_col], inplace=True)
-    training_set.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
+    data = pd.read_csv(data_file, sep='\t', index_col=samples_col)
+    data.dropna(subset=[target_col], inplace=True)
+    data.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
     testing_set = pd.DataFrame()
-    if test:
-        training_set, testing_set = train_test_split(training_set, test_size=test_size, random_state=int(seed))
-        test_size = 0.0
+    training_set, testing_set = train_test_split(data, test_size=test_size, random_state=int(seed))
     os.mkdir(output_folder)
     os.chdir(output_folder)
     logger.info('Model generation starting ...')

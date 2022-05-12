@@ -137,8 +137,8 @@ def classification_model(
         training_set[y_col] = np.interp(
             training_set[y_col], (training_set[y_col].min(), training_set[y_col].max()), (0, 1))
     setup = pycl.setup(target=y_col, fix_imbalance=imbalanced, normalize=normalize, normalize_method=normalize_method,
-                       data=training_set, train_size=1.0 - test_size, silent=True, fold=folds, session_id=seed,
-                       feature_selection=feature_selection)
+                    data=training_set, test_data=testing_set, silent=True, fold=folds, session_id=seed,
+                    feature_selection=feature_selection)
     best_model = pycl.compare_models(sort=metric, include=include_models)
     pycl.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)
     cl_model = pycl.create_model(best_model)
@@ -146,14 +146,12 @@ def classification_model(
     pycl.pull().to_csv(model_name + '_tuned_model.tsv', sep='\t', index=False)
     final_model = pycl.finalize_model(cl_tuned_model)
     pycl.plot_model(final_model, plot='pr', save=True)
-    pycl.plot_model(final_model, plot='confusion_matrix', save=True)
     pycl.plot_model(final_model, plot='feature', save=True)
     pycl.save_model(final_model, model_name)
-    if len(testing_set.index) != 0:
-        unseen_predictions = test_classifier(
-            model_path=model_name+'.pkl', x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
-        )
-        unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=True)
+    unseen_predictions = test_classifier(
+        model_path=model_name+'.pkl', x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
+    )
+    unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=True)
     return final_model
 
 
