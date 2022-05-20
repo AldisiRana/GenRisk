@@ -3,6 +3,9 @@
 GenRisk is a package that implements different gene-based scoring schemes to analyze and find significant genes 
 within a phenotype in a population
 
+## Citation
+Rana Aldisi, Emadeldin Hassanin, Sugirthan Sivalingam, Andreas Buness, Hannah Klinkhammer, Andreas Mayr, Holger Fröhlich, Peter Krawitz, Carlo Maj, GenRisk: a tool for comprehensive genetic risk modeling, Bioinformatics, Volume 38, Issue 9, 1 May 2022, Pages 2651–2653, https://doi.org/10.1093/bioinformatics/btac152
+
 ## Requirements
 * plink >= 1.9 https://www.cog-genomics.org/plink/
 * R version >= 3.6.3
