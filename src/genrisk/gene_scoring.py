@@ -79,7 +79,7 @@ def get_gene_info(
         if len(val) == 1:
             continue
         info.rename(columns={col: val[0]}, inplace=True)
-        info[val[0]] = info[val[0]].str.replace(val[0] + '=', r'')
+        info[val[0]] = info[val[0]].str.replace(val[0] + "=", "")
     df = pd.concat([df, info], axis=1)
     df = df[df[af_col].values.astype(float) < maf_threshold]
     df.replace('.', 0.0, inplace=True)
