@@ -453,7 +453,6 @@ def create_model(
     data = pd.read_csv(data_file, sep='\t', index_col=samples_col)
     data.dropna(subset=[target_col], inplace=True)
     data.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
-    testing_set = pd.DataFrame()
     training_set, testing_set = train_test_split(data, test_size=test_size, random_state=int(seed))
     os.mkdir(output_folder)
     os.chdir(output_folder)
@@ -719,6 +718,7 @@ def get_gbrs(
             test='linear',
             covariates=covariates,
             logger=logger,
+            zero_threshold=1.0,
         )
         logger.info("Exluding samples used in weights calculation.")
         scores_df.reset_index(drop=True, inplace=True)
