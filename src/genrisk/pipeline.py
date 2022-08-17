@@ -4,7 +4,6 @@ import subprocess
 
 import numpy as np
 import pandas as pd
-from statsmodels.stats.multitest import multipletests
 
 from .association_analysis import run_mannwhitneyu, run_ttest, get_pvals_logit, get_pvals_linear
 from .gene_scoring import get_gene_info, plink_process, combine_scores
@@ -115,12 +114,10 @@ def find_pvalue(
     *,
     scores_file,
     info_file,
-    output_file,
     genes=None,
     cases_column,
     samples_column,
     test='mannwhitneyu',
-    adj_pval=None,
     covariates=None,
     cases=None,
     controls=None,
@@ -212,12 +209,6 @@ def find_pvalue(
     except Exception as arg:
         logger.exception(arg)
         raise
-    if adj_pval:
-        logger.info("Calculating the adjusted p_values...")
-        adjusted = multipletests(list(p_values_df['p_value']), method=adj_pval)
-        p_values_df[adj_pval + '_adj_pval'] = list(adjusted)[1]
-    p_values_df.to_csv(output_file, sep='\t', index=False)
-    logger.info("Process is complete. The association analysis results have been saved.")
     return p_values_df
 
 
@@ -293,7 +284,6 @@ def create_prediction_model(
     folds=10,
     training_set,
     testing_set=pd.DataFrame(),
-    test_size=0.25,
     metric=None,
     seed,
     include_models,
@@ -343,7 +333,6 @@ def create_prediction_model(
             y_col=y_col,
             training_set=training_set,
             normalize=normalize,
-            test_size=test_size,
             folds=folds,
             metric=metric,
             model_name=model_name,

@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 
 from sklearn.model_selection import train_test_split
+from statsmodels.stats.multitest import multipletests
 
 from .gene_scoring import calculate_gbrs, pathway_scoring
 from .helpers import create_logger
@@ -238,6 +239,7 @@ def find_association(
         )
         end_time = time.time()
         logger.info(f"Runtime of the program is {end_time - start_time}")
+        df = pd.read_csv(output_file, sep='\t', index_col=False)
     else:
         if genes:
             with open(genes) as f:
@@ -245,13 +247,11 @@ def find_association(
             genes = [x.strip() for x in content]
         df = find_pvalue(
             scores_file=scores_file,
-            output_file=output_file,
             info_file=info_file,
             genes=genes,
             cases_column=cases_col,
             samples_column=samples_col,
             test=test,
-            adj_pval=adj_pval,
             covariates=covariates,
             processes=processes,
             logger=logger,
@@ -260,6 +260,12 @@ def find_association(
         end_time = time.time()
         logger.info(f"Runtime of the program is {end_time - start_time}")
         return df.info()
+    if adj_pval:
+        logger.info("Calculating the adjusted p_values...")
+        adjusted = multipletests(list(df['p_value']), method=adj_pval)
+        df[adj_pval + '_adj_pval'] = list(adjusted)[1]
+    df.to_csv(output_file, sep='\t', index=False)
+    logger.info("Process is complete. The association analysis results have been saved.")
 
 
 @main.command()

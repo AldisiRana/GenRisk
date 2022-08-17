@@ -4,7 +4,7 @@ import pycaret.classification as pycl
 import pycaret.regression as pyreg
 import sklearn.metrics as metrics
 
-from genrisk.helpers import write_output, generate_confusion_matrix, generate_scatterplot
+from .helpers import write_output, generate_confusion_matrix, generate_scatterplot
 
 
 def regression_model(
@@ -12,7 +12,6 @@ def regression_model(
     y_col,
     training_set,
     normalize,
-    test_size,
     folds,
     metric,
     model_name,
@@ -60,7 +59,7 @@ def regression_model(
     if not metric:
         metric = 'RMSE'
     setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, normalize_method=normalize_method,
-                        train_size=1 - test_size, fold=folds, silent=True, session_id=seed,
+                        test_data=testing_set, fold=folds, silent=True, session_id=seed,
                         feature_selection=feature_selection)
     best_model = pyreg.compare_models(sort=metric, include=include_models)
     pyreg.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)
@@ -85,7 +84,6 @@ def classification_model(
     y_col,
     training_set,
     normalize,
-    test_size,
     folds,
     metric,
     model_name,
