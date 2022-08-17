@@ -475,7 +475,6 @@ def create_model(
         y_col=target_col,
         training_set=training_set,
         testing_set=testing_set,
-        test_size=test_size,
         seed=int(seed),
         include_models=include_models,
         normalize_method=normalize_method,
