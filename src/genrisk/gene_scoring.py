@@ -107,6 +107,7 @@ def combine_scores(
     *,
     input_path,
     output_path,
+    plink_extension,
 ):
     """
     Combine the files that contain the scores into one file.
@@ -125,16 +126,15 @@ def combine_scores(
 
     """
     all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(input_path) for name in files]
-    profile_files = [f for f in all_files if re.match(r'.+profile$', f)]
-    df = pd.read_csv(str(profile_files[0]), sep=r'\s+').iloc[:, [1, -1]]
+    score_files = [f for f in all_files if re.match(r'.+'+plink_extension+'$', f)]
+    df = pd.read_csv(str(score_files[0]), sep=r'\s+').iloc[:, [1, -1]]
     scores_col = df.columns[1]
     df.astype({scores_col: np.float32})
-    r = re.compile("([a-zA-Z0-9_.-]*).profile$")
-    gene = r.findall(str(profile_files[0]))
+    r = re.compile("([a-zA-Z0-9_.-]*)."+plink_extension+"$")
+    gene = r.findall(str(score_files[0]))
     df.rename(columns={scores_col: gene[0]}, inplace=True)
-    pf = profile_files
-    for i in tqdm(range(1, len(pf)), desc='merging in process'):
-        df = uni_profiles(df, pf[i])
+    for i in tqdm(range(1, len(score_files)), desc='merging in process'):
+        df = uni_profiles(df, score_files[i], plink_extension=plink_extension)
     df.to_csv(output_path, sep='\t', index=False)
     return df
 

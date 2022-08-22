@@ -69,9 +69,7 @@ def score_genes(
     ---------
     ::
 
-        $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/
-        --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT
-        --variant-col ID --af-col AF --del-col CADD --gene-col Gene
+        $ genrisk score-genes -a /path/to/toy_vcf_info.vcf -o toy_genes_scores.tsv -t toy_vcf_scoring -v ID -f AF -g gene -l ALT -d RawScore
 
     \f
 
@@ -259,7 +257,6 @@ def find_association(
         )
         end_time = time.time()
         logger.info(f"Runtime of the program is {end_time - start_time}")
-        return df.info()
     if adj_pval:
         logger.info("Calculating the adjusted p_values...")
         adjusted = multipletests(list(df['p_value']), method=adj_pval)
@@ -271,7 +268,7 @@ def find_association(
 @main.command()
 @click.option('-p', '--pvals-file', required=True, type=click.Path(exists=True), help="the file containing p-values.")
 @click.option('-i', '--info-file', type=click.Path(exists=True), help="file containing variant/gene info.")
-@click.option('--genescol-1', show_default=True, default='gene', help="the name of the genes column in pvals file.")
+@click.option('--genescol-1', show_default=True, default='genes', help="the name of the genes column in pvals file.")
 @click.option('--genescol-2', show_default=True, default='Gene.refGene', help="the name of the genes column in info file.")
 @click.option('-q', '--qq-output', default=None, help="the name of the qq plot file.")
 @click.option('-m', '--manhattan-output', default=None, help="the name of the manhatten plot file.")
@@ -356,6 +353,7 @@ def visualize(
         except Exception as arg:
             logger.exception(arg)
             raise
+    logger.info('Done.')
 
 
 @main.command()

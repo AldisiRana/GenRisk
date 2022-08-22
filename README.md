@@ -26,30 +26,29 @@ This command calculate the gene-based scores for a given dataset.
 
 It requires an annotated vcf (i.e: annotated with variant ID , ALT, Gene, and deleterious score, for more information check out the example in toy_example)
 
-    $ genrisk score-genes --annotated-vcf annotated_vcf_toy.vcf --temp-dir test/ --output-file test.tsv --weight-func beta --maf-threshold 0.01 --alt-col ALT --variant-col ID --af-col AF --del-col CADD --gene-col Gene
+    $ genrisk score-genes -a ../path/to/toy_vcf_data.vcf -o toy_genes_scores.tsv -t toy_vcf_scoring -v ID -f AF -g gene -l ALT -d RawScore
 
 * For further CLI options and parameters use --help
 
 ### Calculate p-values
 This function calculates the p-values across the genes between two given groups
     
-    $ genrisk find-association --scores-file toy_example/toy_dataset_scores --info-file toy_example/toy.pheno 
-    --cases-column trait1 --samples-column IID --test betareg --output-file toy_dataset_betareg.tsv --covariates age,sex
-    --adj-pval bonferroni
+    $ genrisk find-association -s toy_genes_scores.tsv -i info.pheno -o linear_assoc_quan.tsv -t linear -c quan -a fdr_bh -v sex,age,bmi 
+
 * For further CLI options and parameters use --help
 
 ### Visualize
 Visualize manhatten plot and qqplot for the data.
 
-    $ genrisk visualize --pvals-file toy_example/toy_dataset_scores --info-file annotated_toy_dataset.vcf
-    --qq-output toy_example/toy_dataset_qqplot.jpg --manhattan-output toy_example/toy_dataset_manhattanplot.jpg 
+    $ genrisk visualize -p logit_assoc_binary.tsv -i genes_info_ref.txt -q logit_assoc_binary_qqplot.png -m logit_assoc_binary_manhattan.png --genescol-1 genes
+
 * For further CLI options and parameters use --help
 
 ### Create model
 Create a prediction model (classifier or regressor) with given dataset
 
-    $ genrisk create-model --data-file toy_example_regressor_features.tsv --model-type regressor --output-folder toy_regressor 
-    --test-size 0.25 --test --model-name toy_regressor --target-col trait1 --imbalanced --normalize
+    $ genrisk create-model -d toy_dataset_feats.tsv -o quan_regression_model -n quan_regression_model --model-type regressor -l quan --normalize
+
 * For further CLI options and parameters use --help
 
 ### Test model

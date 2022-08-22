@@ -1,0 +1,4 @@
+quan_regression_model
+Testing model report: 
+R^2 = -0.012596909929109001
+RMSE = 0.5879368860525609

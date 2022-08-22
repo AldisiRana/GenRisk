@@ -83,29 +83,33 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
     data[chr_col] = data[chr_col].astype('int64')
     data = data.sort_values([chr_col, pos_col])
     data.reset_index(inplace=True, drop=True)
-    data['i'] = data.index
-    # Generate Manhattan plot: (#optional tweaks for relplot: linewidth=0, s=9)
-    sns.set_style("white")
-    data['color group'] = data[chr_col].apply(lambda x: 'A' if x % 2 == 0 else 'B')
-    plot = sns.relplot(data=data, x='i', y='-logp', aspect=3.7,
-                       hue='color group', palette=['grey', 'black'], kind='scatter', legend=None)
-    plot.fig.suptitle(manhattan_output.split('.')[0])
-    plot.ax.set_ylim(0.0, max(data["-logp"]) + 1)
+    data['ind'] = data.index
+    df_grouped = data.groupby((chr_col))
+    fig = plt.figure(figsize=(14, 8))  # Set the figure size
+    ax = fig.add_subplot(111)
+    colors = ['black', 'grey']
+    for num, (name, group) in enumerate(df_grouped):
+        group.plot(kind='scatter', x='ind', y='-logp', color=colors[num % len(colors)], ax=ax)
+    ax.set_ylim(0.0, max(data["-logp"]) + 1)
 
-    anno = []
-    for ind in data.nlargest(10, ['-logp']).index:
-        anno.append(
-            plt.text(data.i[ind] + 0.2, data['-logp'][ind] + 0.2, data[genes_col][ind],
-                     horizontalalignment='left', size='medium', rotation=20, color='black'))
-    adjust_text(anno, arrowprops=dict(arrowstyle="->", color='b', lw=0.5))
-    chrom_df = data.groupby(chr_col)['i'].median()
-    plot.ax.set_xlabel(chr_col)
-    plot.ax.set_xticks(chrom_df)
-    plot.ax.set_xticklabels(chrom_df.index)
-    plot.ax.axhline(-np.log10(1.00e-05), c='blue', ls='--')
-    plot.ax.axhline(-np.log10(5.00e-08), c='red', ls='--')
-    plot.savefig(manhattan_output)
-    return plot
+    for i in data[data['-logp'] > 5.6].index:
+        ax.annotate(xy=(data.ind[i], data['-logp'][i]),
+                              xytext=(data.ind[i] + 0.2, data['-logp'][i] + 0.2),
+                              text=data[genes_col][i],
+                              arrowprops=dict(arrowstyle="->", color='b', lw=0.5),
+                              horizontalalignment='left', size='medium', rotation=20, color='black')
+    # adjust_text(anno, arrowprops=dict(arrowstyle="->", color='b', lw=0.5))
+    chrom_df = data.groupby(chr_col)['ind'].median()
+    data['color group'] = data[chr_col].apply(lambda x: 'A' if x % 2 == 0 else 'B')
+    fig.suptitle(manhattan_output.split('.')[0])
+    ax.set_ylim(0.0, max(data["-logp"]) + 1)
+    ax.set_xlabel(chr_col)
+    ax.set_xticks(chrom_df)
+    ax.set_xticklabels(chrom_df.index)
+    ax.axhline(-np.log10(1.00e-05), c='blue', ls='--')
+    ax.axhline(-np.log10(5.00e-08), c='red', ls='--')
+    fig.savefig(manhattan_output)
+    return ax
 
 
 def draw_qqplot(*, pvals, qq_output):

@@ -9,7 +9,7 @@ import pandas as pd
 import sklearn.metrics as metrics
 
 
-def uni_profiles(df, f):
+def uni_profiles(df, f, plink_extension):
     """
     Merge two dataframes.
 
@@ -29,7 +29,7 @@ def uni_profiles(df, f):
     df2 = pd.read_csv(str(f), sep=r'\s+').iloc[:, [1, -1]]
     scores_col = df2.columns[1]
     df2.astype({scores_col: np.float32})
-    r = re.compile("([a-zA-Z0-9_.-]*).profile$")
+    r = re.compile("([a-zA-Z0-9_.-]*)."+plink_extension+"$")
     gene2 = r.findall(str(f))
     df2.rename(columns={scores_col: gene2[0]}, inplace=True)
     df = pd.merge(df, df2, on='IID')

@@ -102,7 +102,11 @@ def scoring_process(
         raise
     logger.info('combining score files ...')
     try:
-        df = combine_scores(input_path=temp_dir, output_path=output_file)
+        if 'plink2' in plink:
+            plink_extension = 'sscore'
+        else:
+            plink_extension = 'profile'
+        df = combine_scores(input_path=temp_dir, output_path=output_file, plink_extension=plink_extension)
     except Exception as arg:
         logger.exception(arg)
         raise
@@ -134,8 +138,6 @@ def find_pvalue(
         dataframe containing the scores of genes across samples.
     info_file : str
         a file containing the information of the sample. this includes target phenotype and covariates.
-    output_file : str
-         a path to save the summary statistics.
     genes : list
         a list of the genes to calculate the significance. if None will calculate for all genes.
     cases_column : str
@@ -144,8 +146,6 @@ def find_pvalue(
         the name of the column contining samples IDs.
     test : str
         the type of statistical test to use, choices are: ttest_ind, mannwhitenyu, linear, logit.
-    adj_pval : str
-        the method for pvalue adjustment. Choices: ['bonferroni', 'sidak', 'holm-sidak', 'holm', 'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']
     covariates : str
         the list of covariates used in the calculation.
     cases : str

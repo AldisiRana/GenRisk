@@ -1,0 +1,13 @@
+binary_classifier_model
+Testing model report: 
+              precision    recall  f1-score   support
+
+         0.0       0.75      0.56      0.64        16
+         1.0       0.46      0.67      0.55         9
+
+    accuracy                           0.60        25
+   macro avg       0.61      0.61      0.59        25
+weighted avg       0.65      0.60      0.61        25
+
+AUC = 0.6145833333333333
+Accuracy = 0.6
