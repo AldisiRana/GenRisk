@@ -81,8 +81,8 @@ def get_gene_info(
         info.rename(columns={col: val[0]}, inplace=True)
         info[val[0]] = info[val[0]].str.replace(val[0] + "=", "")
     df = pd.concat([df, info], axis=1)
-    df = df[df[af_col].values.astype(float) < maf_threshold]
     df.replace('.', 0.0, inplace=True)
+    df = df[df[af_col].values.astype(float) < maf_threshold]
     if weight_func == 'beta':
         df[weight_func] = beta.pdf(df[af_col].values.astype(float), beta_param[0], beta_param[1])
     elif weight_func == 'log10':
