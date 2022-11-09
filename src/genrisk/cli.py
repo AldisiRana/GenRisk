@@ -715,7 +715,6 @@ def get_gbrs(
         weights_df = find_pvalue(
             scores_file='scores_temp.tsv',
             info_file=pheno_file,
-            output_file=output_file + '.assoc',
             cases_column=pheno_col,
             samples_column=samples_col,
             test='linear',
@@ -723,6 +722,7 @@ def get_gbrs(
             logger=logger,
             zero_threshold=1.0,
         )
+        weights_df.to_csv(output_file+'.assoc', sep='\t', index=False)
         logger.info("Exluding samples used in weights calculation.")
         scores_df.reset_index(drop=True, inplace=True)
         logger.info("Remove temporary files.")
