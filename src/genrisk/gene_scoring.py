@@ -127,7 +127,10 @@ def combine_scores(
     """
     all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(input_path) for name in files]
     score_files = [f for f in all_files if re.match(r'.+'+plink_extension+'$', f)]
-    df = pd.read_csv(str(score_files[0]), sep=r'\s+').iloc[:, [1, -1]]
+    try:
+        df = pd.read_csv(str(score_files[0]), sep=r'\s+').iloc[:, [1, -1]]
+    except:
+        raise Exception("It seems that there is a problem with your score files, please make sure that plink is running correctly.")
     scores_col = df.columns[1]
     df.astype({scores_col: np.float32})
     r = re.compile("([a-zA-Z0-9_.-]*)."+plink_extension+"$")
@@ -272,5 +275,5 @@ def pathway_scoring(
         selected_genes = list(set(genes) & (set(path_genes)))
         if len(selected_genes) == 0:
             pathway_scores.drop(columns=[path], inplace=True)
-        pathway_scores[path] = scores_df[selected_genes].sum(axis=1)
+        pathway_scores[path] = scores_df[selected_genes].sum(axis=1)/len(selected_genes)
     return pathway_scores
