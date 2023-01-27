@@ -69,17 +69,17 @@ def get_gene_info(
                     skip += 1
     df = pd.read_csv(annotated_vcf, usecols=[variant_col, alt_col, 'INFO'], skiprows=skip, sep=r'\s+', index_col=False)
     info = df['INFO'].str.split(pat=';', expand=True)
-    missing_info = info[info.isnull().any(axis=1)].index
+    missing_info = info[info.isnull().all(axis=1)].index
     df.drop(missing_info, inplace=True)
     df.reset_index(drop=True, inplace=True)
     info.drop(missing_info, inplace=True)
     info.reset_index(drop=True, inplace=True)
     for col in info.columns:
-        val = info[col][0].split('=')
+        val = str(info[col][0]).split('=')
         if len(val) == 1:
             continue
+        info[col] = info[col].str.split(pat='=', expand=True).drop(columns=0)
         info.rename(columns={col: val[0]}, inplace=True)
-        info[val[0]] = info[val[0]].str.replace(val[0] + "=", "")
     df = pd.concat([df, info], axis=1)
     df.replace('.', 0.0, inplace=True)
     df = df[df[af_col].values.astype(float) < maf_threshold]
