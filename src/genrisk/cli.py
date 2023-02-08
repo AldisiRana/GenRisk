@@ -46,6 +46,7 @@ def main():
 @click.option('-d', '--del-col', show_default=True, default='CADD_raw', help="the column containing the deleteriousness score.")
 @click.option('-l', '--alt-col', show_default=True, default='Alt', help="the column containing the alternate base.")
 @click.option('-m', '--maf-threshold', show_default=True, default=0.01, help="the threshold for minor allele frequency.")
+@click.option('-k', '--keep', is_flag=True, help='if flagged temporary files will not be deleted.')
 def score_genes(
         *,
         annotated_vcf,
@@ -61,6 +62,7 @@ def score_genes(
         del_col,
         alt_col,
         maf_threshold,
+        keep
 ):
     """
     Calculate the gene-based scores for a given dataset.
@@ -111,7 +113,6 @@ def score_genes(
         the DataFrame is saved into the output path indicated in the arguments
 
     """
-    confirm = click.confirm('Would you like us to delete the temporary files when process is done?')
     logger.info('Gene-based scoring')
     logger.info('Score genes process is starting now...')
     logger.info(locals())
@@ -133,7 +134,7 @@ def score_genes(
         alt_col=alt_col,
         maf_threshold=maf_threshold,
     )
-    if confirm:
+    if not keep:
         logger.info('The temporary files will be removed now.')
         shutil.rmtree(temp_dir)
     time.sleep(1)
