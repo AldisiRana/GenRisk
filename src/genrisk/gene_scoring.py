@@ -82,7 +82,9 @@ def get_gene_info(
         info.rename(columns={col: val[0]}, inplace=True)
     df = pd.concat([df, info], axis=1)
     df[af_col].replace('.', 3.98e-6, inplace=True) # 1 allele out 125,748 indiv in gnomADexome (251496 alleles)
-    df[del_col].replace('.', 0, inplace=True) 
+    df[af_col].replace('nan', 3.98e-6, inplace=True) # 1 allele out 125,748 indiv in gnomADexome (251496 alleles)
+    df[del_col].replace('.', 0, inplace=True)
+    df[del_col].replace('nan', 0, inplace=True)
     df = df[df[af_col].values.astype(float) < maf_threshold]
     if weight_func == 'beta':
         df[weight_func] = beta.pdf(df[af_col].values.astype(float), beta_param[0], beta_param[1])
