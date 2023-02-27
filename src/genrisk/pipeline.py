@@ -23,7 +23,7 @@ association_functions = {
 def scoring_process(
     *,
     logger,
-    annotated_vcf,
+    annotation_file,
     temp_dir,
     beta_param,
     weight_func,
@@ -45,7 +45,7 @@ def scoring_process(
     ----------
     logger
         an object that logs function outputs.
-    annotated_vcf : str
+    annotation_file : str
         an annotated containing variant IDs, alt, info and samples genotypes.
     temp_dir : str
         a temporary directory to save temporary files before merging.
@@ -79,24 +79,15 @@ def scoring_process(
 
     """
     try:
-        genes_folder = get_gene_info(
-            annotated_vcf=annotated_vcf,
-            output_dir=temp_dir,
-            beta_param=beta_param,
-            weight_func=weight_func,
-            del_col=del_col,
-            maf_threshold=maf_threshold,
-            genes_col=gene_col,
-            variant_col=variant_col,
-            af_col=af_col,
-            alt_col=alt_col,
-        )
+        genes_folder = get_gene_info(annotation_file=, variant_col=variant_col, af_col=af_col, alt_col=alt_col,
+                                     del_col=del_col, output_dir=temp_dir, genes_col=gene_col,
+                                     maf_threshold=maf_threshold, beta_param=beta_param, weight_func=weight_func)
     except Exception as arg:
         logger.exception(arg)
         raise
     logger.info('calculating gene scores ...')
     try:
-        plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=annotated_vcf, bfiles=bfiles)
+        plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=annotation_file, bfiles=bfiles)
     except Exception as arg:
         logger.exception(arg)
         raise

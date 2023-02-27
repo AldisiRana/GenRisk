@@ -30,9 +30,9 @@ def main():
 
 
 @main.command()
-@click.option('-a', '--annotated-vcf', required=True, type=click.Path(exists=True), help='an annotated containing variant IDs, alt, info and samples genotypes.')
-@click.option('-b', '--bfiles', default=None,
-              help='provide binary files if annotated vcf does not contain the samples info')
+@click.option('-a', '--annotation-file', required=True, type=click.Path(exists=True), help='an annotation file containing variant IDs, alt, AF and deletarious scores.')
+@click.option('-b', '--bfiles', required=True,
+              help='provide binary files that contain the samples info')
 @click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
 @click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
 @OUTPUT_FILE
@@ -49,7 +49,7 @@ def main():
 @click.option('-k', '--keep', is_flag=True, help='if flagged temporary files will not be deleted.')
 def score_genes(
         *,
-        annotated_vcf,
+        annotation_file,
         bfiles,
         plink,
         beta_param,
@@ -77,11 +77,10 @@ def score_genes(
 
     Parameters
     ----------
-    annotated_vcf : str
-        an annotated containing variant IDs, alt, info and samples genotypes.
+    annotation_file : str
+        an annotation file containing variant IDs, alt, AF and deleterious scores.
     bfiles : str
         the binary files for plink process.
-        this arg is not needed if the annotated vcf contains all information.
     plink : str
         the location of plink, if not set in environment
     beta_param : tuple
@@ -118,22 +117,10 @@ def score_genes(
     logger.info(locals())
     logger.info('getting information from vcf files')
     start_time = time.time()
-    df = scoring_process(
-        logger=logger,
-        annotated_vcf=annotated_vcf,
-        bfiles=bfiles,
-        plink=plink,
-        beta_param=beta_param,
-        temp_dir=temp_dir,
-        output_file=output_file,
-        weight_func=weight_func,
-        variant_col=variant_col,
-        gene_col=gene_col,
-        af_col=af_col,
-        del_col=del_col,
-        alt_col=alt_col,
-        maf_threshold=maf_threshold,
-    )
+    df = scoring_process(logger=logger, annotation_file=, temp_dir=temp_dir, beta_param=beta_param,
+                         weight_func=weight_func, del_col=del_col, maf_threshold=maf_threshold, gene_col=gene_col,
+                         variant_col=variant_col, af_col=af_col, alt_col=alt_col, bfiles=bfiles, plink=plink,
+                         output_file=output_file)
     if not keep:
         logger.info('The temporary files will be removed now.')
         shutil.rmtree(temp_dir)
