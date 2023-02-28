@@ -79,7 +79,7 @@ def scoring_process(
 
     """
     try:
-        genes_folder = get_gene_info(annotation_file=, variant_col=variant_col, af_col=af_col, alt_col=alt_col,
+        genes_folder = get_gene_info(annotation_file=annotation_file, variant_col=variant_col, af_col=af_col, alt_col=alt_col,
                                      del_col=del_col, output_dir=temp_dir, genes_col=gene_col,
                                      maf_threshold=maf_threshold, beta_param=beta_param, weight_func=weight_func)
     except Exception as arg:
@@ -87,7 +87,7 @@ def scoring_process(
         raise
     logger.info('calculating gene scores ...')
     try:
-        plink_process(genes_folder=genes_folder, plink=plink, annotated_vcf=annotation_file, bfiles=bfiles)
+        plink_process(genes_folder=genes_folder, plink=plink, bfiles=bfiles)
     except Exception as arg:
         logger.exception(arg)
         raise

@@ -145,7 +145,7 @@ def combine_scores(
     return df
 
 
-def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None, method=""):
+def plink_process(*, genes_folder, plink, bfiles=None, method=""):
     """
     Use plink to calculate and sum the scores for each gene.
 
@@ -155,8 +155,6 @@ def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None, method="")
         the folder containing the temporary genes files.
     plink : str
         the directory of plink (if not default).
-    annotated_vcf : str
-        vcf with samples information
     bfiles : str
         the name of the binary files, not needed if annotated file is given.
     method : str
@@ -167,15 +165,11 @@ def plink_process(*, genes_folder, plink, annotated_vcf, bfiles=None, method="")
 
     """
     genes = [line.strip() for line in open(genes_folder + '.genes', 'r')]
-    if bfiles:
-        input_files = " --bfile " + bfiles
-    else:
-        input_files = " --vcf " + annotated_vcf
     for gene in tqdm(genes, desc='calculating genes scores'):
         v_file = os.path.join(genes_folder, (gene + '.v'))
         w_file = os.path.join(genes_folder, (gene + '.w'))
         p = subprocess.call(
-            plink + input_files + " --double-id" + " --extract " + v_file + " --score " + w_file +
+            plink + " --bfile " + bfiles + " --double-id" + " --extract " + v_file + " --score " + w_file +
             " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True
         )
 

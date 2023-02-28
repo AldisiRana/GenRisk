@@ -117,7 +117,7 @@ def score_genes(
     logger.info(locals())
     logger.info('getting information from vcf files')
     start_time = time.time()
-    df = scoring_process(logger=logger, annotation_file=, temp_dir=temp_dir, beta_param=beta_param,
+    df = scoring_process(logger=logger, annotation_file=annotation_file, temp_dir=temp_dir, beta_param=beta_param,
                          weight_func=weight_func, del_col=del_col, maf_threshold=maf_threshold, gene_col=gene_col,
                          variant_col=variant_col, af_col=af_col, alt_col=alt_col, bfiles=bfiles, plink=plink,
                          output_file=output_file)
