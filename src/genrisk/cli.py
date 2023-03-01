@@ -141,7 +141,7 @@ def score_genes(
 @click.option('-t', '--test', required=True,
               type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'betareg', 'linear']),
               help='statistical test for calculating P value.')
-@click.option('-c', '--cases-col', required=True,
+@click.option('-p', '--phenotype', required=True,
               help="the name of the column that contains the case/control or quantitative vals.")
 @SAMPLES_COL
 @click.option('-a', '--adj-pval', type=click.Choice(
@@ -156,7 +156,7 @@ def find_association(
         info_file,
         output_file,
         genes,
-        cases_col,
+        phenotype,
         samples_col,
         test,
         adj_pval,
@@ -186,7 +186,7 @@ def find_association(
         path to the final output.
     genes : str
         a file that contains a list of genes to calculate p-values. if not, all genes in scoring file will be used.
-    cases_col : str
+    phenotype : str
         the name of the column with phenotypes. Phenotypes can be either binary or quantitative.
     samples_col : str
          the name of the column with sample IDs. All files need to have the same format.
@@ -215,7 +215,7 @@ def find_association(
         betareg_pvalues(
             scores_file=scores_file,
             pheno_file=info_file,
-            cases_col=cases_col,
+            cases_col=phenotype,
             samples_col=samples_col,
             output_path=output_file,
             covariates=covariates,
@@ -226,6 +226,11 @@ def find_association(
         end_time = time.time()
         logger.info(f"Runtime of the program is {end_time - start_time}")
         df = pd.read_csv(output_file, sep='\t', index_col=False)
+        if adj_pval:
+            logger.info("Calculating the adjusted p_values...")
+            adjusted = multipletests(list(df['p_value']), method=adj_pval)
+            df[adj_pval + '_adj_pval'] = list(adjusted)[1]
+        df.to_csv(output_file, sep='\t', index=False)
     else:
         if genes:
             with open(genes) as f:
@@ -235,7 +240,7 @@ def find_association(
             scores_file=scores_file,
             info_file=info_file,
             genes=genes,
-            cases_column=cases_col,
+            phenotype=phenotype,
             samples_column=samples_col,
             test=test,
             covariates=covariates,
@@ -245,11 +250,6 @@ def find_association(
         )
         end_time = time.time()
         logger.info(f"Runtime of the program is {end_time - start_time}")
-    if adj_pval:
-        logger.info("Calculating the adjusted p_values...")
-        adjusted = multipletests(list(df['p_value']), method=adj_pval)
-        df[adj_pval + '_adj_pval'] = list(adjusted)[1]
-    df.to_csv(output_file, sep='\t', index=False)
     logger.info("Process is complete. The association analysis results have been saved.")
 
 

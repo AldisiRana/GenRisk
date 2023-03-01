@@ -4,6 +4,7 @@ import subprocess
 
 import numpy as np
 import pandas as pd
+from statsmodels.stats.multitest import multipletests
 
 from .association_analysis import run_mannwhitneyu, run_ttest, get_pvals_logit, get_pvals_linear
 from .gene_scoring import get_gene_info, plink_process, combine_scores
@@ -110,7 +111,7 @@ def find_pvalue(
     scores_file,
     info_file,
     genes=None,
-    cases_column,
+    phenotype,
     samples_column,
     test='mannwhitneyu',
     covariates=None,
@@ -119,6 +120,8 @@ def find_pvalue(
     processes=1,
     logger,
     zero_threshold=1.0,
+    adj_pval,
+    output_file,
 ):
     """
     Calculate the significance of a gene in a population using different statistical analyses [mannwhitneyu, logit, linear, ttest_ind]
@@ -131,7 +134,7 @@ def find_pvalue(
         a file containing the information of the sample. this includes target phenotype and covariates.
     genes : list
         a list of the genes to calculate the significance. if None will calculate for all genes.
-    cases_column : str
+    phenotype : str
         the name of the column containing phenotype information.
     samples_column : str
         the name of the column contining samples IDs.
@@ -165,14 +168,14 @@ def find_pvalue(
     scores_df.fillna(0, inplace=True)
     scores_df = scores_df.loc[:, scores_df.var() != 0.0].reset_index()
     logger.info("Reading info file...")
+    phenotypes_col = phenotype.split(',')
     if covariates:
         covariates = covariates.split(',')
-        genotype_df = pd.read_csv(info_file, sep='\t', usecols=covariates+[cases_column, samples_column])
+        genotype_df = pd.read_csv(info_file, sep='\t', usecols=covariates+phenotypes_col+[samples_column])
         genotype_df.fillna(genotype_df.mean(), inplace=True)
         genotype_df.dropna(inplace=True)
     else:
         genotype_df = pd.read_csv(info_file, sep='\t')
-        genotype_df.dropna(subset=[cases_column], inplace=True)
     logger.info("Processing files...")
     merged_df = pd.merge(scores_df, genotype_df, how='inner', on=samples_column)
     merged_df.replace([np.inf, -np.inf], 0.0, inplace=True)
@@ -194,13 +197,20 @@ def find_pvalue(
         'processes': processes, 'cases': cases, 'controls': controls, 'covariates': covariates, 'logger': logger,
     }
     logger.info("Calculating p_values using the following test: " + test)
-    try:
-        p_values_df = association_functions.get(test)(df=merged_df, genes=genes, cases_column=cases_column, **args)
-        p_values_df.dropna(subset=['p_value'], inplace=True)
-    except Exception as arg:
-        logger.exception(arg)
-        raise
-    return p_values_df
+    for pheno in phenotypes_col:
+        merged_df.dropna(subset=[pheno], inplace=True)
+        try:
+            p_values_df = association_functions.get(test)(df=merged_df, genes=genes, cases_column=pheno, **args)
+            p_values_df.dropna(subset=['p_value'], inplace=True)
+        except Exception as arg:
+            logger.exception(arg)
+            raise
+        if adj_pval:
+            logger.info("Calculating the adjusted p_values...")
+            adjusted = multipletests(list(df['p_value']), method=adj_pval)
+            df[adj_pval + '_adj_pval'] = list(adjusted)[1]
+        df.to_csv(output_file, sep='\t', index=False)
+    return
 
 
 def betareg_pvalues(
