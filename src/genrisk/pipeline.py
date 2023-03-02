@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import subprocess
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
@@ -121,7 +122,6 @@ def find_pvalue(
     logger,
     zero_threshold=1.0,
     adj_pval,
-    output_file,
 ):
     """
     Calculate the significance of a gene in a population using different statistical analyses [mannwhitneyu, logit, linear, ttest_ind]
@@ -209,7 +209,13 @@ def find_pvalue(
             logger.info("Calculating the adjusted p_values...")
             adjusted = multipletests(list(df['p_value']), method=adj_pval)
             df[adj_pval + '_adj_pval'] = list(adjusted)[1]
-        df.to_csv(output_file, sep='\t', index=False)
+        now = datetime.now().strftime("%Y%m%d")
+        cohort = scores_file.split('.')[0]
+        if zero_threshold != 1.0:
+            output = now+"_"+test+"_"+str(zero_threshold*100)+"_"+cohort+"_"+phenotype+".tsv"
+        else:
+            output = now + "_" + test + "_" + cohort + "_" + phenotype + ".tsv"
+        df.to_csv(output, sep='\t', index=False)
     return
 
 

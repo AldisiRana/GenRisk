@@ -135,7 +135,6 @@ def score_genes(
               help="The scoring file of genes across a population.")
 @click.option('-i', '--info-file', required=True, type=click.Path(exists=True),
               help="File containing information about the cohort.")
-@OUTPUT_FILE
 @click.option('-g', '--genes', default="",
               help="a file containing the genes to calculate. if not provided all genes will be used.")
 @click.option('-t', '--test', required=True,
@@ -154,7 +153,6 @@ def find_association(
         *,
         scores_file,
         info_file,
-        output_file,
         genes,
         phenotype,
         samples_col,
@@ -211,45 +209,44 @@ def find_association(
     logger.info(locals())
     logger.info("The process for calculating the p_values will start now.")
     start_time = time.time()
-    if test == 'betareg':
-        betareg_pvalues(
-            scores_file=scores_file,
-            pheno_file=info_file,
-            cases_col=phenotype,
-            samples_col=samples_col,
-            output_path=output_file,
-            covariates=covariates,
-            processes=processes,
-            genes=genes,
-            logger=logger,
-        )
-        end_time = time.time()
-        logger.info(f"Runtime of the program is {end_time - start_time}")
-        df = pd.read_csv(output_file, sep='\t', index_col=False)
-        if adj_pval:
-            logger.info("Calculating the adjusted p_values...")
-            adjusted = multipletests(list(df['p_value']), method=adj_pval)
-            df[adj_pval + '_adj_pval'] = list(adjusted)[1]
-        df.to_csv(output_file, sep='\t', index=False)
-    else:
-        if genes:
-            with open(genes) as f:
-                content = f.readlines()
-            genes = [x.strip() for x in content]
-        df = find_pvalue(
-            scores_file=scores_file,
-            info_file=info_file,
-            genes=genes,
-            phenotype=phenotype,
-            samples_column=samples_col,
-            test=test,
-            covariates=covariates,
-            processes=processes,
-            logger=logger,
-            zero_threshold=zero_threshold
-        )
-        end_time = time.time()
-        logger.info(f"Runtime of the program is {end_time - start_time}")
+    # if test == 'betareg':
+    #     betareg_pvalues(
+    #         scores_file=scores_file,
+    #         pheno_file=info_file,
+    #         cases_col=phenotype,
+    #         samples_col=samples_col,
+    #         output_path=output_file,
+    #         covariates=covariates,
+    #         processes=processes,
+    #         genes=genes,
+    #         logger=logger,
+    #     )
+    #     end_time = time.time()
+    #     logger.info(f"Runtime of the program is {end_time - start_time}")
+    #     df = pd.read_csv(output_file, sep='\t', index_col=False)
+    #     if adj_pval:
+    #         logger.info("Calculating the adjusted p_values...")
+    #         adjusted = multipletests(list(df['p_value']), method=adj_pval)
+    #         df[adj_pval + '_adj_pval'] = list(adjusted)[1]
+    #     df.to_csv(output_file, sep='\t', index=False)
+    if genes:
+        with open(genes) as f:
+            content = f.readlines()
+        genes = [x.strip() for x in content]
+    df = find_pvalue(
+        scores_file=scores_file,
+        info_file=info_file,
+        genes=genes,
+        phenotype=phenotype,
+        samples_column=samples_col,
+        test=test,
+        covariates=covariates,
+        processes=processes,
+        logger=logger,
+        zero_threshold=zero_threshold,
+    )
+    end_time = time.time()
+    logger.info(f"Runtime of the program is {end_time - start_time}")
     logger.info("Process is complete. The association analysis results have been saved.")
 
 
