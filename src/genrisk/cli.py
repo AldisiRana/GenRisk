@@ -140,7 +140,7 @@ def score_genes(
 @click.option('-t', '--test', required=True,
               type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'betareg', 'linear']),
               help='statistical test for calculating P value.')
-@click.option('-p', '--phenotype', required=True,
+@click.option('-c', '--phenotype', required=True,
               help="the name of the column that contains the case/control or quantitative vals.")
 @SAMPLES_COL
 @click.option('-a', '--adj-pval', type=click.Choice(
