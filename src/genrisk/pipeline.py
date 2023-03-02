@@ -210,7 +210,7 @@ def find_pvalue(
             adjusted = multipletests(list(p_values_df['p_value']), method=adj_pval)
             p_values_df[adj_pval + '_adj_pval'] = list(adjusted)[1]
         now = datetime.now().strftime("%Y%m%d")
-        cohort = scores_file.split('.')[0]
+        cohort = scores_file.split(r"/")[-1].split(".")[0]
         if zero_threshold != 1.0:
             output = now+"_"+test+"_"+str(zero_threshold*100)+"_"+cohort+"_"+phenotype+".tsv"
         else:
