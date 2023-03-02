@@ -244,6 +244,7 @@ def find_association(
         processes=processes,
         logger=logger,
         zero_threshold=zero_threshold,
+        adj_pval=adj_pval,
     )
     end_time = time.time()
     logger.info(f"Runtime of the program is {end_time - start_time}")
