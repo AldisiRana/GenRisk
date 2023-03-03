@@ -184,6 +184,7 @@ def find_pvalue(
         'processes': processes, 'cases': cases, 'controls': controls, 'covariates': covariates, 'logger': logger,
     }
     for pheno in phenotypes_col:
+        logger.info("Calculating p_values using the following test: " + test + ' for the phenotype: ' + pheno)
         pheno_df = merged_df.dropna(subset=[pheno])
         if zero_threshold != 1.0:
             for gene in genes:
@@ -197,7 +198,6 @@ def find_pvalue(
                     pheno_df.drop(columns=gene, inplace=True)
                     genes.remove(gene)
         try:
-            logger.info("Calculating p_values using the following test: " + test + ' for the phenotype: '+ pheno)
             p_values_df = association_functions.get(test)(df=pheno_df, genes=genes, cases_column=pheno, **args)
             p_values_df.dropna(subset=['p_value'], inplace=True)
         except Exception as arg:
