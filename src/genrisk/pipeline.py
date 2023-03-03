@@ -212,7 +212,7 @@ def find_pvalue(
         now = datetime.now().strftime("%Y%m%d")
         cohort = scores_file.split(r"/")[-1].split(".")[0]
         if zero_threshold != 1.0:
-            output = now+"_"+test+"_"+str(zero_threshold*100)+"_"+cohort+"_"+pheno+".tsv"
+            output = now+"_"+test+"_"+str(int(zero_threshold*100))+"_"+cohort+"_"+pheno+".tsv"
         else:
             output = now + "_" + test + "_" + cohort + "_" + phenotype + ".tsv"
         p_values_df.to_csv(output, sep='\t', index=False)
