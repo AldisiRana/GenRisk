@@ -24,9 +24,9 @@ Option2: you can also install the package with the latest updates directly from 
 ### Score genes
 This command calculate the gene-based scores for a given dataset.
 
-It requires an annotated vcf (i.e: annotated with variant ID , ALT, Gene, and deleterious score, for more information check out the example in toy_example)
+It requires plink binary files, and an annotations file that contains all information needed for the score computation.
 
-    $ genrisk score-genes -a ../path/to/toy_vcf_data.vcf -o toy_genes_scores.tsv -t toy_vcf_scoring -v ID -f AF -g gene -l ALT -d RawScore
+    $ genrisk score-genes -a ../path/to/toy_vcf_data.tsv -o toy_genes_scores.tsv -t toy_vcf_scoring -v ID -f AF -g gene -l ALT -d RawScore
 
 * For further CLI options and parameters use --help
 

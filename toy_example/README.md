@@ -4,8 +4,8 @@ This folder contains an example on how to run the GenRisk pipeline.
 The toy dataset is not real data. It contains real SNPs and gene info, but no real individuals.
 
 ## Files:
-### Annotated vcf
-(filename: toy_vcf_data.vcf)
+### Annotations file
+(filename: toy_vcf_data.tsv)
 
 The annotated vcf contains information about the SNPS, gene, deleteriousness score and allele frequency.
 It should also contain samples genotypes. This information is important for the calculation of the gene-based scores.
