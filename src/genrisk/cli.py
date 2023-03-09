@@ -138,7 +138,7 @@ def score_genes(
 @click.option('-g', '--genes', default="",
               help="a file containing the genes to calculate. if not provided all genes will be used.")
 @click.option('-t', '--test', required=True,
-              type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'betareg', 'linear']),
+              type=click.Choice(['ttest_ind', 'mannwhitneyu', 'logit', 'linear']),
               help='statistical test for calculating P value.')
 @click.option('-c', '--phenotype', required=True,
               help="the name of the column that contains the case/control or quantitative vals.")

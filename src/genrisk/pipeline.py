@@ -160,9 +160,9 @@ def find_pvalue(
     logger.info("Reading scores file...")
     if genes:
         scores_df = pd.read_csv(scores_file, sep=r'\s+',
-                                usecols=lambda x: x in genes+[samples_column])
+                                usecols=lambda x: x in genes+[samples_column], on_bad_lines='warn')
     else:
-        scores_df = pd.read_csv(scores_file, sep=r'\s+')
+        scores_df = pd.read_csv(scores_file, sep=r'\s+', on_bad_lines='warn')
     scores_df.set_index(samples_column, inplace=True)
     scores_df.replace([np.inf, -np.inf], 0, inplace=True)
     scores_df.fillna(0, inplace=True)
@@ -171,9 +171,9 @@ def find_pvalue(
     phenotypes_col = phenotype.split(',')
     if covariates:
         covariates = covariates.split(',')
-        genotype_df = pd.read_csv(info_file, sep='\t', usecols=covariates+phenotypes_col+[samples_column])
+        genotype_df = pd.read_csv(info_file, sep='\t', usecols=covariates+phenotypes_col+[samples_column], on_bad_lines='warn')
     else:
-        genotype_df = pd.read_csv(info_file, sep='\t')
+        genotype_df = pd.read_csv(info_file, sep='\t', on_bad_lines='warn')
     logger.info("Processing files...")
     merged_df = pd.merge(scores_df, genotype_df, how='inner', on=samples_column)
     merged_df.replace([np.inf, -np.inf], 0.0, inplace=True)
@@ -384,7 +384,7 @@ def model_testing(
         the results of predictions.
 
     """
-    testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col)
+    testing_df = pd.read_csv(input_file, sep='\t', index_col=samples_col, on_bad_lines='warn')
     testing_df = testing_df.dropna(subset=[label_col])
     testing_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
     x_set = testing_df.drop(columns=label_col)
@@ -431,7 +431,7 @@ def normalize_data(
         a df with the normalized dataset.
 
     """
-    scores_df = pd.read_csv(data_file, sep=r'\s+')
+    scores_df = pd.read_csv(data_file, sep=r'\s+', on_bad_lines='warn')
     if method == 'gene_length':
         scores_df = gene_length_normalize(
             genes_info=genes_info, genes_col=genes_col, length_col=length_col, scores_df=scores_df,

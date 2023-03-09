@@ -67,7 +67,7 @@ def get_gene_info(
     #         for line in file:
     #             if line.startswith('##'):
     #                 skip += 1
-    df = pd.read_csv(annotation_file, sep=r'\s+', index_col=False)
+    df = pd.read_csv(annotation_file, sep=r'\s+', index_col=False, on_bad_lines='warn')
     # info = df['INFO'].str.split(pat=';', expand=True)
     # missing_info = info[info.isnull().all(axis=1)].index
     # df.drop(missing_info, inplace=True)
@@ -131,7 +131,7 @@ def combine_scores(
     all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(input_path) for name in files]
     score_files = [f for f in all_files if re.match(r'.+'+plink_extension+'$', f)]
     try:
-        df = pd.read_csv(str(score_files[0]), sep=r'\s+').iloc[:, [1, -1]]
+        df = pd.read_csv(str(score_files[0]), sep=r'\s+', on_bad_lines='warn').iloc[:, [1, -1]]
     except:
         raise Exception("It seems that there is a problem with your score files, please make sure that plink is running correctly.")
     scores_col = df.columns[1]
@@ -264,7 +264,7 @@ def pathway_scoring(
 
     """
     logger.info('reading scores file ...')
-    scores_df = pd.read_csv(scores_file, sep=r'\s+', usecols=[samples_col] + genes)
+    scores_df = pd.read_csv(scores_file, sep=r'\s+', usecols=[samples_col] + genes, on_bad_lines='warn')
     pathway_scores = pd.DataFrame(columns=[samples_col] + list(pathways))
     pathway_scores[samples_col] = scores_df[samples_col]
     logger.info('calculating pathway scores ...')
