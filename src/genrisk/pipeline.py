@@ -200,6 +200,7 @@ def find_pvalue(
         try:
             p_values_df = association_functions.get(test)(df=pheno_df, genes=genes, cases_column=pheno, **args)
             p_values_df.dropna(subset=['p_value'], inplace=True)
+            p_values_df['p_value'].replace(0.0, 7.1429666685167604e-293, inplace=True)
         except Exception as arg:
             logger.exception(arg)
             raise
