@@ -179,13 +179,13 @@ def find_pvalue(
     merged_df.replace([np.inf, -np.inf], 0.0, inplace=True)
     genes = scores_df.columns.tolist()[1:]
     del scores_df
-    sample_size = merged_df.shape[0]
     args = {
         'processes': processes, 'cases': cases, 'controls': controls, 'covariates': covariates, 'logger': logger,
     }
     for pheno in phenotypes_col:
         logger.info("Calculating p_values using the following test: " + test + ' for the phenotype: ' + pheno)
         pheno_df = merged_df.dropna(subset=[pheno])
+        sample_size = pheno_df.shape[0]
         if zero_threshold != 1.0:
             for gene in genes:
                 df = pd.DataFrame(pheno_df[gene].value_counts()).reset_index()
