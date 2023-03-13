@@ -211,7 +211,7 @@ def find_pvalue(
             if zero_threshold != 1.0:
                 output = now + "_" + test + "_" + str(int(zero_threshold * 100)) + "_" + cohort + "_" + pheno + ".tsv"
             else:
-                output = now + "_" + test + "_" + cohort + "_" + phenotype + ".tsv"
+                output = now + "_" + test + "_" + cohort + "_" + pheno + ".tsv"
             p_values_df.to_csv(output, sep='\t', index=False)
         except Exception as arg:
             logger.exception(arg)
