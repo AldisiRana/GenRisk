@@ -170,8 +170,8 @@ def find_association(
     ::
 
         $ genrisk find-association --scores-file toy_example/toy_dataset_scores --info-file
-        toy_example/toy.pheno --cases-column trait1 --samples-column IID --test betareg --output-file
-        toy_dataset_betareg.tsv --covariates age,sex --adj-pval bonferroni
+        toy_example/toy.pheno --cases-column trait1,trait2 --samples-column IID --test logit
+         --covariates age,sex --adj-pval bonferroni
     \f
 
     Parameters
@@ -180,8 +180,6 @@ def find_association(
         the file containing gene-based scores.
     info_file : str
         file containing the phenotype.
-    output_file : str
-        path to the final output.
     genes : str
         a file that contains a list of genes to calculate p-values. if not, all genes in scoring file will be used.
     phenotype : str
@@ -277,8 +275,7 @@ def visualize(
     ::
 
         $ genrisk visualize --pvals-file toy_example/toy_dataset_scores
-        --info-file annotated_toy_dataset.vcf --qq-output toy_example/toy_dataset_qqplot.jpg
-        --manhattan-output toy_example/toy_dataset_manhattanplot.jpg
+        --info-file annotated_toy_dataset.vcf
     \f
 
     Parameters

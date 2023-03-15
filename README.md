@@ -33,14 +33,14 @@ It requires plink binary files, and an annotations file that contains all inform
 ### Calculate p-values
 This function calculates the p-values across the genes between two given groups
     
-    $ genrisk find-association -s toy_genes_scores.tsv -i info.pheno -o linear_assoc_quan.tsv -t linear -c quan -a fdr_bh -v sex,age,bmi 
+    $ genrisk find-association -s toy_genes_scores.tsv -i info.pheno -t linear -c quan -a fdr_bh -v sex,age,bmi 
 
 * For further CLI options and parameters use --help
 
 ### Visualize
 Visualize manhatten plot and qqplot for the data.
 
-    $ genrisk visualize -p logit_assoc_binary.tsv -i genes_info_ref.txt -q logit_assoc_binary_qqplot.png -m logit_assoc_binary_manhattan.png --genescol-1 genes
+    $ genrisk visualize -p logit_assoc_binary.tsv -i genes_info_ref.txt --genescol-1 genes
 
 * For further CLI options and parameters use --help
 
