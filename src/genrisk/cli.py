@@ -256,8 +256,6 @@ def find_association(
 @click.option('-i', '--info-file', type=click.Path(exists=True), help="file containing variant/gene info.")
 @click.option('--genescol-1', show_default=True, default='genes', help="the name of the genes column in pvals file.")
 @click.option('--genescol-2', show_default=True, default='Gene.refGene', help="the name of the genes column in info file.")
-@click.option('-q', '--qq-output', default=None, help="the name of the qq plot file.")
-@click.option('-m', '--manhattan-output', default=None, help="the name of the manhatten plot file.")
 @click.option('-v', '--pval-col', show_default=True, default='p_value', help="the name of the pvalues column.")
 @click.option('-c', '--chr-col', show_default=True, default='Chr', help='the name of the chromosomes column')
 @click.option('-s', '--pos-col', show_default=True, default='Start', help='the name of the position/start of the gene column')
@@ -267,8 +265,6 @@ def visualize(
         info_file,
         genescol_1,
         genescol_2,
-        qq_output,
-        manhattan_output,
         pval_col,
         chr_col,
         pos_col,
@@ -295,10 +291,6 @@ def visualize(
         the name of the genes column in pvals file.
     genescol_2 : str
         the name of the genes column in info file.
-    qq_output : str
-        the name of the qq plot file. If left empty no file will be produced.
-    manhattan_output : str
-        the name of the manhatten plot file. If left empty no file will be produced
     pval_col : str
         the name of the pvalues column.
     chr_col : str
@@ -314,31 +306,32 @@ def visualize(
     logger.info(locals())
     logger.info('Reading p_values file...')
     pvals_df = pd.read_csv(pvals_file, sep='\t', index_col=False)
-    if qq_output:
-        logger.info('Creating QQ-plot...')
-        try:
-            draw_qqplot(pvals=pvals_df[pval_col], qq_output=qq_output)
-        except Exception as arg:
-            logger.exception(arg)
-            raise
-    if manhattan_output:
-        logger.info('Creating Manhattan plot...')
-        if not info_file:
-            logger.exception('Please provide a file with gene information to generate manhattan plot.')
-        info_df = pd.read_csv(info_file, sep="\t", index_col=False)
-        merged = pd.merge(pvals_df, info_df, left_on=genescol_1, right_on=genescol_2, how='left')
-        try:
-            draw_manhattan(
-                data=merged,
-                chr_col=chr_col,
-                pos_col=pos_col,
-                pvals_col=pval_col,
-                genes_col=genescol_1,
-                manhattan_output=manhattan_output
-            )
-        except Exception as arg:
-            logger.exception(arg)
-            raise
+    prefix = pvals_file.split(".")[0]
+    qq_output= prefix + "_qqplot.png"
+    manhattan_output = prefix + "_manhattan.png"
+    logger.info('Creating QQ-plot...')
+    try:
+        draw_qqplot(pvals=pvals_df[pval_col], qq_output=qq_output)
+    except Exception as arg:
+        logger.exception(arg)
+        raise
+    logger.info('Creating Manhattan plot...')
+    if not info_file:
+        logger.exception('Please provide a file with gene information to generate manhattan plot.')
+    info_df = pd.read_csv(info_file, sep="\t", index_col=False)
+    merged = pd.merge(pvals_df, info_df, left_on=genescol_1, right_on=genescol_2, how='left')
+    try:
+        draw_manhattan(
+            data=merged,
+            chr_col=chr_col,
+            pos_col=pos_col,
+            pvals_col=pval_col,
+            genes_col=genescol_1,
+            manhattan_output=manhattan_output
+        )
+    except Exception as arg:
+        logger.exception(arg)
+        raise
     logger.info('Done.')
 
 
