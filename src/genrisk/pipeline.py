@@ -441,16 +441,24 @@ def normalize_data(
         )
     elif method == 'maxabs':
         for col in scores_df.columns:
+            if col == samples_col:
+                continue
             scores_df[col] = scores_df[col]/scores_df[col].abs().max()
     elif method == 'minmax':
         for col in scores_df.columns:
+            if col == samples_col:
+                continue
             scores_df[col] = (scores_df[col] - scores_df[col].min()) / (scores_df[col].max() - scores_df[col].min())
     elif method == 'zscore ':
         scores_df.std(ddof=0)
         for col in scores_df.columns:
+            if col == samples_col:
+                continue
             scores_df[col] = (scores_df[col] - scores_df[col].mean()) / scores_df[col].std()
     elif method == 'robust':
         for col in scores_df.columns:
+            if col == samples_col:
+                continue
             scores_df[col] = (scores_df[col] - scores_df[col].median()) / (scores_df[col].quantile(0.75) - scores_df[col].quantile(0.25))
     else:
         raise Exception(
