@@ -449,7 +449,7 @@ def normalize_data(
             if col == samples_col:
                 continue
             scores_df[col] = (scores_df[col] - scores_df[col].min()) / (scores_df[col].max() - scores_df[col].min())
-    elif method == 'zscore ':
+    elif method == 'zscore':
         scores_df.std(ddof=0)
         for col in scores_df.columns:
             if col == samples_col:
@@ -464,4 +464,5 @@ def normalize_data(
         raise Exception(
             'This function does not support the normalization method you selected. Methods: [zscore, gene_length, minmax, maxabs, robust]'
         )
+    scores_df.replace([np.inf, -np.inf], 0, inplace=True)
     return scores_df
