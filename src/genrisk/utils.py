@@ -132,7 +132,7 @@ def draw_qqplot(*, pvals, qq_output):
     """
     pvals.dropna(inplace=True)
     f, ax = plt.subplots(figsize=(6, 6), facecolor="w", edgecolor="k")
-    title = "\n".join(wrap(qq_output.split('.')[0], 60))
+    title = "\n".join(wrap(qq_output.split('.')[0], 50))
     qqplot(data=pvals,
            title=title,
            marker="o",
