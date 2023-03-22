@@ -135,8 +135,8 @@ def draw_qqplot(*, pvals, qq_output):
            title=qq_output.split('.')[0],
            xlabel=r"Expected $-log_{10}{(P)}$",
            ylabel=r"Observed $-log_{10}{(P)}$",
-           figname=qq_output,
            ax=ax)
+    plt.savefig(qq_output)
     return ax
 
 
