@@ -132,13 +132,13 @@ def draw_qqplot(*, pvals, qq_output):
     """
     pvals.dropna(inplace=True)
     f, ax = plt.subplots(figsize=(6, 6), facecolor="w", edgecolor="k")
+    title = "\n".join(wrap(qq_output.split('.')[0], 60))
     qqplot(data=pvals,
+           title=title,
            marker="o",
            xlabel=r"Expected $-log_{10}{(P)}$",
            ylabel=r"Observed $-log_{10}{(P)}$",
            ax=ax)
-    title = "\n".join(wrap(qq_output.split('.')[0], 60))
-    plt.title(title)
     plt.savefig(qq_output)
     return ax
 
