@@ -7,6 +7,8 @@ from adjustText import adjust_text
 from qmplot import qqplot
 from tqdm import tqdm
 from pybiomart import Dataset
+from textwrap import wrap
+
 
 
 def gene_length_normalize(*, genes_info, genes_col='HGNC symbol', length_col='gene_length', scores_df, samples_col):
@@ -135,7 +137,8 @@ def draw_qqplot(*, pvals, qq_output):
            xlabel=r"Expected $-log_{10}{(P)}$",
            ylabel=r"Observed $-log_{10}{(P)}$",
            ax=ax)
-    plt.title(qq_output.split('.')[0], loc='center', wrap=True)
+    title = "\n".join(wrap(qq_output.split('.')[0], 60))
+    plt.title(title)
     plt.savefig(qq_output)
     return ax
 
