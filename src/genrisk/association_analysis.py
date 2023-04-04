@@ -111,7 +111,7 @@ def run_logit(gene_col, x_set, y_set):
         x_set[gene_col[0]] = gene_col[1]
         x_set = sm.add_constant(x_set)
         logit_model = sm.Logit(y_set, x_set)
-        result = logit_model.fit()
+        result = logit_model.fit_regularized()
         pval = list(result.pvalues)
         std_err = result.bse[-1]
         coef = result.params[-1]
