@@ -128,3 +128,4 @@ dmypy.json
 .DS_Store
 .idea
 scripts/.Rhistory
+*.sqlite
