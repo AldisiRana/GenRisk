@@ -120,7 +120,6 @@ def find_pvalue(
     controls=None,
     processes=1,
     logger,
-    zero_threshold=1.0,
     adj_pval,
 ):
     """
@@ -176,7 +175,7 @@ def find_pvalue(
         genotype_df = pd.read_csv(info_file, sep='\t', on_bad_lines='warn')
     logger.info("Processing files...")
     merged_df = pd.merge(scores_df, genotype_df, how='inner', on=samples_column)
-    merged_df.replace([np.inf, -np.inf], 0.0, inplace=True)
+    merged_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
     genes = scores_df.columns.tolist()[1:]
     del scores_df
     args = {
@@ -185,18 +184,6 @@ def find_pvalue(
     for pheno in phenotypes_col:
         logger.info("Calculating p_values using the following test: " + test + ' for the phenotype: ' + pheno)
         pheno_df = merged_df.dropna(subset=[pheno])
-        sample_size = pheno_df.shape[0]
-        if zero_threshold != 1.0:
-            for gene in genes:
-                df = pd.DataFrame(pheno_df[gene].value_counts()).reset_index()
-                try:
-                    zeros = df.loc[df['index'] == 0.0].iloc[0, 1]
-                    freq = zeros / sample_size
-                except:
-                    freq = 0
-                if freq >= zero_threshold:
-                    pheno_df.drop(columns=gene, inplace=True)
-                    genes.remove(gene)
         try:
             p_values_df = association_functions.get(test)(df=pheno_df, genes=genes, cases_column=pheno, **args)
             p_values_df.dropna(subset=['p_value'], inplace=True)
@@ -208,10 +195,7 @@ def find_pvalue(
                 p_values_df[adj_pval + '_adj_pval'] = list(adjusted)[1]
             now = datetime.now().strftime("%Y%m%d")
             cohort = scores_file.split(r"/")[-1].split(".")[0]
-            if zero_threshold != 1.0:
-                output = now + "_" + test + "_" + str(int(zero_threshold * 100)) + "_" + cohort + "_" + pheno + ".tsv"
-            else:
-                output = now + "_" + test + "_" + cohort + "_" + pheno + ".tsv"
+            output = now + "_" + test + "_" + cohort + "_" + pheno + ".tsv"
             p_values_df.to_csv(output, sep='\t', index=False)
         except Exception as arg:
             logger.exception(arg)
