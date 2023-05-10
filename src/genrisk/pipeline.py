@@ -175,7 +175,7 @@ def find_pvalue(
         genotype_df = pd.read_csv(info_file, sep='\t', on_bad_lines='warn')
     logger.info("Processing files...")
     merged_df = pd.merge(scores_df, genotype_df, how='inner', on=samples_column)
-    merged_df.replace([np.inf, -np.inf, np.nan], 0.0, inplace=True)
+    merged_df.replace([np.inf, -np.inf], 0.0, inplace=True)
     genes = scores_df.columns.tolist()[1:]
     del scores_df
     args = {
