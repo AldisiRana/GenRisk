@@ -184,7 +184,6 @@ def find_pvalue(
     for pheno in phenotypes_col:
         logger.info("Calculating p_values using the following test: " + test + ' for the phenotype: ' + pheno)
         pheno_df = merged_df.dropna(subset=[pheno])
-        pheno_df.loc[:, covariates].fillna(method="ffill", inplace=True)
         try:
             p_values_df = association_functions.get(test)(df=pheno_df, genes=genes, cases_column=pheno, **args)
             p_values_df.dropna(subset=['p_value'], inplace=True)

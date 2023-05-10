@@ -79,6 +79,7 @@ def run_linear(gene_col, x_set, y_set):
 
     """
     x_set[gene_col[0]] = gene_col[1]
+    x_set.fillna(method="ffill", inplace=True)
     x_set = sm.add_constant(x_set)
     linear_model = sm.OLS(y_set, x_set)
     result = linear_model.fit()
