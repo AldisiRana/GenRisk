@@ -120,7 +120,7 @@ def find_pvalue(
     controls=None,
     processes=1,
     logger,
-    adj_pval,
+    adj_pval=None,
 ):
     """
     Calculate the significance of a gene in a population using different statistical analyses [mannwhitneyu, logit, linear, ttest_ind]
