@@ -693,7 +693,6 @@ def get_gbrs(
             test='linear',
             covariates=covariates,
             logger=logger,
-            zero_threshold=1.0,
         )
         weights_df.to_csv(output_file+'.assoc', sep='\t', index=False)
         logger.info("Exluding samples used in weights calculation.")
