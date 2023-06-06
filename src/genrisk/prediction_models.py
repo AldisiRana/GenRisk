@@ -59,8 +59,7 @@ def regression_model(
     if not metric:
         metric = 'RMSE'
     setup = pyreg.setup(target=y_col, data=training_set, normalize=normalize, normalize_method=normalize_method,
-                        test_data=testing_set, fold=folds, session_id=seed,
-                        feature_selection=feature_selection)
+                        fold=folds, session_id=seed, feature_selection=feature_selection)
     best_model = pyreg.compare_models(sort=metric, include=include_models)
     pyreg.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)
     reg_model = pyreg.create_model(best_model)
@@ -137,8 +136,7 @@ def classification_model(
         testing_set[y_col] = np.interp(
             testing_set[y_col], (testing_set[y_col].min(), testing_set[y_col].max()), (0, 1))
     setup = pycl.setup(target=y_col, fix_imbalance=imbalanced, normalize=normalize, normalize_method=normalize_method,
-                    data=training_set, test_data=testing_set, fold=folds, session_id=seed,
-                    feature_selection=feature_selection)
+                    data=training_set, fold=folds, session_id=seed, feature_selection=feature_selection)
     best_model = pycl.compare_models(sort=metric, include=include_models)
     pycl.pull().to_csv(model_name + '_compare_models.tsv', sep='\t', index=False)
     cl_model = pycl.create_model(best_model)
