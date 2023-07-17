@@ -68,6 +68,7 @@ def get_gene_info(
     #             if line.startswith('##'):
     #                 skip += 1
     df = pd.read_csv(annotation_file, sep=r'\s+', index_col=False, on_bad_lines='warn')
+    df.drop_duplicates(inplace=True)
     # info = df['INFO'].str.split(pat=';', expand=True)
     # missing_info = info[info.isnull().all(axis=1)].index
     # df.drop(missing_info, inplace=True)
