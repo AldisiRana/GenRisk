@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import gzip
 import os
 import re
 import subprocess
@@ -56,32 +55,8 @@ def get_gene_info(
         output directory with all the temporary files.
 
     """
-    # skip = 0
-    # if annotated_vcf.endswith('.gz'):
-    #     with gzip.open(annotated_vcf, 'r') as fin:
-    #         for line in fin:
-    #             if line.decode('utf-8').startswith('##'):
-    #                 skip += 1
-    # else:
-    #     with open(annotated_vcf, 'r') as file:
-    #         for line in file:
-    #             if line.startswith('##'):
-    #                 skip += 1
     df = pd.read_csv(annotation_file, sep=r'\s+', index_col=False, on_bad_lines='warn')
     df.drop_duplicates(inplace=True)
-    # info = df['INFO'].str.split(pat=';', expand=True)
-    # missing_info = info[info.isnull().all(axis=1)].index
-    # df.drop(missing_info, inplace=True)
-    # df.reset_index(drop=True, inplace=True)
-    # info.drop(missing_info, inplace=True)
-    # info.reset_index(drop=True, inplace=True)
-    # for col in info.columns:
-    #     val = str(info[col][0]).split('=')
-    #     if len(val) == 1:
-    #         continue
-    #     info[col] = info[col].str.split(pat='=', expand=True).drop(columns=0)
-    #     info.rename(columns={col: val[0]}, inplace=True)
-    # df = pd.concat([df, info], axis=1)
     df[af_col].replace('.', 3.98e-6, inplace=True) # 1 allele out 125,748 indiv in gnomADexome (251496 alleles)
     df[af_col].replace('nan', 3.98e-6, inplace=True) # 1 allele out 125,748 indiv in gnomADexome (251496 alleles)
     df[del_col].replace('.', 0, inplace=True)
@@ -146,7 +121,7 @@ def combine_scores(
     return df
 
 
-def plink_process(*, genes_folder, plink, bfiles=None, method=""):
+def plink_process(*, genes_folder, plink, bfiles=None, method="", vcf=None):
     """
     Use plink to calculate and sum the scores for each gene.
 
@@ -166,13 +141,22 @@ def plink_process(*, genes_folder, plink, bfiles=None, method=""):
 
     """
     genes = [line.strip() for line in open(genes_folder + '.genes', 'r')]
-    for gene in tqdm(genes, desc='calculating genes scores'):
-        v_file = os.path.join(genes_folder, (gene + '.v'))
-        w_file = os.path.join(genes_folder, (gene + '.w'))
-        p = subprocess.call(
-            plink + " --bfile " + bfiles + " --double-id" + " --extract " + v_file + " --score " + w_file +
-            " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True
-        )
+    if bfiles:
+        for gene in tqdm(genes, desc='calculating genes scores'):
+            v_file = os.path.join(genes_folder, (gene + '.v'))
+            w_file = os.path.join(genes_folder, (gene + '.w'))
+            p = subprocess.call(
+                plink + " --bfile " + bfiles + " --double-id --extract " + v_file + " --score " + w_file +
+                " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True
+            )
+    else:
+        for gene in tqdm(genes, desc='calculating genes scores'):
+            v_file = os.path.join(genes_folder, (gene + '.v'))
+            w_file = os.path.join(genes_folder, (gene + '.w'))
+            p = subprocess.call(
+                plink + " --vcf " + vcf + " --double-id --extract " + v_file + " --score " + w_file +
+                " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True
+            )
 
 
 def calculate_gbrs(

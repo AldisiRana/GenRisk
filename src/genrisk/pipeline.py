@@ -38,6 +38,7 @@ def scoring_process(
     bfiles,
     plink,
     output_file,
+    vcf
 ):
     """
     Calculate gene-based scores.
@@ -89,7 +90,7 @@ def scoring_process(
         raise
     logger.info('calculating gene scores ...')
     try:
-        plink_process(genes_folder=genes_folder, plink=plink, bfiles=bfiles)
+        plink_process(genes_folder=genes_folder, plink=plink, bfiles=bfiles, vcf=vcf)
     except Exception as arg:
         logger.exception(arg)
         raise

@@ -9,11 +9,10 @@ import pandas as pd
 import numpy as np
 
 from sklearn.model_selection import train_test_split
-from statsmodels.stats.multitest import multipletests
 
 from .gene_scoring import calculate_gbrs, pathway_scoring
 from .helpers import create_logger
-from .pipeline import find_pvalue, betareg_pvalues, create_prediction_model, model_testing, scoring_process, \
+from .pipeline import find_pvalue, create_prediction_model, model_testing, scoring_process, \
     normalize_data
 from .prs_scoring import prs_prompt
 from .utils import draw_qqplot, draw_manhattan, merge_files
@@ -31,8 +30,7 @@ def main():
 
 @main.command()
 @click.option('-a', '--annotation-file', required=True, type=click.Path(exists=True), help='an annotation file containing variant IDs, alt, AF and deletarious scores.')
-@click.option('-b', '--bfiles', required=True,
-              help='provide binary files that contain the samples info')
+@click.option('-b', '--bfiles', default=None, help='provide binary files that contain the samples info')
 @click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
 @click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
 @OUTPUT_FILE
@@ -47,6 +45,7 @@ def main():
 @click.option('-l', '--alt-col', show_default=True, default='Alt', help="the column containing the alternate base.")
 @click.option('-m', '--maf-threshold', show_default=True, default=0.01, help="the threshold for minor allele frequency.")
 @click.option('-k', '--keep', is_flag=True, help='if flagged temporary files will not be deleted.')
+@click.option('--vcf', default=None, help='provide vcf that contain the samples info')
 def score_genes(
         *,
         annotation_file,
@@ -62,7 +61,8 @@ def score_genes(
         del_col,
         alt_col,
         maf_threshold,
-        keep
+        keep,
+        vcf
 ):
     """
     Calculate the gene-based scores for a given dataset.
@@ -117,10 +117,12 @@ def score_genes(
     logger.info(locals())
     logger.info('getting information from vcf files')
     start_time = time.time()
+    if not vcf and not bfiles:
+        raise Exception("Please input a VCF or binary files for processing...")
     df = scoring_process(logger=logger, annotation_file=annotation_file, temp_dir=temp_dir, beta_param=beta_param,
                          weight_func=weight_func, del_col=del_col, maf_threshold=maf_threshold, gene_col=gene_col,
                          variant_col=variant_col, af_col=af_col, alt_col=alt_col, bfiles=bfiles, plink=plink,
-                         output_file=output_file)
+                         output_file=output_file, vcf=vcf)
     if not keep:
         logger.info('The temporary files will be removed now.')
         shutil.rmtree(temp_dir)
@@ -205,26 +207,6 @@ def find_association(
     logger.info(locals())
     logger.info("The process for calculating the p_values will start now.")
     start_time = time.time()
-    # if test == 'betareg':
-    #     betareg_pvalues(
-    #         scores_file=scores_file,
-    #         pheno_file=info_file,
-    #         cases_col=phenotype,
-    #         samples_col=samples_col,
-    #         output_path=output_file,
-    #         covariates=covariates,
-    #         processes=processes,
-    #         genes=genes,
-    #         logger=logger,
-    #     )
-    #     end_time = time.time()
-    #     logger.info(f"Runtime of the program is {end_time - start_time}")
-    #     df = pd.read_csv(output_file, sep='\t', index_col=False)
-    #     if adj_pval:
-    #         logger.info("Calculating the adjusted p_values...")
-    #         adjusted = multipletests(list(df['p_value']), method=adj_pval)
-    #         df[adj_pval + '_adj_pval'] = list(adjusted)[1]
-    #     df.to_csv(output_file, sep='\t', index=False)
     if genes:
         with open(genes) as f:
             content = f.readlines()
