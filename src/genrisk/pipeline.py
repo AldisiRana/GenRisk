@@ -82,6 +82,7 @@ def scoring_process(
 
     """
     try:
+        logger.info('getting information from annotation file')
         genes_folder = get_gene_info(annotation_file=annotation_file, variant_col=variant_col, af_col=af_col, alt_col=alt_col,
                                      del_col=del_col, output_dir=temp_dir, genes_col=gene_col,
                                      maf_threshold=maf_threshold, beta_param=beta_param, weight_func=weight_func)

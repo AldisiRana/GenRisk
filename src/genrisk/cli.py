@@ -115,7 +115,6 @@ def score_genes(
     logger.info('Gene-based scoring')
     logger.info('Score genes process is starting now...')
     logger.info(locals())
-    logger.info('getting information from vcf files')
     start_time = time.time()
     if not vcf and not bfiles:
         raise Exception("Please input a VCF or binary files for processing...")
