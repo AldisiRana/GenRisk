@@ -150,18 +150,40 @@ def plink_process(*, genes_folder, plink, bfiles=None, method="", vcf=None):
         for gene in tqdm(genes, desc='calculating genes scores'):
             v_file = os.path.join(genes_folder, (gene + '.v'))
             w_file = os.path.join(genes_folder, (gene + '.w'))
-            p = subprocess.call(
-                plink + " --bfile " + bfiles + " --double-id --extract " + v_file + " --score " + w_file +
-                " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True
-            )
+            try:
+                p = subprocess.run(
+                    plink + " --bfile " + bfiles + " --double-id --extract " + v_file + " --score " + w_file +
+                    " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True, check=True
+                )
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 127:
+                    raise Exception(
+                        "Problem running plink, please make sure that you installed plink and provide the correct path")
+                else:
+                    with open("genes.error", "a") as f:
+                        f.write(gene + "\n")
+                    raise Warning(
+                        "The score for %s was not calculated because of some issue in the plink process" % gene)
+                    continue
     elif vcf:
         for gene in tqdm(genes, desc='calculating genes scores'):
             v_file = os.path.join(genes_folder, (gene + '.v'))
             w_file = os.path.join(genes_folder, (gene + '.w'))
-            p = subprocess.call(
-                plink + " --vcf " + vcf + " --double-id --extract " + v_file + " --score " + w_file +
-                " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True
-            )
+            try:
+                p = subprocess.run(
+                    plink + " --vcf " + vcf + " --double-id --extract " + v_file + " --score " + w_file +
+                    " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True, check=True
+                )
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 127:
+                    raise Exception(
+                        "Problem running plink, please make sure that you installed plink and provide the correct path")
+                else:
+                    with open("genes.error", "a") as f:
+                        f.write(gene + "\n")
+                    raise Warning(
+                        "The score for %s was not calculated because of some issue in the plink process" % gene)
+                    continue
     else:
         raise Exception("Gene scoring failed, no binary or VCF files are provided!")
 

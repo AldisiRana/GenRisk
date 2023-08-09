@@ -121,10 +121,15 @@ def score_genes(
     start_time = time.time()
     if not vcf and not bfiles:
         raise Exception("Please input a VCF or binary files for processing...")
+    if not os.path.exists(vcf) and not os.path.exists(str(bfiles)+".bim"):
+        raise Exception("Genetic data file does not exist, please make sure that you provide the correct file path!")
     df = scoring_process(logger=logger, annotation_file=annotation_file, temp_dir=temp_dir, beta_param=beta_param,
                          weight_func=weight_func, del_col=del_col, maf_threshold=maf_threshold, gene_col=gene_col,
                          variant_col=variant_col, af_col=af_col, alt_col=alt_col, bfiles=bfiles, plink=plink,
                          output_file=output_file, vcf=vcf)
+    if os.path.exists("genes.error"):
+        logger.info("Some gene-scores were not calculated because of errors in the plink process. Gene list was saved "
+                    "in current directory as genes.error")
     if not keep:
         logger.info('The temporary files will be removed now.')
         shutil.rmtree(temp_dir)
