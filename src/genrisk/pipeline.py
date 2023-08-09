@@ -448,7 +448,8 @@ def normalize_data(
             scores_df[col] = (scores_df[col] - scores_df[col].median()) / (scores_df[col].quantile(0.75) - scores_df[col].quantile(0.25))
     else:
         raise Exception(
-            'This function does not support the normalization method you selected. Methods: [zscore, gene_length, minmax, maxabs, robust]'
+            'This function does not support the normalization method you selected. Methods: [zscore, gene_length, '
+            'minmax, maxabs, robust] '
         )
     scores_df.replace([np.inf, -np.inf], 0, inplace=True)
     return scores_df

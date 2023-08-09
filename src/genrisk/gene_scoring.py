@@ -12,17 +12,17 @@ from .helpers import uni_profiles
 
 
 def get_gene_info(
-    *,
-    annotation_file,
-    variant_col,
-    af_col,
-    alt_col='Alt',
-    del_col,
-    output_dir,
-    genes_col,
-    maf_threshold=0.01,
-    beta_param,
-    weight_func='beta'
+        *,
+        annotation_file,
+        variant_col,
+        af_col,
+        alt_col='Alt',
+        del_col,
+        output_dir,
+        genes_col,
+        maf_threshold=0.01,
+        beta_param,
+        weight_func='beta'
 ):
     """
     Create temporary files with variant information for each gene, plus the weights calculated.
@@ -57,8 +57,8 @@ def get_gene_info(
     """
     df = pd.read_csv(annotation_file, sep=r'\s+', index_col=False, on_bad_lines='warn')
     df.drop_duplicates(inplace=True)
-    df[af_col].replace('.', 3.98e-6, inplace=True) # 1 allele out 125,748 indiv in gnomADexome (251496 alleles)
-    df[af_col].replace('nan', 3.98e-6, inplace=True) # 1 allele out 125,748 indiv in gnomADexome (251496 alleles)
+    df[af_col].replace('.', 3.98e-6, inplace=True)  # 1 allele out 125,748 indiv in gnomADexome (251496 alleles)
+    df[af_col].replace('nan', 3.98e-6, inplace=True)  # 1 allele out 125,748 indiv in gnomADexome (251496 alleles)
     df[del_col].replace('.', 0, inplace=True)
     df[del_col].replace('nan', 0, inplace=True)
     df = df[df[af_col].values.astype(float) <= maf_threshold]
@@ -75,7 +75,7 @@ def get_gene_info(
     with open(gene_file, 'w') as f:
         f.writelines("%s\n" % gene for gene in genes)
     [df[df[genes_col] == gene][[variant_col, alt_col, 'score', genes_col]].to_csv(os.path.join(output_dir, (
-        str(gene) + '.w')), index=False, sep='\t') for gene in tqdm(genes, desc="writing w gene files")]
+            str(gene) + '.w')), index=False, sep='\t') for gene in tqdm(genes, desc="writing w gene files")]
     [df[df[genes_col] == gene][[variant_col, alt_col]].to_csv(os.path.join(output_dir, (str(gene) + '.v')),
                                                               index=False, sep='\t') for gene in
      tqdm(genes, desc="writing v gene files")]
@@ -83,16 +83,18 @@ def get_gene_info(
 
 
 def combine_scores(
-    *,
-    input_path,
-    output_path,
-    plink_extension,
+        *,
+        input_path,
+        output_path,
+        plink_extension,
 ):
     """
     Combine the files that contain the scores into one file.
 
     Parameters
     ----------
+    plink_extension: str
+        either sscore or profile depending on the plink version
     input_path : str
         the directory containing scores files.
     output_path : str
@@ -105,14 +107,15 @@ def combine_scores(
 
     """
     all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(input_path) for name in files]
-    score_files = [f for f in all_files if re.match(r'.+'+plink_extension+'$', f)]
+    score_files = [f for f in all_files if re.match(r'.+' + plink_extension + '$', f)]
     try:
         df = pd.read_csv(str(score_files[0]), sep=r'\s+', on_bad_lines='warn').iloc[:, [1, -1]]
     except:
-        raise Exception("It seems that there is a problem with your score files, please make sure that plink is running correctly.")
+        raise Exception("It seems that there is a problem with your score files, please make sure that plink is "
+                        "running correctly.")
     scores_col = df.columns[1]
     df.astype({scores_col: np.float32})
-    r = re.compile("([a-zA-Z0-9_.-]*)."+plink_extension+"$")
+    r = re.compile("([a-zA-Z0-9_.-]*)." + plink_extension + "$")
     gene = r.findall(str(score_files[0]))
     df.rename(columns={scores_col: gene[0]}, inplace=True)
     for i in tqdm(range(1, len(score_files)), desc='merging in process'):
@@ -132,7 +135,9 @@ def plink_process(*, genes_folder, plink, bfiles=None, method="", vcf=None):
     plink : str
         the directory of plink (if not default).
     bfiles : str
-        the name of the binary files, not needed if annotated file is given.
+        the name of the binary files, not needed if a vcf is given.
+    vcf : str
+        the name of vcf file, not needed if binary files are given.
     method : str
         if empty method is the average. if 'sum', then the variants scores will be summed.
 
@@ -149,7 +154,7 @@ def plink_process(*, genes_folder, plink, bfiles=None, method="", vcf=None):
                 plink + " --bfile " + bfiles + " --double-id --extract " + v_file + " --score " + w_file +
                 " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True
             )
-    else:
+    elif vcf:
         for gene in tqdm(genes, desc='calculating genes scores'):
             v_file = os.path.join(genes_folder, (gene + '.v'))
             w_file = os.path.join(genes_folder, (gene + '.w'))
@@ -157,18 +162,16 @@ def plink_process(*, genes_folder, plink, bfiles=None, method="", vcf=None):
                 plink + " --vcf " + vcf + " --double-id --extract " + v_file + " --score " + w_file +
                 " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True
             )
+    else:
+        raise Exception("Gene scoring failed, no binary or VCF files are provided!")
 
 
 def calculate_gbrs(
-    *,
-    scores_df,
-    weights_df,
-    weights_col,
-    genes_col,
-    pathway_file=None,
-    samples_col,
-    method,
-    logger
+        *,
+        scores_df,
+        weights_df,
+        weights_col,
+        genes_col,
 ):
     """
     Calculate a gene-based risk score for each individual in a given dataset.
@@ -183,14 +186,6 @@ def calculate_gbrs(
         the name of the column with the weights.
     genes_col : str
         the name of the column with the genes.
-    pathway_file : str
-        if pathway method chosen, the file contains a list of pathways
-    samples_col : str
-        the name of the column with samples IDs.
-    method : str
-        the method used to calulate the gene-based risk scores. [sum | pathways]
-    logger
-        the logger to log the process
 
     Returns
     -------
@@ -202,29 +197,18 @@ def calculate_gbrs(
     df = scores_df[genes]
     df = df.reindex(sorted(df.columns), axis=1)
     df *= list(weights_df.sort_values(by=genes_col)[weights_col].values)
-    if method == 'sum':
-        df['gbrs'] = df.sum(axis=1)
-        df = df[['gbrs']]
-    elif method == 'pathways':
-        pathways = {line.strip().split('\t')[0]: line.strip().split('\t')[2:] for line in open(pathway_file, 'r')}
-        pathway_scores = pd.DataFrame(columns=[samples_col] + list(pathways))
-        logger.info('calculating pathway scores ...')
-        for path, path_genes in tqdm(pathways.items(), desc='calculating pathway scores'):
-            selected_genes = list(set(genes) & (set(path_genes)))
-            if len(selected_genes) == 0:
-                pathway_scores.drop(columns=[path], inplace=True)
-            pathway_scores[path] = df[selected_genes].sum(axis=1)/len(selected_genes)
-        df = pathway_scores
+    df['gbrs'] = df.sum(axis=1)
+    df = df[['gbrs']]
     return df
 
 
 def pathway_scoring(
-    *,
-    pathways,
-    genes,
-    scores_file,
-    samples_col,
-    logger
+        *,
+        pathways,
+        genes,
+        scores_file,
+        samples_col,
+        logger
 ):
     """
     sum the gene-based scores to pathway-based scores.
@@ -257,5 +241,5 @@ def pathway_scoring(
         selected_genes = list(set(genes) & (set(path_genes)))
         if len(selected_genes) == 0:
             pathway_scores.drop(columns=[path], inplace=True)
-        pathway_scores[path] = scores_df[selected_genes].sum(axis=1)/len(selected_genes)
+        pathway_scores[path] = scores_df[selected_genes].sum(axis=1) / len(selected_genes)
     return pathway_scores

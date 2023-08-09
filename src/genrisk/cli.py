@@ -17,7 +17,7 @@ from .pipeline import find_pvalue, create_prediction_model, model_testing, scori
 from .prs_scoring import prs_prompt
 from .utils import draw_qqplot, draw_manhattan, merge_files
 
-SAMPLES_COL = click.option('-m', '--samples-col',  default='IID', show_default=True,
+SAMPLES_COL = click.option('-m', '--samples-col', default='IID', show_default=True,
                            help="the name of the column that contains the samples.")
 OUTPUT_FILE = click.option('-o', '--output-file', required=True, help="the final output path")
 logger = create_logger()
@@ -29,7 +29,8 @@ def main():
 
 
 @main.command()
-@click.option('-a', '--annotation-file', required=True, type=click.Path(exists=True), help='an annotation file containing variant IDs, alt, AF and deletarious scores.')
+@click.option('-a', '--annotation-file', required=True, type=click.Path(exists=True),
+              help='an annotation file containing variant IDs, alt, AF and deletarious scores.')
 @click.option('-b', '--bfiles', default=None, help='provide binary files that contain the samples info')
 @click.option('--plink', default='plink', help="the directory of plink, if not set in environment")
 @click.option('-t', '--temp-dir', required=True, help="a temporary directory to save temporary files before merging.")
@@ -41,9 +42,11 @@ def main():
 @click.option('-v', '--variant-col', show_default=True, default='SNP', help="the column containing the variant IDs.")
 @click.option('-g', '--gene-col', show_default=True, default='Gene.refGene', help="the column containing gene names.")
 @click.option('-f', '--af-col', show_default=True, default='MAF', help="the column containing allele frequency.")
-@click.option('-d', '--del-col', show_default=True, default='CADD_raw', help="the column containing the deleteriousness score.")
+@click.option('-d', '--del-col', show_default=True, default='CADD_raw',
+              help="the column containing the deleteriousness score.")
 @click.option('-l', '--alt-col', show_default=True, default='Alt', help="the column containing the alternate base.")
-@click.option('-m', '--maf-threshold', show_default=True, default=0.01, help="the threshold for minor allele frequency.")
+@click.option('-m', '--maf-threshold', show_default=True, default=0.01,
+              help="the threshold for minor allele frequency.")
 @click.option('-k', '--keep', is_flag=True, help='if flagged temporary files will not be deleted.')
 @click.option('--vcf', default=None, help='provide vcf that contain the samples info')
 def score_genes(
@@ -148,7 +151,8 @@ def score_genes(
     ['bonferroni', 'sidak', 'holm-sidak', 'holm',
      'simes-hochberg', 'hommel', 'fdr_bh', 'fdr_by', 'fdr_tsbh', 'fdr_tsbky']))
 @click.option('-v', '--covariates', default='', help="the covariates used for calculation")
-@click.option('-p', '--processes', show_default=True, type=int, default=1, help='number of processes for parallelization')
+@click.option('-p', '--processes', show_default=True, type=int, default=1,
+              help='number of processes for parallelization')
 def find_association(
         *,
         scores_file,
@@ -231,10 +235,12 @@ def find_association(
 @click.option('-p', '--pvals-file', required=True, type=click.Path(exists=True), help="the file containing p-values.")
 @click.option('-i', '--info-file', type=click.Path(exists=True), help="file containing variant/gene info.")
 @click.option('--genescol-1', show_default=True, default='genes', help="the name of the genes column in pvals file.")
-@click.option('--genescol-2', show_default=True, default='Gene.refGene', help="the name of the genes column in info file.")
+@click.option('--genescol-2', show_default=True, default='Gene.refGene',
+              help="the name of the genes column in info file.")
 @click.option('-v', '--pval-col', show_default=True, default='p_value', help="the name of the pvalues column.")
 @click.option('-c', '--chr-col', show_default=True, default='Chr', help='the name of the chromosomes column')
-@click.option('-s', '--pos-col', show_default=True, default='Start', help='the name of the position/start of the gene column')
+@click.option('-s', '--pos-col', show_default=True, default='Start',
+              help='the name of the position/start of the gene column')
 def visualize(
         *,
         pvals_file,
@@ -282,7 +288,7 @@ def visualize(
     logger.info('Reading p_values file...')
     pvals_df = pd.read_csv(pvals_file, sep='\t', index_col=False)
     prefix = pvals_file.split(".")[0]
-    qq_output= prefix + "_qqplot.png"
+    qq_output = prefix + "_qqplot.png"
     manhattan_output = prefix + "_manhattan.png"
     logger.info('Creating QQ-plot...')
     try:
@@ -314,16 +320,19 @@ def visualize(
 @click.option('-d', '--data-file', type=click.Path(exists=True), required=True,
               help='file with all features and target for training model.')
 @click.option('-o', '--output-folder', required=True, help='path of folder that will contain all outputs.')
-@click.option('-i', '--test-size', show_default=True, default=0.25, help='test size for cross validation and evaluation.')
+@click.option('-i', '--test-size', show_default=True, default=0.25,
+              help='test size for cross validation and evaluation.')
 @click.option('-n', '--model-name', required=True, help='name of model file.')
 @click.option('--model-type', required=True, type=click.Choice(['regressor', 'classifier']),
               help='type of prediction model.')
 @click.option('-l', '--target-col', required=True, help='name of target column in data_file.')
 @click.option('-b', '--imbalanced', is_flag=True, help='if flagged methods will be used to account for the imbalance.')
 @click.option('--normalize', is_flag=True, help='if flagged the data will be normalized before training.')
-@click.option('--normalize-method', show_default=True, default='zscore', type=click.Choice(['zscore', 'minmax', 'maxabs', 'robust']),
+@click.option('--normalize-method', show_default=True, default='zscore',
+              type=click.Choice(['zscore', 'minmax', 'maxabs', 'robust']),
               help='features normalization method.')
-@click.option('-f', '--folds', show_default=True, default=10, type=int, help='number of cross-validation folds in training.')
+@click.option('-f', '--folds', show_default=True, default=10, type=int,
+              help='number of cross-validation folds in training.')
 @click.option('--metric', help='the metric used to choose best model after training.')
 @SAMPLES_COL
 @click.option('--seed', default=random.randint(1, 2147483647),
@@ -597,14 +606,11 @@ def merge(
 @click.option('-g', '--genes-col', show_default=True, default='genes', help='the column containing gene names.')
 @click.option('-e', '--weights-col', show_default=True, default='zscore', help='the name and path to output results.')
 @OUTPUT_FILE
-@click.option('--split-size', show_default=True, default=0.25, help='the size ratio to split dataset for weight calculation.')
-@click.option('--method', type=click.Choice(['sum', 'pathways']),
-              help='method for presenting the risk scores.')
+@click.option('--split-size', show_default=True, default=0.25,
+              help='the size ratio to split dataset for weight calculation.')
 @SAMPLES_COL
-@click.option('--pathway-file', default=None, help='.gmt file containing the pathway and its genes.')
 def get_gbrs(
         *,
-        method,
         scores_file,
         weights_file,
         pheno_file,
@@ -615,7 +621,6 @@ def get_gbrs(
         weights_col,
         output_file,
         split_size,
-        pathway_file
 ):
     """
     Calculate gene-based risk score for individuals. 
@@ -623,8 +628,6 @@ def get_gbrs(
 
     Parameters
     ----------
-    method : str
-        for presenting the risk score, either sum of all genes or pathways.
     scores_file : str
         the gene-based scores file
     weights_file : str
@@ -645,8 +648,6 @@ def get_gbrs(
         the name and path to output results.
     split_size : str
         the proportion of the dataset to use for calculating the weights. should be between 0.0 and 1.0.
-    pathway_file : str
-        if pathways method is chosen, a file with the pathways is needed
 
     Returns
     -------
@@ -675,14 +676,14 @@ def get_gbrs(
             covariates=covariates,
             logger=logger,
         )
-        weights_df.to_csv(output_file+'.assoc', sep='\t', index=False)
+        weights_df.to_csv(output_file + '.assoc', sep='\t', index=False)
         logger.info("Exluding samples used in weights calculation.")
         scores_df.reset_index(drop=True, inplace=True)
         logger.info("Remove temporary files.")
         del scores_temp
         os.remove('scores_temp.tsv')
         weights_df['zscore'] = weights_df['beta_coef'] / weights_df['std_err']
-        weights_df.to_csv(output_file+'.weights', sep='\t', index=False)
+        weights_df.to_csv(output_file + '.weights', sep='\t', index=False)
     logger.info("Calculating GBRS now ...")
     weights_df[weights_col] = pd.to_numeric(weights_df[weights_col], errors='coerce')
     df = calculate_gbrs(
@@ -690,10 +691,6 @@ def get_gbrs(
         weights_df=weights_df,
         weights_col=weights_col,
         genes_col=genes_col,
-        method=method,
-        pathway_file=pathway_file,
-        samples_col=samples_col,
-        logger=logger,
     )
     df[samples_col] = scores_df[samples_col]
     logger.info("GBRS dataframe is being saved ...")
@@ -750,7 +747,7 @@ def calculate_pathways(
 
 
 @main.command()
-@click.option('--method', required=True, type=click.Choice(['gene_length', 'zscore', 'minmax','maxabs', 'robust']))
+@click.option('--method', required=True, type=click.Choice(['gene_length', 'zscore', 'minmax', 'maxabs', 'robust']))
 @click.option('--data-file', required=True, type=click.Path(exists=True))
 @click.option('--genes-info', default=None)
 @SAMPLES_COL
@@ -802,7 +799,7 @@ def normalize(
     DataFrame with normalized data.
 
     """
-    logger.info('GenRisk - normalizing data using '+ method)
+    logger.info('GenRisk - normalizing data using ' + method)
     logger.info(locals())
     df = normalize_data(
         method=method, data_file=data_file, samples_col=samples_col, genes_col=genes_col, length_col=lengths_col,
@@ -811,6 +808,7 @@ def normalize(
     df.to_csv(output_file, sep='\t', index=False)
     logger.info('Process is done.')
     return df
+
 
 if __name__ == '__main__':
     main()
