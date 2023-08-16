@@ -160,10 +160,10 @@ def find_pvalue(
     """
     logger.info("Reading scores file...")
     if genes:
-        scores_df = pd.read_csv(scores_file, sep=r'\s+',
+        scores_df = pd.read_csv(scores_file, sep='\t',
                                 usecols=lambda x: x in genes+[samples_column], on_bad_lines='warn')
     else:
-        scores_df = pd.read_csv(scores_file, sep=r'\s+', on_bad_lines='warn')
+        scores_df = pd.read_csv(scores_file, sep='\t', on_bad_lines='warn')
     scores_df.set_index(samples_column, inplace=True)
     scores_df.replace([np.inf, -np.inf], 0, inplace=True)
     scores_df.fillna(0, inplace=True)
