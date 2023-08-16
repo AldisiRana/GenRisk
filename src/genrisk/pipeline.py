@@ -49,7 +49,7 @@ def scoring_process(
     logger
         an object that logs function outputs.
     annotation_file : str
-        an annotated containing variant IDs, alt, info and samples genotypes.
+        an annotation file containing variant IDs, alt, and another info.
     temp_dir : str
         a temporary directory to save temporary files before merging.
     beta_param : tuple
@@ -69,11 +69,13 @@ def scoring_process(
     alt_col : str
         the column containing alternate allele.
     bfiles : str
-        the binary files for plink process. if vcf contains all information bfiles are not needed.
+        the binary files for plink process. if a vcf is provided no binary files are needed.
     plink : str
         the directory of plink, if not set in environment
     output_file : str
         the path to save the final output scores matrix.
+    vcf : str
+        the vcf file for plink process. if binary files are provided no vcf is needed.
 
     Returns
     -------
@@ -125,10 +127,13 @@ def find_pvalue(
     adj_pval=None,
 ):
     """
-    Calculate the significance of a gene in a population using different statistical analyses [mannwhitneyu, logit, linear, ttest_ind]
+    Calculate the significance of a gene in a population using different statistical analyses
+    [mannwhitneyu, logit, linear, ttest_ind].
 
     Parameters
     ----------
+    adj_pval : str
+        the method used to adjust the p-values.
     scores_file : str
         dataframe containing the scores of genes across samples.
     info_file : str

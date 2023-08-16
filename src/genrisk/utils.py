@@ -8,7 +8,6 @@ from pybiomart import Dataset
 from textwrap import wrap
 
 
-
 def gene_length_normalize(*, genes_info, genes_col='HGNC symbol', length_col='gene_length', scores_df, samples_col):
     """
     Normalize dataset by gene length. if gene lengths file is not provided, info will be retrieved from ensembl.
@@ -94,10 +93,10 @@ def draw_manhattan(*, data, chr_col, pos_col, pvals_col, genes_col, manhattan_ou
 
     for i in data[data['-logp'] > 5.6].index:
         ax.annotate(xy=(data.ind[i], data['-logp'][i]),
-                              xytext=(data.ind[i] + 0.2, data['-logp'][i] + 0.2),
-                              text=data[genes_col][i],
-                              arrowprops=dict(arrowstyle="->", color='b', lw=0.5),
-                              horizontalalignment='left', size='medium', rotation=20, color='black')
+                    xytext=(data.ind[i] + 0.2, data['-logp'][i] + 0.2),
+                    text=data[genes_col][i],
+                    arrowprops=dict(arrowstyle="->", color='b', lw=0.5),
+                    horizontalalignment='left', size='medium', rotation=20, color='black')
     # adjust_text(anno, arrowprops=dict(arrowstyle="->", color='b', lw=0.5))
     chrom_df = data.groupby(chr_col)['ind'].median()
     data['color group'] = data[chr_col].apply(lambda x: 'A' if x % 2 == 0 else 'B')
@@ -168,4 +167,3 @@ def merge_files(*, files_lst, sep, by, cols=None):
     if cols:
         df = df[[cols]]
     return df
-
