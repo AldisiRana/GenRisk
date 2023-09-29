@@ -1,4 +1,5 @@
 import joblib
+import matplotlib.pyplot as plt
 import numpy as np
 import pycaret.classification as pycl
 import pycaret.regression as pyreg
@@ -66,15 +67,18 @@ def regression_model(
     reg_tuned_model = pyreg.tune_model(reg_model, optimize=metric)
     pyreg.pull().to_csv(model_name + '_tuned_model.tsv', sep='\t', index=False)
     final_model = pyreg.finalize_model(reg_tuned_model)
-    pyreg.plot_model(final_model, save=True)
-    pyreg.plot_model(final_model, plot='feature', save=True)
-    pyreg.plot_model(final_model, plot='error', save=True)
     pyreg.save_model(final_model, model_name)
     if len(testing_set.index) != 0:
         unseen_predictions = test_regressor(
             model_path=model_name+'.pkl', x_set=testing_set.drop(columns=[y_col]), y_col=testing_set[y_col], output=model_name
         )
         unseen_predictions.to_csv(model_name + '_external_testing_results.tsv', sep='\t', index=True)
+    pyreg.plot_model(final_model, save=True)
+    plt.close()
+    pyreg.plot_model(final_model, plot='feature', save=True)
+    plt.close()
+    pyreg.plot_model(final_model, plot='error', save=True)
+    plt.close()
     return final_model
 
 
