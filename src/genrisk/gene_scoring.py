@@ -2,6 +2,7 @@
 import os
 import re
 import subprocess
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -162,7 +163,7 @@ def plink_process(*, genes_folder, plink, bfiles=None, method="", vcf=None):
                 else:
                     with open("genes.error", "a") as f:
                         f.write(gene + "\n")
-                    raise Warning(
+                    warnings.warn(
                         "The score for %s was not calculated because of some issue in the plink process" % gene)
                     continue
     elif vcf:
@@ -181,7 +182,7 @@ def plink_process(*, genes_folder, plink, bfiles=None, method="", vcf=None):
                 else:
                     with open("genes.error", "a") as f:
                         f.write(gene + "\n")
-                    raise Warning(
+                    warnings.warn(
                         "The score for %s was not calculated because of some issue in the plink process" % gene)
                     continue
     else:
