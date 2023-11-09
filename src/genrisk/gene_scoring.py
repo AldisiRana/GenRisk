@@ -147,6 +147,10 @@ def plink_process(*, genes_folder, plink, bfiles=None, method="", vcf=None):
 
     """
     genes = [line.strip() for line in open(genes_folder + '.genes', 'r')]
+    if 'plink2' in plink:
+        dosage = ""
+    else:
+        dosage = "double-dosage "
     if bfiles:
         for gene in tqdm(genes, desc='calculating genes scores'):
             v_file = os.path.join(genes_folder, (gene + '.v'))
@@ -154,7 +158,7 @@ def plink_process(*, genes_folder, plink, bfiles=None, method="", vcf=None):
             try:
                 p = subprocess.run(
                     plink + " --bfile " + bfiles + " --double-id --extract " + v_file + " --score " + w_file +
-                    " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True, check=True
+                    " 1 2 3 " + method + dosage + "--out " + os.path.join(genes_folder, gene), shell=True, check=True
                 )
             except subprocess.CalledProcessError as e:
                 if e.returncode == 127:
@@ -173,7 +177,7 @@ def plink_process(*, genes_folder, plink, bfiles=None, method="", vcf=None):
             try:
                 p = subprocess.run(
                     plink + " --vcf " + vcf + " --double-id --extract " + v_file + " --score " + w_file +
-                    " 1 2 3 " + method + "--out " + os.path.join(genes_folder, gene), shell=True, check=True
+                    " 1 2 3 " + method + dosage + "--out " + os.path.join(genes_folder, gene), shell=True, check=True
                 )
             except subprocess.CalledProcessError as e:
                 if e.returncode == 127:
