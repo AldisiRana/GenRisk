@@ -11,7 +11,7 @@ GenRisk is a package that implements different gene-based scoring schemes to ana
 within a phenotype in a population
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :hidden:
     :caption: Content
 
