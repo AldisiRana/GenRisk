@@ -40,6 +40,7 @@ Rana Aldisi, Emadeldin Hassanin, Sugirthan Sivalingam, Andreas Buness, Hannah Kl
 
 .. toctree::
     :maxdepth: 2
+    :hidden:
     :caption: Content
 
    cli
