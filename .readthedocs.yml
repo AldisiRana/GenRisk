@@ -7,7 +7,8 @@ version: 2
 
 build:
   os: ubuntu-22.04
-  python: "3.9"
+  tools:
+    python: "3.9"
     
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
