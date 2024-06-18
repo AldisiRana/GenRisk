@@ -23,7 +23,7 @@ copyright = '2021, Rana Aldisi'
 author = 'Rana Aldisi'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.8'
+release = '0.3.1'
 
 parsed_version = re.match(
     '(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?:-(?P<release>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+(?P<build>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?',
