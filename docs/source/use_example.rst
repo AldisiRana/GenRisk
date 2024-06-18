@@ -26,7 +26,7 @@ done on the dataset showed significance in gene5 and geen17 as expected.
 
 The QQ-plot was also produced using the pipeline:
 
-.. image:: ../../toy_example/toy_dataset_qqplot.jpeg
+.. image:: ../../toy_example/linear_assoc_quan_qqplot.png
     :width: 400
     :align: center
 
