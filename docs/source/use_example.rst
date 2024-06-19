@@ -32,13 +32,13 @@ We performed linear regression on the qunatitative phenotype and a logistic regr
 
 The QQ-plot of quantitative phenotype:
 
-.. image:: ../../toy_example/linear_assoc_quan_qqplot.png
+.. image:: https://github.com/AldisiRana/GenRisk/blob/master/toy_example/linear_assoc_quan_qqplot.png
     :width: 400
     :align: center
 
 Manhatten plot of quantitative phenotype:
 
-.. image:: ../../toy_example/linear_assoc_quan_manhattan.png
+.. image:: https://github.com/AldisiRana/GenRisk/blob/master/toy_example/linear_assoc_quan_manhattan.png
     :width: 400
     :align: center
 
