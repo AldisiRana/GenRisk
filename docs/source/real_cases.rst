@@ -62,13 +62,13 @@ QQ-plot and Manhattan plot are presented below.
 
 The QQ-plot:
 
-.. image:: ../ldl_example/200k_maf001_ldl_adj_qqplot.png
+.. image:: https://github.com/AldisiRana/GenRisk/blob/master/docs/ldl_example/200k_maf001_ldl_adj_qqplot.png
     :width: 400
     :align: center
 
 The Manhattan plot:
 
-.. image:: ../ldl_example/200k_maf001_ldl_adj_manhattan.png
+.. image:: https://github.com/AldisiRana/GenRisk/blob/master/docs/ldl_example/200k_maf001_ldl_adj_manhattan.png
     :width: 400
     :align: center
 
@@ -90,19 +90,19 @@ The final prediction models was generated using gradiant boosting regression, ev
 The images below are the output of the final combined model.
 Feature importance plot:
 
-.. image:: ../ldl_example/Feature_Importance.png
+.. image:: https://github.com/AldisiRana/GenRisk/blob/master/docs/ldl_example/Feature_Importance.png
     :width: 400
     :align: center
 
 Actual vs Predicted:
 
-.. image:: ../ldl_example/regressor_scatterplot.png
+.. image:: https://github.com/AldisiRana/GenRisk/blob/master/docs/ldl_example/regressor_scatterplot.png
     :width: 400
     :align: center
 
 Model residuals:
 
-.. image:: ../ldl_example/Residuals.png
+.. image:: https://github.com/AldisiRana/GenRisk/blob/master/docs/ldl_example/Residuals.png
     :width: 400
     :align: center
 
@@ -119,13 +119,13 @@ QQ-plot and Manhattan plot are presented below.
 
 The QQ-plot:
 
-.. image:: ../alp_example/linear_assoc_alkaline_phosphatase_cov_200k_qqplot.png
+.. image:: https://github.com/AldisiRana/GenRisk/blob/master/docs/alp_example/linear_assoc_alkaline_phosphatase_cov_200k_qqplot.png
     :width: 400
     :align: center
 
 The Manhattan plot:
 
-.. image:: ../alp_example/linear_assoc_alkaline_phosphatase_cov_200k_manhattan.png
+.. image:: https://github.com/AldisiRana/GenRisk/blob/master/docs/alp_example/linear_assoc_alkaline_phosphatase_cov_200k_manhattan.png
     :width: 400
     :align: center
 
