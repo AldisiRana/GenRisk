@@ -102,7 +102,7 @@ Actual vs Predicted:
 
 Model residuals:
 
-.. image:: ../docs/ldl_example/Residuals.png
+.. image:: ../ldl_example/Residuals.png
     :width: 400
     :align: center
 
