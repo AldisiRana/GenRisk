@@ -119,13 +119,13 @@ QQ-plot and Manhattan plot are presented below.
 
 The QQ-plot:
 
-.. image:: ../linear_assoc_alkaline_phosphatase_cov_200k_qqplot.png
+.. image:: ../alp_example/linear_assoc_alkaline_phosphatase_cov_200k_qqplot.png
     :width: 400
     :align: center
 
 The Manhattan plot:
 
-.. image:: ../linear_assoc_alkaline_phosphatase_cov_200k_manhattan.png
+.. image:: ../alp_example/linear_assoc_alkaline_phosphatase_cov_200k_manhattan.png
     :width: 400
     :align: center
 
