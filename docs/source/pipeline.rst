@@ -26,14 +26,14 @@ Weighting functions
 :beta: this option uses two parameters α and β, to create beta distribution. Depending on the parameters chosen, the distribution can change its shape, giving more flexibilty for the user to chose how to weight the variables.
 The default for this function is [1,25] which are the same parameters used in SKAT-O.
 
-.. image::  https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Beta_distribution_pdf.svg/1920px-Beta_distribution_pdf.svg.png
+.. image::  https://github.com/AldisiRana/GenRisk/blob/master/docs/source/1920px-Beta_distribution_pdf.svg.png
     :width: 300
     :alt: Beta distribution
 `image source here <https://en.wikipedia.org/wiki/Beta_distribution>`_
 
 :log10: this option uses -log distribution to upweight rare variants. This has been applied previously in another `gene-based score tool <https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2877-3>`_
 
-.. image::  https://ljvmiranda921.github.io/assets/png/cs231n-ann/neg_log.png
+.. image::  https://github.com/AldisiRana/GenRisk/blob/master/docs/source/neg_log.png
     :width: 300
     :alt: -log distribution
 `image source here <https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/>`_
