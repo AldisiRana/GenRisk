@@ -64,7 +64,7 @@ Feature importance:
 
 Precision-recall curve:
 
-.. image:: ../../toy_example/binary_classifier_model/Precision%20Recall.png
+.. image:: ../../toy_example/binary_classifier_model/Precision Recall.png
     :width: 400
     :align: center
 
@@ -88,7 +88,7 @@ Feature importance:
 
 Prediction error:
 
-.. image:: ../../toy_example/quan_regression_model/Prediction%20Error.png
+.. image:: ../../toy_example/quan_regression_model/Prediction Error.png
     :width: 400
     :align: center
 
