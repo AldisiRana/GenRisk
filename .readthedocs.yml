@@ -16,7 +16,7 @@ sphinx:
 
 formats:
   - epub
-  - html
+  - htmlzip
 
 python:
   install:
