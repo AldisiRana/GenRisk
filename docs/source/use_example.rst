@@ -32,13 +32,13 @@ We performed linear regression on the qunatitative phenotype and a logistic regr
 
 The QQ-plot of quantitative phenotype:
 
-.. image:: https://github.com/AldisiRana/GenRisk/blob/master/toy_example/linear_assoc_quan_qqplot.png
+.. image:: ../../toy_example/linear_assoc_quan_qqplot.png
     :width: 400
     :align: center
 
 Manhatten plot of quantitative phenotype:
 
-.. image:: https://github.com/AldisiRana/GenRisk/blob/master/toy_example/linear_assoc_quan_manhattan.png
+.. image:: ../..//toy_example/linear_assoc_quan_manhattan.png
     :width: 400
     :align: center
 
@@ -58,19 +58,19 @@ Results of model training
 
 Feature importance:
 
-.. image:: https://github.com/AldisiRana/GenRisk/blob/master/toy_example/binary_classifier_model/feature.png
+.. image:: ../../toy_example/binary_classifier_model/feature.png
     :width: 400
     :align: center
 
 Precision-recall curve:
 
-.. image:: https://github.com/AldisiRana/GenRisk/blob/master/toy_example/binary_classifier_model/Precision%20Recall.png
+.. image:: ../../toy_example/binary_classifier_model/Precision%20Recall.png
     :width: 400
     :align: center
 
 Confusion matrix:
 
-.. image:: https://github.com/AldisiRana/GenRisk/blob/master/toy_example/binary_classifier_model/binary_classifier_model_classifier_confusion_matrix.png
+.. image:: ../../toy_example/binary_classifier_model/binary_classifier_model_classifier_confusion_matrix.png
     :width: 400
     :align: center
 
@@ -82,18 +82,18 @@ Results for model training
 
 Feature importance:
 
-.. image:: https://github.com/AldisiRana/GenRisk/blob/master/toy_example/quan_regression_model/feature.png
+.. image:: ../../toy_example/quan_regression_model/feature.png
     :width: 400
     :align: center
 
 Prediction error:
 
-.. image:: https://github.com/AldisiRana/GenRisk/blob/master/toy_example/quan_regression_model/Prediction%20Error.png
+.. image:: ../../toy_example/quan_regression_model/Prediction%20Error.png
     :width: 400
     :align: center
 
 Residuals:
 
-.. image:: https://github.com/AldisiRana/GenRisk/blob/master/toy_example/quan_regression_model/Residuals.png
+.. image:: ../../toy_example/quan_regression_model/Residuals.png
     :width: 400
     :align: center
