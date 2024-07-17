@@ -6,7 +6,7 @@ The toy dataset is not real data. It contains real SNPs and gene info, but no re
 ## Files:
 
 ### Annotations file
-(filename: toy_vcf_data.tsv)
+(filename: toy_annotations.tsv)
 
 The annotated file contains information about the SNPS, gene, deleteriousness score and allele frequency.
 It should also contain samples genotypes. This information is important for the calculation of the gene-based scores.
@@ -16,7 +16,7 @@ It should also contain samples genotypes. This information is important for the 
 
 The binary files contains all genotype information for the cohort.
 
-The annotations and binary files [here](https://uni-bonn.sciebo.de/s/Ih1Hhrf5ek8u8sa).
+**The annotations and binary files [here](https://uni-bonn.sciebo.de/s/Ih1Hhrf5ek8u8sa).**
 
 ### Phenotype file
 (filename: info.pheno)
