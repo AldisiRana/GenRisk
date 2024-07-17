@@ -5,6 +5,7 @@ The toy dataset is not real data. It contains real SNPs and gene info, but no re
 
 ## Files:
 
+**The annotations and binary files can be downloaded [here](https://uni-bonn.sciebo.de/s/Ih1Hhrf5ek8u8sa).**
 ### Annotations file
 (filename: toy_annotations.tsv)
 
@@ -15,8 +16,6 @@ It should also contain samples genotypes. This information is important for the 
 (filenames: toy_data.bed, toy_data.bim, toy_data.fam)
 
 The binary files contains all genotype information for the cohort.
-
-**The annotations and binary files [here](https://uni-bonn.sciebo.de/s/Ih1Hhrf5ek8u8sa).**
 
 ### Phenotype file
 (filename: info.pheno)
