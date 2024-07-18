@@ -74,8 +74,7 @@ def score_genes(
     ---------
     ::
 
-        $ genrisk score-genes -a /path/to/toy_vcf_info.vcf -o toy_genes_scores.tsv -t toy_vcf_scoring -v ID -f AF -g gene -l ALT -d RawScore
-
+        $ genrisk score-genes -a ../toy_example/toy_annotations.tsv -b ../toy_example/toy_data.bim -o toy_genes_scores_test_mod.tsv -t toy_vcf_scoring -v SNP -f gnomadAF -g gene -l ALT -d CADD_raw
     \f
 
     Parameters
