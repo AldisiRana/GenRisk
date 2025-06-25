@@ -5,7 +5,7 @@ The toy dataset is not real data. It contains real SNPs and gene info, but no re
 
 ## Files:
 
-**The annotations and binary files can be downloaded from [here]([https://uni-bonn.sciebo.de/s/Ih1Hhrf5ek8u8sa](https://uni-bonn.sciebo.de/s/yGsYnP3JGFBRYPe)).**
+**The annotations and binary files can be downloaded from [here](https://uni-bonn.sciebo.de/s/yGsYnP3JGFBRYPe).**
 ### Annotations file
 (filename: toy_annotations.tsv)
 
